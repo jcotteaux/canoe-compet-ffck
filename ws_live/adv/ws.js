@@ -1,15 +1,38 @@
 const ws = {};
 
+/**
+ * Commandes qui établissent l'état de la page, par niveau : après une coupure
+ * il suffit de les rejouer dans l'ordre pour retrouver l'affichage exact.
+ * Rejouer une commande de niveau N périme celles de niveau supérieur
+ * (changer de course invalide l'épreuve sélectionnée).
+ */
+ws.STATE_COMMANDS = new Map([
+	['<competition_load>', 0],
+	['<race_load>', 1],
+	['<epreuve_load>', 2],
+]);
+
+ws.RECONNECT_DELAY_MIN = 1000;
+ws.RECONNECT_DELAY_MAX = 15000;
+
 ws.Context = function(url='ws://localhost', port=8080)
 {
 	this.url = url;
 	this.port = port;
-	
+
 	this.mode = '';			// mode command, mode binary, ...
-	this.delay = 0;			// retard en ms 
+	this.delay = 0;			// retard en ms
 
 	this.keyCommand = 'key';
 	this.mapCommand = new Map();
+
+	// Reconnexion automatique
+	this.reconnect = true;			// mettre à false pour désactiver
+	this.reconnectDelay = ws.RECONNECT_DELAY_MIN;
+	this.reconnectTimer = null;
+	this.reconnectCount = 0;
+	this.stateCommands = [];		// commandes à rejouer après une coupure
+	this.openArgs = null;			// arguments du dernier OpenWebSocket
 };
 
 ws.Context.prototype.SetCommand = function(key, value)
@@ -24,7 +47,89 @@ ws.Context.prototype.onopen = function(evt)
 
 ws.Context.prototype.onclose = function(evt)
 {
-	this.websocket = null; 
+	this.websocket = null;
+}
+
+/**
+ * Mémorise une commande d'état pour pouvoir la rejouer après une coupure.
+ * Appelée automatiquement : OpenWebSocket instrumente websocket.send, ce qui
+ * couvre aussi les pages qui appellent websocket.send() directement.
+ */
+ws.Context.prototype.RememberCommand = function(data)
+{
+	if (typeof data !== 'string')
+		return;
+
+	var cmd = null;
+	try { cmd = JSON.parse(data); } catch (e) { return; }
+	if (!cmd || typeof cmd !== 'object')
+		return;
+
+	const level = ws.STATE_COMMANDS.get(cmd[this.keyCommand]);
+	if (level === undefined)
+		return;
+
+	this.stateCommands = this.stateCommands.filter(function(c) { return c.level < level; });
+	this.stateCommands.push({ level : level, data : data });
+}
+
+/** Rejoue l'état après reconnexion ; retourne false si rien à rejouer. */
+ws.Context.prototype.ReplayState = function()
+{
+	if (this.stateCommands.length == 0)
+		return false;
+
+	// <competition_load> ne sert qu'à afficher le sélecteur de compétition :
+	// le rejouer alors qu'une course est chargée ferait clignoter la liste
+	// devant le public avant que le classement ne revienne.
+	var replay = this.stateCommands;
+	if (replay.length > 1)
+		replay = replay.filter(function(c) { return c.level > 0; });
+
+	const socket = this.websocket;
+	replay.forEach(function(c) { socket.send(c.data); });
+	return true;
+}
+
+ws.Context.prototype.NotifyStatus = function(status, detail)
+{
+	const info = Object.assign({ status : status, url : this.url+':'+this.port }, detail || {});
+	console.log('WebSocket '+status, info);
+	if (typeof window !== 'undefined' && typeof window.dispatchEvent == 'function')
+		window.dispatchEvent(new CustomEvent('competffck:ws-status', { detail : info }));
+}
+
+ws.Context.prototype.ScheduleReconnect = function()
+{
+	if (!this.reconnect || this.reconnectTimer != null)
+		return;
+
+	const delay = this.reconnectDelay;
+	this.reconnectCount++;
+	this.NotifyStatus('reconnecting', { attempt : this.reconnectCount, delay : delay });
+
+	const self = this;
+	this.reconnectTimer = window.setTimeout(function() {
+		self.reconnectTimer = null;
+		const a = self.openArgs;
+		if (a) self.OpenWebSocket(a.fnOpen, a.fnClose, a.fnMessage, a.mode, a.binaryType);
+	}, delay);
+
+	// délai progressif : on n'inonde pas un serveur qui vient de tomber
+	this.reconnectDelay = Math.min(Math.round(this.reconnectDelay * 1.5), ws.RECONNECT_DELAY_MAX);
+}
+
+/** Fermeture volontaire : pas de reconnexion. */
+ws.Context.prototype.Close = function()
+{
+	this.reconnect = false;
+	if (this.reconnectTimer != null)
+	{
+		window.clearTimeout(this.reconnectTimer);
+		this.reconnectTimer = null;
+	}
+	if (this.websocket)
+		this.websocket.close();
 }
 
 ws.Context.prototype.onmessage_command = function(evt)
@@ -128,32 +233,65 @@ ws.Context.prototype.onmessage_binary = function(evt)
 
 ws.Context.prototype.OpenWebSocket = function(fnOpen=undefined, fnClose=undefined, fnMessage=undefined, mode='command', binaryType='arraybuffer')
 {
+	// mémorisé pour pouvoir rouvrir à l'identique après une coupure
+	this.openArgs = { fnOpen : fnOpen, fnClose : fnClose, fnMessage : fnMessage, mode : mode, binaryType : binaryType };
+
 	this.websocket = new WebSocket(this.url+':'+(this.port).toString());
 	this.mode = mode;
 	if (mode == 'binary')
 		this.websocket.binaryType = binaryType;
-	
-	if (fnOpen != undefined)
-		this.websocket.onopen = fnOpen;
-	else
-		this.websocket.onopen = (evt) => this.onopen(evt);
+
+	// Instrumentation de send() : capte aussi les pages qui appellent
+	// wsMain.websocket.send(...) sans passer par le contexte.
+	const socket = this.websocket;
+	const nativeSend = socket.send.bind(socket);
+	socket.send = (data) => { this.RememberCommand(data); nativeSend(data); };
+
+	const isReconnection = this.reconnectCount > 0;
+
+	socket.onopen = (evt) => {
+		this.reconnectDelay = ws.RECONNECT_DELAY_MIN;
+
+		// Après une coupure on rejoue l'état : rappeler fnOpen renverrait
+		// l'utilisateur à la liste des compétitions en plein direct.
+		const replayed = isReconnection && this.ReplayState();
+
+		this.reconnectCount = 0;
+		this.NotifyStatus(isReconnection ? 'reconnected' : 'connected', { replayed : !!replayed });
+
+		if (replayed)
+			return;
+
+		if (fnOpen != undefined)
+			fnOpen(evt);
+		else
+			this.onopen(evt);
+	};
 
 	if (fnMessage != undefined)
-		this.websocket.onmessage = fnMessage;
+		socket.onmessage = fnMessage;
 	else
 	{
 		if (this.mode == 'binary')
-			this.websocket.onmessage = (evt) => this.onmessage_binary(evt);
+			socket.onmessage = (evt) => this.onmessage_binary(evt);
 		else if (this.delay == 0)
-			this.websocket.onmessage = (evt) => this.onmessage_command(evt);
+			socket.onmessage = (evt) => this.onmessage_command(evt);
 		else
-			this.websocket.onmessage = (evt) => this.onmessage_command_delay(evt);
+			socket.onmessage = (evt) => this.onmessage_command_delay(evt);
 	}
-	
-	if (fnClose != undefined)
-		this.websocket.onclose = fnClose;
-	else
-		this.websocket.onclose = (evt) => this.onclose(evt);
+
+	socket.onclose = (evt) => {
+		if (fnClose != undefined)
+			fnClose(evt);
+		else
+			this.onclose(evt);
+
+		this.websocket = null;
+		this.ScheduleReconnect();
+	};
+
+	// Sans ce handler, une erreur de connexion remonte en exception non gérée.
+	socket.onerror = () => { /* onclose suit toujours : c'est lui qui replanifie */ };
 }
 
 ws.Context.prototype.OpenWebSocketCommand = function(fnOpen=undefined, fnClose=undefined, fnMessage=undefined)

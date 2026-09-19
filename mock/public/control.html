@@ -77,8 +77,9 @@
       <button id="mode">Changer de mode chrono</button>
     </div>
     <p class="sub" style="margin:10px 0 0">
-      « Couper le réseau » ferme brutalement toutes les sockets : aucune page ws_live ne se reconnecte
-      aujourd'hui (<code>ws.js:onclose</code> se contente de mettre la socket à <code>null</code>).
+      « Couper le réseau » ferme brutalement toutes les sockets. Les pages doivent se reconnecter
+      seules et revenir sur l'épreuve affichée, sans repasser par la liste des compétitions.
+      Pour le test complet, couper aussi le serveur (<code>Ctrl-C</code>) puis le relancer.
     </p>
   </section>
 

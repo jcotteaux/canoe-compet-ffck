@@ -294,18 +294,39 @@ function omit(obj, k) {
   return rest;
 }
 
-server.listen(HTTP_PORT, () => {
+/** Adresses IPv4 non internes, pour ouvrir les pages depuis un téléphone. */
+function lanAddresses() {
+  const out = [];
+  for (const list of Object.values(require('os').networkInterfaces())) {
+    for (const i of list || []) {
+      if (i.family === 'IPv4' && !i.internal) out.push(i.address);
+    }
+  }
+  return out;
+}
+
+server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log('');
   console.log(`  bouchon competFFCK — fixture « ${fixture.label} » (${fixture.competition.Code_activite})`);
   console.log('');
   console.log(`  panneau de contrôle  http://localhost:${HTTP_PORT}/mock/`);
   console.log(`  live                 http://localhost:${HTTP_PORT}/canoe/live.html`);
+  console.log(`  monitor              http://localhost:${HTTP_PORT}/canoe/monitor_race.html`);
   console.log(`  tv inrace            http://localhost:${HTTP_PORT}/canoe/tv_inrace.html`);
   console.log(`  tv ranking           http://localhost:${HTTP_PORT}/canoe/tv_ranking.html`);
   console.log(`  tv startlist         http://localhost:${HTTP_PORT}/canoe/tv_startlist.html`);
+  console.log(`  jugement             http://localhost:${HTTP_PORT}/canoe/jugement.html`);
   console.log(`  inrace (php)         http://localhost:${HTTP_PORT}/canoe/inrace.php`);
   console.log('');
   console.log(`  websocket            ws://localhost:${WS_PORT}`);
+
+  const lan = lanAddresses();
+  if (lan.length) {
+    console.log('');
+    console.log('  depuis un téléphone ou une tablette du même réseau :');
+    for (const ip of lan) console.log(`    http://${ip}:${HTTP_PORT}/canoe/live.html`);
+    console.log('    (ws_params.js déduit l\'adresse du serveur : rien à configurer)');
+  }
   console.log('');
 });
 

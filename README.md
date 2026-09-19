@@ -75,6 +75,36 @@ utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
 `advPage` (classes PHP) et n'est pas rendu — le bouchon le signale sur la sortie
 standard au lieu de produire une page silencieusement cassée.
 
+## Reconnexion automatique
+
+`adv/ws.js` se reconnecte désormais seul. Auparavant, `onclose` se contentait de
+mettre la socket à `null` : la moindre coupure Wi-Fi figeait la page jusqu'à un
+F5 manuel — sur un réseau de course, devant le public.
+
+- délai progressif de 1 s à 15 s, pour ne pas inonder un serveur qui vient de tomber ;
+- à la reconnexion, le contexte **rejoue l'état** (`<race_load>` puis
+  `<epreuve_load>`) au lieu de rappeler le handler d'ouverture, qui renverrait
+  l'utilisateur à la liste des compétitions en plein direct ;
+- `<competition_load>` n'est pas rejoué quand une course est chargée : cela
+  ferait clignoter le sélecteur avant le retour du classement ;
+- les commandes sont captées en instrumentant `websocket.send`, donc les pages
+  qui appellent `wsMain.websocket.send(...)` directement sont couvertes sans
+  modification.
+
+Chaque changement d'état émet un `CustomEvent` sur `window` :
+
+```js
+window.addEventListener('competffck:ws-status', (e) => {
+  // e.detail.status : 'connected' | 'reconnecting' | 'reconnected'
+});
+```
+
+Aucun affichage n'est imposé : une page d'incrustation TV ne doit rien dessiner.
+`wsContext.Close()` ferme sans reconnecter, `wsContext.reconnect = false` désactive.
+
+Pour le vérifier : bouton « Couper le réseau » du panneau, ou `Ctrl-C` sur le
+serveur puis relance — la page doit repartir seule sur la même épreuve.
+
 ### Configuration de l'adresse WebSocket
 
 `ws_live/adv/ws_params.js` **n'existe pas dans le zip officiel** : chaque
