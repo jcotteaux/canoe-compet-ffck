@@ -1,0 +1,169 @@
+{
+  "id": "descente-internationale",
+  "label": "Coupe du Monde Descente — Finale (niveau INT)",
+  "speed": 4,
+  "first_start": "09:30:00",
+  "start_interval_s": 60,
+  "nb_inter": 2,
+  "nb_porte": 0,
+  "competition": {
+    "Code_competition": 3300,
+    "Nom": "ICF Wildwater World Cup",
+    "Code_activite": "DES",
+    "Code_niveau": "INT",
+    "Date_debut": "2026-07-04",
+    "Lieu": "Bourg-Saint-Maurice"
+  },
+  "course": {
+    "Code_course": 1,
+    "Libelle": "Classique"
+  },
+  "phase": {
+    "Code_phase": 1,
+    "Libelle": "Finale"
+  },
+  "epreuves": [
+    {
+      "code": "K1H",
+      "libelle": "Kayak monoplace hommes",
+      "etat": "1",
+      "offsetMs": 0
+    },
+    {
+      "code": "K1D",
+      "libelle": "Kayak monoplace dames",
+      "etat": "1",
+      "offsetMs": 10000
+    }
+  ],
+  "boats": [
+    {
+      "bib": 1,
+      "epreuve": "K1H",
+      "nom": "CHEVALIER Arthur",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 1118529
+    },
+    {
+      "bib": 2,
+      "epreuve": "K1H",
+      "nom": "RIVIERE Hugo",
+      "club": "Annecy CK",
+      "nation": "GER",
+      "ref_time_ms": 1129947
+    },
+    {
+      "bib": 3,
+      "epreuve": "K1H",
+      "nom": "VASSEUR Quentin",
+      "club": "CKC Argentat",
+      "nation": "CZE",
+      "ref_time_ms": 1134211
+    },
+    {
+      "bib": 4,
+      "epreuve": "K1H",
+      "nom": "GAUDIN Nolan",
+      "club": "CK Metz",
+      "nation": "SVK",
+      "ref_time_ms": 1116087
+    },
+    {
+      "bib": 5,
+      "epreuve": "K1H",
+      "nom": "LEMOINE Antoine",
+      "club": "CK Saint-Pierre",
+      "nation": "ESP",
+      "ref_time_ms": 1195044
+    },
+    {
+      "bib": 6,
+      "epreuve": "K1H",
+      "nom": "ROYER Gabin",
+      "club": "ACA Aviron Canoë",
+      "nation": "ITA",
+      "ref_time_ms": 1101291
+    },
+    {
+      "bib": 7,
+      "epreuve": "K1H",
+      "nom": "GUILLET Théo",
+      "club": "US Ivry CK",
+      "nation": "GBR",
+      "ref_time_ms": 1088130
+    },
+    {
+      "bib": 8,
+      "epreuve": "K1H",
+      "nom": "HEBERT Baptiste",
+      "club": "Sablé CK",
+      "nation": "POL",
+      "ref_time_ms": 1154098
+    },
+    {
+      "bib": 9,
+      "epreuve": "K1D",
+      "nom": "BLANCHARD Jeanne",
+      "club": "CK Pau-Béarn",
+      "nation": "SLO",
+      "ref_time_ms": 1119548
+    },
+    {
+      "bib": 10,
+      "epreuve": "K1D",
+      "nom": "LEROY Alice",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "AUT",
+      "ref_time_ms": 1150582
+    },
+    {
+      "bib": 11,
+      "epreuve": "K1D",
+      "nom": "FAURE Léa",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 1192607
+    },
+    {
+      "bib": 12,
+      "epreuve": "K1D",
+      "nom": "MARCHAND Camille",
+      "club": "Annecy CK",
+      "nation": "GER",
+      "ref_time_ms": 1138548
+    },
+    {
+      "bib": 13,
+      "epreuve": "K1D",
+      "nom": "AUBERT Louise",
+      "club": "CKC Argentat",
+      "nation": "CZE",
+      "ref_time_ms": 1090190
+    },
+    {
+      "bib": 14,
+      "epreuve": "K1D",
+      "nom": "BARBIER Anaïs",
+      "club": "CK Metz",
+      "nation": "SVK",
+      "ref_time_ms": 1209932
+    },
+    {
+      "bib": 15,
+      "epreuve": "K1D",
+      "nom": "MASSON Sarah",
+      "club": "CK Saint-Pierre",
+      "nation": "ESP",
+      "ref_time_ms": 1122903
+    },
+    {
+      "bib": 16,
+      "epreuve": "K1D",
+      "nom": "DELAUNAY Clara",
+      "club": "ACA Aviron Canoë",
+      "nation": "ITA",
+      "ref_time_ms": 1196705
+    }
+  ]
+}

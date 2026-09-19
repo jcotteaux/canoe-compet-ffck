@@ -1,0 +1,181 @@
+{
+  "id": "slalom-finale",
+  "label": "Coupe de France Slalom — Finale (18 portes)",
+  "speed": 4,
+  "first_start": "14:00:00",
+  "start_interval_s": 90,
+  "nb_inter": 2,
+  "nb_porte": 18,
+  "competition": {
+    "Code_competition": 3207,
+    "Nom": "Coupe de France Slalom",
+    "Code_activite": "SLA",
+    "Code_niveau": "NAT",
+    "Date_debut": "2026-06-20",
+    "Lieu": "L'Argentière-la-Bessée"
+  },
+  "course": {
+    "Code_course": 1,
+    "Libelle": "Slalom"
+  },
+  "phase": {
+    "Code_phase": 1,
+    "Libelle": "Finale"
+  },
+  "epreuves": [
+    {
+      "code": "K1H",
+      "libelle": "Kayak monoplace hommes",
+      "etat": "1",
+      "offsetMs": 0
+    },
+    {
+      "code": "K1D",
+      "libelle": "Kayak monoplace dames",
+      "etat": "1",
+      "offsetMs": 11000
+    },
+    {
+      "code": "C1H",
+      "libelle": "Canoë monoplace hommes",
+      "etat": "1",
+      "offsetMs": 7000
+    },
+    {
+      "code": "C1D",
+      "libelle": "Canoë monoplace dames",
+      "etat": "1",
+      "offsetMs": 18000
+    }
+  ],
+  "boats": [
+    {
+      "bib": 1,
+      "epreuve": "K1H",
+      "nom": "CHEVALIER Arthur",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 103502
+    },
+    {
+      "bib": 2,
+      "epreuve": "K1H",
+      "nom": "RIVIERE Hugo",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 116725
+    },
+    {
+      "bib": 3,
+      "epreuve": "K1H",
+      "nom": "VASSEUR Quentin",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 120343
+    },
+    {
+      "bib": 4,
+      "epreuve": "K1H",
+      "nom": "GAUDIN Nolan",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 100975
+    },
+    {
+      "bib": 5,
+      "epreuve": "K1D",
+      "nom": "LEMOINE Chloé",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 132364
+    },
+    {
+      "bib": 6,
+      "epreuve": "K1D",
+      "nom": "ROYER Manon",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 116613
+    },
+    {
+      "bib": 7,
+      "epreuve": "K1D",
+      "nom": "GUILLET Marion",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 129377
+    },
+    {
+      "bib": 8,
+      "epreuve": "K1D",
+      "nom": "HEBERT Émilie",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 124177
+    },
+    {
+      "bib": 9,
+      "epreuve": "C1H",
+      "nom": "BLANCHARD Mathis",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 116368
+    },
+    {
+      "bib": 10,
+      "epreuve": "C1H",
+      "nom": "LEROY Maxime",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 120659
+    },
+    {
+      "bib": 11,
+      "epreuve": "C1H",
+      "nom": "FAURE Enzo",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 122295
+    },
+    {
+      "bib": 12,
+      "epreuve": "C1H",
+      "nom": "MARCHAND Lucas",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 125889
+    },
+    {
+      "bib": 13,
+      "epreuve": "C1D",
+      "nom": "AUBERT Louise",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 138576
+    },
+    {
+      "bib": 14,
+      "epreuve": "C1D",
+      "nom": "BARBIER Anaïs",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 115216
+    },
+    {
+      "bib": 15,
+      "epreuve": "C1D",
+      "nom": "MASSON Sarah",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 116463
+    },
+    {
+      "bib": 16,
+      "epreuve": "C1D",
+      "nom": "DELAUNAY Clara",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 133167
+    }
+  ]
+}

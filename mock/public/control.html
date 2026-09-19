@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bouchon competFFCK</title>
+<style>
+  :root {
+    --bg: #11151c; --panel: #1a212b; --line: #2b3542; --text: #e6ecf3;
+    --muted: #8fa0b3; --accent: #3da9fc; --ok: #3ddc97; --warn: #ffb454; --ko: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex;
+           align-items: center; gap: 20px; flex-wrap: wrap; background: var(--panel); }
+  h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 26px; font-weight: 600; color: var(--accent); }
+  .sub { color: var(--muted); font-size: 13px; }
+  main { padding: 20px; display: grid; gap: 20px; grid-template-columns: 1fr; max-width: 1400px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  button, select, input { font: inherit; color: var(--text); background: #232c38;
+      border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #06131f; border-color: var(--accent); font-weight: 600; }
+  button.danger { background: #3a2026; border-color: #5c2f38; color: var(--ko); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  td.num, th.num { text-align: right; }
+  .state { font-size: 11px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+  .waiting { background: #2a3240; color: var(--muted); }
+  .running { background: #113a2c; color: var(--ok); }
+  .finished { background: #1d2b3d; color: var(--accent); }
+  .status { background: #3a2026; color: var(--ko); }
+  a { color: var(--accent); }
+  .links a { margin-right: 14px; display: inline-block; }
+  .mini { padding: 3px 8px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Bouchon competFFCK</h1>
+  <span class="clock" id="clock">--:--:--</span>
+  <span class="sub" id="meta"></span>
+  <span style="flex:1"></span>
+  <span class="links" id="links"></span>
+</header>
+
+<main>
+  <section>
+    <h2>Course</h2>
+    <div class="row">
+      <button class="primary" id="toggle">Démarrer</button>
+      <button id="reset">Réinitialiser</button>
+      <label class="sub">Vitesse
+        <select id="speed">
+          <option value="1">×1 (temps réel)</option>
+          <option value="2">×2</option>
+          <option value="4" selected>×4</option>
+          <option value="10">×10</option>
+          <option value="30">×30</option>
+        </select>
+      </label>
+      <label class="sub">Fixture <select id="fixture"></select></label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Scénarios — les cas qu'on ne peut pas provoquer sur une vraie compétition</h2>
+    <div class="row">
+      <button class="danger" id="erase">Effacer la manche &lt;run_erase&gt;</button>
+      <button class="danger" id="kill">Couper le réseau (fermer les WebSockets)</button>
+      <button id="mode">Changer de mode chrono</button>
+    </div>
+    <p class="sub" style="margin:10px 0 0">
+      « Couper le réseau » ferme brutalement toutes les sockets : aucune page ws_live ne se reconnecte
+      aujourd'hui (<code>ws.js:onclose</code> se contente de mettre la socket à <code>null</code>).
+    </p>
+  </section>
+
+  <section>
+    <h2>Bateaux</h2>
+    <table>
+      <thead>
+        <tr>
+          <th class="num">Dos.</th><th>Identité</th><th>Épr.</th><th>Départ</th>
+          <th>État</th><th class="num">Temps</th><th class="num">Péna</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="boats"></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let state = null;
+
+async function api(action, body) {
+  const r = await fetch('/mock/api/' + action, {
+    method: body === undefined ? 'GET' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  return r.json();
+}
+
+function chrono(ms) {
+  if (ms === null || ms === undefined || ms === '') return '';
+  if (ms < 1) return { '-500': 'DNF', '-600': 'DNS', '-700': 'DES', '-800': 'DSQ' }[String(ms)] || '';
+  const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000), c = Math.floor((ms % 1000) / 10);
+  return (m > 0 ? m + ':' + String(s).padStart(2, '0') : String(s)) + '.' + String(c).padStart(2, '0');
+}
+
+function render(s) {
+  state = s;
+  $('clock').textContent = s.clock;
+  $('meta').textContent = `${s.fixture} · ${s.activite} · épreuve ${s.epreuve}` +
+    (s.nbPorte ? ` · ${s.nbPorte} portes` : '') + (s.nbInter ? ` · ${s.nbInter} inter` : '');
+  $('toggle').textContent = s.running ? 'Mettre en pause' : 'Démarrer';
+  $('speed').value = String(s.speed);
+
+  $('boats').innerHTML = s.boats.map((b) => {
+    const cls = b.status ? 'status' : b.state;
+    const label = b.status || b.state;
+    const time = b.state === 'running' ? chrono(b.elapsed)
+               : b.state === 'finished' ? chrono(b.total) : '';
+    return `<tr>
+      <td class="num">${b.bib}</td>
+      <td>${b.nom}</td>
+      <td>${b.epreuve}</td>
+      <td>${b.hour_start}</td>
+      <td><span class="state ${cls}">${label}</span></td>
+      <td class="num">${time}</td>
+      <td class="num">${b.pena || ''}</td>
+      <td class="row">
+        <button class="mini" data-act="bib-start" data-bib="${b.bib}">Départ</button>
+        <button class="mini" data-act="bib-finish" data-bib="${b.bib}">Arrivée</button>
+        ${s.nbPorte ? `<button class="mini" data-act="pena2" data-bib="${b.bib}">+2</button>
+                       <button class="mini" data-act="pena50" data-bib="${b.bib}">+50</button>` : ''}
+        <button class="mini" data-act="dnf" data-bib="${b.bib}">DNF</button>
+        <button class="mini" data-act="dsq" data-bib="${b.bib}">DSQ</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+$('boats').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const bib = Number(btn.dataset.bib);
+  const act = btn.dataset.act;
+  if (act === 'pena2' || act === 'pena50') {
+    // pose la pénalité sur la première porte libre, comme un juge le ferait
+    const porte = 1 + Math.floor(Math.random() * (state.nbPorte || 1));
+    render(await api('penalty', { bib, porte, value: act === 'pena2' ? 2 : 50 }));
+  } else if (act === 'dnf' || act === 'dsq') {
+    render(await api('bib-status', { bib, status: act.toUpperCase() }));
+  } else {
+    render(await api(act, { bib }));
+  }
+});
+
+$('toggle').onclick = async () => render(await api(state.running ? 'pause' : 'start', {}));
+$('reset').onclick = async () => render(await api('reset', {}));
+$('erase').onclick = async () => render(await api('erase', {}));
+$('kill').onclick = async () => render(await api('kill-clients', {}));
+$('mode').onclick = async () => render(await api('mode-chrono', { mode: 1 }));
+$('speed').onchange = async (e) => render(await api('speed', { speed: e.target.value }));
+$('fixture').onchange = async (e) => render(await api('fixture', { name: e.target.value }));
+
+(async function init() {
+  const fixtures = await api('fixtures');
+  const s = await api('state');
+  $('fixture').innerHTML = fixtures
+    .map((f) => `<option value="${f.id}" ${f.id === s.fixture ? 'selected' : ''}>${f.label}</option>`)
+    .join('');
+  $('links').innerHTML = [
+    ['live', '/canoe/live.html'],
+    ['monitor', '/canoe/monitor_race.html'],
+    ['tv inrace', '/canoe/tv_inrace.html'],
+    ['tv startlist', '/canoe/tv_startlist.html'],
+    ['tv ranking', '/canoe/tv_ranking.html'],
+    ['inrace.php', '/canoe/inrace.php'],
+  ].map(([t, h]) => `<a href="${h}" target="_blank">${t}</a>`).join('');
+  render(s);
+  setInterval(async () => render(await api('state')), 500);
+})();
+</script>
+</body>
+</html>

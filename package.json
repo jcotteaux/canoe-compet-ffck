@@ -1,0 +1,16 @@
+{
+  "name": "canoe-wslive",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Front live competFFCK (ws_live) + bouchon de serveur WebSocket pour developper sans competFFCK ni MySQL",
+  "scripts": {
+    "start": "node mock/server.js",
+    "descente": "node mock/server.js --fixture descente-sprint",
+    "slalom": "node mock/server.js --fixture slalom-finale",
+    "international": "node mock/server.js --fixture descente-internationale",
+    "fixtures": "node tools/make-fixtures.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
