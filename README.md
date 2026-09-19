@@ -168,6 +168,29 @@ diverger de lui en cas d'ex æquo ; la position dans la liste triée ne sert que
 de repli. Les statuts DNF/DNS/DSQ sont des valeurs négatives et sortent donc
 naturellement du classement.
 
+### Insertion animée
+
+À chaque arrivée, la nouvelle ligne **s'insère** à sa place et celles qui
+reculent **glissent** d'un cran. Le classement n'est jamais effacé puis
+redessiné : les lignes déjà à l'écran sont les mêmes nœuds du DOM, seul leur
+contenu et leur ordre changent.
+
+Deux points rendent cela possible :
+
+- l'ordre passe par la propriété flex `order`, jamais par `appendChild` —
+  réinsérer un nœud relance ses animations CSS ;
+- le glissement utilise la technique FLIP : on relève la position de chaque
+  ligne avant la mise à jour, on la relève après, et on repart de l'ancienne
+  pour animer jusqu'à la nouvelle. La transition est posée depuis le
+  JavaScript, la distance n'étant connue qu'à l'exécution.
+
+L'animation d'insertion dure 350 ms, comme le glissement : les deux doivent se
+lire comme un seul mouvement. Le bloc entier garde les 0,7 s de la charte.
+
+Le test `tv_leaders / insertion sans redessiner` marque les lignes avant
+l'arrivée et vérifie ensuite que sept ont survécu, qu'une seule est neuve et
+que cinq ont glissé.
+
 | paramètre | défaut | rôle |
 |---|---|---|
 | `max=8` | 8 | nombre de places affichées |
@@ -196,7 +219,7 @@ que depuis OBS, jouer sur `top` de chacune.
 ## Tests de non-régression
 
 ```bash
-npm test                    # 36 cas
+npm test                    # 37 cas
 node tools/smoke.js --only tv
 ```
 

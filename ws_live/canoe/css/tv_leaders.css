@@ -159,7 +159,16 @@ body.ancre-bas #leaders
 	font-weight: bold;
 	font-size: 19pt;
 
-	animation: leader-in 0.7s ease-out;
+	/*
+	 * Animation d'insertion. Elle ne joue qu'à la création de la ligne : le
+	 * classement est réconcilié en place, jamais reconstruit, donc un nœud
+	 * déjà à l'écran ne la rejoue pas.
+	 *
+	 * 350 ms, soit la durée du glissement FLIP appliqué aux lignes qui
+	 * descendent d'un cran : l'insertion et le décalage doivent se lire comme
+	 * un seul mouvement. Le bloc entier garde lui les 0,7 s de la charte.
+	 */
+	animation: leader-in 350ms ease-out;
 }
 
 /* Le dernier arrivé, qu'il soit dans les premiers ou en pied de bloc. */
@@ -245,6 +254,12 @@ body.ancre-bas #leaders
 	from { opacity: 0; transform: translateX(-120px); }
 	to   { opacity: 1; transform: translateX(0); }
 }
+
+/*
+ * Le glissement des lignes existantes est piloté depuis le JavaScript
+ * (transition posée en ligne), parce qu'il dépend de la distance réellement
+ * parcourue, mesurée avant et après la mise à jour.
+ */
 
 /* Sur un poste qui n'aime pas les animations (vieille machine de régie), on
    coupe tout : ?anim=0 ajoute cette classe sur <body>. */

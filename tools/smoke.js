@@ -217,6 +217,25 @@ const CASES = [
 
   // Page ouverte alors qu'une epreuve sans resultat est chronometree : il faut
   // afficher la derniere epreuve qui en a, pas un bloc vide.
+  // Une arrivee doit inserer une ligne et faire glisser les suivantes, sans
+  // reconstruire le classement : les noeuds deja affiches doivent survivre.
+  // Le temoin est pose avant l'arrivee ; une ligne recreee l'aurait perdu.
+  { name: 'tv_leaders / insertion sans redessiner', url: '/canoe/tv_leaders.html',
+    setup: (() => {
+      const a = [];
+      for (let i = 1; i <= 8; i++) {
+        a.push(['bib-start', { bib: i }]);
+        a.push(['bib-finish', { bib: i, time: 89000 + i * 900 }]);
+      }
+      a.push(['bib-start', { bib: 9 }]);
+      return a;
+    })(),
+    events: [[5000, 'bib-finish', { bib: 9, time: 91300 }]], settle: 10000,
+    evalEarlyExpr: "document.querySelectorAll('#leaders .leader').forEach(e => e.dataset.temoin='1'); 'ok'",
+    expect: (r) => (r.eval && r.eval.conserves === 7 && r.eval.neufs === 1 && r.eval.glisses === 5
+      ? null : `attendu 7 lignes conservees, 1 neuve et 5 glissees, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const l=[...document.querySelectorAll('#leaders_list .leader')]; return JSON.stringify({conserves: l.filter(e=>e.dataset.temoin).length, neufs: l.filter(e=>!e.dataset.temoin).length, glisses: l.filter(e=>String(e.style.transition).indexOf('transform')>=0).length}); })()" },
+
   { name: 'tv_leaders / amorcage sur une epreuve avec resultats', url: '/canoe/tv_leaders.html',
     setup: classementK1H().concat([['bib-remove', { bib: 12 }], ['bib-start', { bib: 16 }]]),
     settle: 8000,
@@ -243,6 +262,7 @@ function runBrowse(c) {
   const args = [path.join(__dirname, 'browse.js'), BASE + c.url, '--wait', String(c.wait || 2500)];
   if (c.clicks) args.push('--click', c.clicks, '--after', String(c.after || 2500));
   args.push('--settle', String(c.settle || 9000));
+  if (c.evalEarlyExpr) args.push('--eval-early', c.evalEarlyExpr);
   if (c.evalExpr) args.push('--eval', c.evalExpr);
   args.push('--width', '1920', '--height', '1080');
 

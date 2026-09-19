@@ -211,29 +211,110 @@ function GetClassement()
 	return out;
 }
 
-/** Construit (ou met à jour) une ligne de classement. */
-function BuildRow(el, r)
+function RowId(bib)
 {
-	if (el == null)
-	{
-		el = document.createElement('div');
-		el.className = 'leader';
-		el.innerHTML = '<div class="rank"></div><div class="bib"></div>'
-			+ '<div class="name"></div><div class="time"></div>';
-	}
-
-	// textContent : les identités viennent du serveur, on ne les interprète
-	// pas comme du HTML.
-	el.querySelector('.rank').textContent = r.rank;
-	el.querySelector('.bib').textContent = r.bib;
-	el.querySelector('.name').textContent = r.name;
-	el.querySelector('.time').textContent = adv.GetChrono(r.time, GetFmt());
-	return el;
+	return 'leader_' + bib;
 }
 
 function GetFmt()
 {
 	return wsMain.fmtChrono ? wsMain.fmtChrono : canoe.GetFmtChrono();
+}
+
+/**
+ * Crée la ligne si elle n'existe pas, sinon met simplement son contenu à jour.
+ *
+ * Une ligne déjà à l'écran n'est jamais recréée ni déplacée dans le DOM :
+ * l'ordre passe par la propriété flex `order`. Réinsérer un nœud relance ses
+ * animations CSS, ce qui ferait clignoter tout le classement à chaque arrivée.
+ */
+function SyncRow(container, r, ordre, estDernier)
+{
+	const id = RowId(r.bib);
+	let el = document.getElementById(id);
+
+	if (el == null)
+	{
+		el = document.createElement('div');
+		el.id = id;
+		el.className = 'leader';
+		el.innerHTML = '<div class="rank"></div><div class="bib"></div>'
+			+ '<div class="name"></div><div class="time"></div>';
+		container.appendChild(el);
+
+		// textContent : les identités viennent du serveur, on ne les
+		// interprète pas comme du HTML.
+		el.querySelector('.bib').textContent = r.bib;
+		el.querySelector('.name').textContent = r.name;
+	}
+	else if (el.parentNode !== container)
+	{
+		// Changement de zone (classement <-> pied de bloc) : rare, mais il
+		// faut bien déplacer le nœud.
+		container.appendChild(el);
+	}
+
+	el.style.order = ordre;
+	el.classList.toggle('last', estDernier);
+	el.querySelector('.rank').textContent = r.rank;
+	el.querySelector('.time').textContent = adv.GetChrono(r.time, GetFmt());
+
+	return el;
+}
+
+/** Position verticale de chaque ligne affichée, pour l'animation FLIP. */
+function MesurerLignes(elBlock)
+{
+	const positions = new Map();
+	const lignes = elBlock.querySelectorAll('.leader');
+	for (let i = 0; i < lignes.length; i++)
+		positions.set(lignes[i].id, lignes[i].getBoundingClientRect().top);
+
+	return positions;
+}
+
+/**
+ * Animation FLIP : on a relevé la position des lignes avant la mise à jour,
+ * on relève la nouvelle, et on repart de l'ancienne pour glisser jusqu'à la
+ * nouvelle. Les lignes déjà présentes descendent donc d'un cran au lieu de
+ * réapparaître au nouvel endroit.
+ */
+function GlisserVersLaNouvellePosition(elBlock, avant)
+{
+	const lignes = elBlock.querySelectorAll('.leader');
+	const aAnimer = [];
+
+	for (let i = 0; i < lignes.length; i++)
+	{
+		const el = lignes[i];
+		const y0 = avant.get(el.id);
+		if (y0 === undefined)
+			continue;			// ligne neuve : elle a son animation d'entrée
+
+		const dy = y0 - el.getBoundingClientRect().top;
+		if (Math.abs(dy) < 1)
+			continue;
+
+		el.style.transition = 'none';
+		el.style.transform = 'translateY(' + dy + 'px)';
+		aAnimer.push(el);
+	}
+
+	if (aAnimer.length === 0)
+		return;
+
+	// Deux trames : la première applique le décalage, la seconde lance la
+	// transition. Sans cela le navigateur fusionne les deux écritures et rien
+	// ne bouge.
+	window.requestAnimationFrame(function() {
+		window.requestAnimationFrame(function() {
+			for (const el of aAnimer)
+			{
+				el.style.transition = 'transform 350ms ease-out';
+				el.style.transform = '';
+			}
+		});
+	});
 }
 
 function Render()
@@ -256,22 +337,9 @@ function Render()
 	if (wsMain.showCateg)
 		elCateg.textContent = GetLibelleEpreuve();
 
-	// Liste des premiers. On reconstruit : contrairement au temps tournant,
-	// un classement ne bouge qu'à chaque arrivée, pas dix fois par seconde.
-	elList.innerHTML = '';
-	for (const r of tete)
-	{
-		const el = BuildRow(null, r);
-		if (wsMain.lastBib !== null && String(r.bib) === wsMain.lastBib)
-			el.classList.add('last');		// le dernier arrivé est déjà dans les premiers
-		elList.appendChild(el);
-	}
-
-	// Pied de bloc : le dernier arrivé, seulement s'il n'est pas déjà affiché
-	// au-dessus. Le trait de séparation est porté par le CSS.
-	elLast.innerHTML = '';
-	elLast.style.display = 'none';
-
+	// Pied de bloc : le dernier arrivé, seulement s'il n'est pas déjà dans les
+	// premiers. Le trait de séparation est porté par le CSS.
+	let pied = null;
 	if (wsMain.showLast && wsMain.lastBib !== null)
 	{
 		const dansLaTete = tete.some(function(r) { return String(r.bib) === wsMain.lastBib; });
@@ -279,14 +347,38 @@ function Render()
 		{
 			const hors = classement.find(function(r) { return String(r.bib) === wsMain.lastBib; });
 			if (hors !== undefined)
-			{
-				const el = BuildRow(null, hors);
-				el.classList.add('last');
-				elLast.appendChild(el);
-				elLast.style.display = '';
-			}
+				pied = hors;
 		}
 	}
+
+	const avant = MesurerLignes(elBlock);
+
+	const vus = {};
+	for (let i = 0; i < tete.length; i++)
+	{
+		const r = tete[i];
+		vus[RowId(r.bib)] = true;
+		SyncRow(elList, r, i, wsMain.lastBib !== null && String(r.bib) === wsMain.lastBib);
+	}
+
+	if (pied !== null)
+	{
+		vus[RowId(pied.bib)] = true;
+		SyncRow(elLast, pied, 0, true);
+	}
+	elLast.style.display = pied === null ? 'none' : '';
+
+	// Les lignes qui sortent du classement affiché sont retirées tout de suite :
+	// les laisser s'estomper les ferait occuper leur place pendant l'animation,
+	// et les autres ne pourraient pas glisser.
+	const lignes = elBlock.querySelectorAll('.leader');
+	for (let i = lignes.length - 1; i >= 0; i--)
+	{
+		if (!vus[lignes[i].id])
+			lignes[i].parentNode.removeChild(lignes[i]);
+	}
+
+	GlisserVersLaNouvellePosition(elBlock, avant);
 }
 
 /** Code court de l'épreuve, ou son libellé complet avec ?libelle=1. */

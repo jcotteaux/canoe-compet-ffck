@@ -6,11 +6,14 @@
  * puis renvoie le DOM, les erreurs console et éventuellement une capture.
  *
  *   node tools/browse.js <url> [--wait 6000] [--click "sel"] [--after 4000]
- *                        [--settle 8000] [--eval "expression"] [--shot out.png]
+ *                        [--settle 8000] [--eval-early "expr"] [--eval "expression"]
+ *                        [--shot out.png]
  *                        [--width 1920] [--height 1080]
  *
  * `--settle` attend encore après les clics : c'est la fenêtre pendant laquelle on
  * observe le flux temps réel (arrivées, pénalités, effacement de manche).
+ * `--eval-early` s'exécute juste avant cette fenêtre : de quoi marquer l'état
+ * de la page pour le comparer à ce que `--eval` relèvera ensuite.
  *
  * `--click` accepte plusieurs sélecteurs séparés par ` >> `, cliqués l'un après
  * l'autre : les pages ws_live se naviguent en cascade (compétition, puis épreuve).
@@ -160,6 +163,8 @@ async function waitForChrome(timeoutMs = 15000) {
       await sleep(Number(opts.after || 3000));
     }
   }
+
+  if (opts['eval-early']) await evaluate(String(opts['eval-early']));
 
   if (opts.settle) await sleep(Number(opts.settle));
 
