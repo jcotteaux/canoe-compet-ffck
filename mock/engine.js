@@ -222,6 +222,23 @@ class Engine extends EventEmitter {
     this.emitFrame({ key: '<bib_time>', bib: b.bib, passage: 0, time_chrono: b.chrono, device: 'mock' });
   }
 
+  /**
+   * Fait arriver d'un coup tous les bateaux restants d'une épreuve.
+   * Le podium se déclenche quand une épreuve est complète : sans cela il
+   * faudrait faire partir et arriver douze bateaux à la main.
+   */
+  finishCategory(epreuve) {
+    const cible = epreuve || this.currentEpreuve;
+    let t = 95000;
+
+    for (const b of this.boats) {
+      if (b.epreuve !== cible || b.state === 'finished') continue;
+      if (b.state === 'waiting') b.state = 'running';
+      t += 1250;
+      this.finish(b, t);
+    }
+  }
+
   addPenalty(bib, porte, value) {
     const b = this.boat(bib);
     if (!b) return;

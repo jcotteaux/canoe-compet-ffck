@@ -308,6 +308,32 @@ const CASES = [
     expect: (r) => (r.eval && r.eval.hidden ? null : 'le bloc devrait etre masque'),
     evalExpr: "JSON.stringify({hidden: document.getElementById('leaders').classList.contains('empty')})" },
 
+  // Le podium ne doit rien peindre tant qu'aucune epreuve n'est terminee.
+  { name: 'tv_podium / silencieux hors sequence', url: '/canoe/tv_podium.html',
+    setup: classementK1H(), settle: 7000,
+    expect: (r) => (r.eval && r.eval.cache ? null : `le bloc devrait etre cache, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({cache: document.getElementById('podium').classList.contains('cache')})" },
+
+  { name: 'tv_podium / declenche en fin d epreuve', url: '/canoe/tv_podium.html',
+    events: [[4000, 'finish-categ', { epreuve: 'K1D' }]], settle: 9000,
+    expect: (r) => (r.eval && r.eval.visible && r.eval.categ === 'K1D' && r.eval.noms === 3
+      ? null : `podium K1D attendu avec 3 marches, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const p=document.getElementById('podium'); return JSON.stringify({visible: !p.classList.contains('cache'), categ: document.getElementById('podium_categ').textContent, noms: [1,2,3].filter(i=>document.getElementById('step_'+i).querySelector('.name').textContent!=='').length}); })()" },
+
+  // delay court : la sequence doit se refermer d'elle-meme.
+  { name: 'tv_podium / disparait apres le delai', url: '/canoe/tv_podium.html?delay=2000',
+    events: [[4000, 'finish-categ', { epreuve: 'K1D' }]], settle: 11000,
+    expect: (r) => (r.eval && r.eval.cache ? null : `le podium aurait du se refermer, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({cache: document.getElementById('podium').classList.contains('cache')})" },
+
+  // ?delay ne doit pas atterrir dans wsMain.delay : ws.Context s'en sert pour
+  // differer la distribution de TOUTES les trames.
+  { name: 'tv_podium / delay ne bloque pas les trames', url: '/canoe/tv_podium.html?delay=30000',
+    setup: classementK1H(), settle: 7000,
+    expect: (r) => (r.eval && r.eval.contexte === 0 && r.eval.race === 'object'
+      ? null : `wsMain.delay du contexte doit rester a 0 et la course etre chargee, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({contexte: wsMain.delay, race: typeof canoe.notify_race})" },
+
   { name: 'tv_ranking', url: '/canoe/tv_ranking.html', settle: 8000 },
   { name: 'tv_startlist', url: '/canoe/tv_startlist.html', settle: 8000 },
   { name: 'tv_clear', url: '/canoe/tv_clear.html' },

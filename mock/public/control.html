@@ -75,6 +75,7 @@
       <button class="danger" id="erase">Effacer la manche &lt;run_erase&gt;</button>
       <button class="danger" id="kill">Couper le réseau (fermer les WebSockets)</button>
       <button id="mode">Changer de mode chrono</button>
+      <button id="finish_categ">Terminer l'épreuve en cours (déclenche le podium)</button>
     </div>
     <p class="sub" style="margin:10px 0 0">
       « Couper le réseau » ferme brutalement toutes les sockets. Les pages doivent se reconnecter
@@ -171,6 +172,7 @@ $('reset').onclick = async () => render(await api('reset', {}));
 $('erase').onclick = async () => render(await api('erase', {}));
 $('kill').onclick = async () => render(await api('kill-clients', {}));
 $('mode').onclick = async () => render(await api('mode-chrono', { mode: 1 }));
+$('finish_categ').onclick = async () => render(await api('finish-categ', { epreuve: state.epreuve }));
 $('speed').onchange = async (e) => render(await api('speed', { speed: e.target.value }));
 $('fixture').onchange = async (e) => render(await api('fixture', { name: e.target.value }));
 
@@ -186,6 +188,7 @@ $('fixture').onchange = async (e) => render(await api('fixture', { name: e.targe
     ['tv inrace', '/canoe/tv_inrace.html'],
     ['tv oncourse', '/canoe/tv_oncourse.html'],
     ['tv leaders', '/canoe/tv_leaders.html'],
+    ['tv podium', '/canoe/tv_podium.html'],
     ['tv startlist', '/canoe/tv_startlist.html'],
     ['tv ranking', '/canoe/tv_ranking.html'],
     ['inrace.php', '/canoe/inrace.php'],

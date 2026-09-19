@@ -217,6 +217,7 @@ function handleApi(req, res, pathname, url) {
         case 'bib-status': engine.setStatus(p.bib, p.status); break;
         case 'bib-remove': engine.removeFromCourse(p.bib); break;
         case 'penalty': engine.addPenalty(p.bib, p.porte, p.value); break;
+        case 'finish-categ': engine.finishCategory(p.epreuve); break;
         case 'erase': engine.eraseRun(); break;
         case 'mode-chrono': engine.setModeChrono(p.mode || 1); break;
         case 'kill-clients':
@@ -315,6 +316,7 @@ server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log(`  tv inrace            http://localhost:${HTTP_PORT}/canoe/tv_inrace.html`);
   console.log(`  tv oncourse          http://localhost:${HTTP_PORT}/canoe/tv_oncourse.html`);
   console.log(`  tv leaders           http://localhost:${HTTP_PORT}/canoe/tv_leaders.html`);
+  console.log(`  tv podium            http://localhost:${HTTP_PORT}/canoe/tv_podium.html`);
   console.log(`  tv ranking           http://localhost:${HTTP_PORT}/canoe/tv_ranking.html`);
   console.log(`  tv startlist         http://localhost:${HTTP_PORT}/canoe/tv_startlist.html`);
   console.log(`  jugement             http://localhost:${HTTP_PORT}/canoe/jugement.html`);

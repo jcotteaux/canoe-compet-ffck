@@ -71,8 +71,8 @@ de rupture.
 ### Pages servies
 
 `live.html`, `monitor_race.html`, `tv_inrace.html`, `tv_oncourse.html`,
-`tv_leaders.html`, `tv_startlist.html`, `tv_ranking.html`, `jugement.html`,
-`inrace.php`.
+`tv_leaders.html`, `tv_podium.html`, `tv_startlist.html`, `tv_ranking.html`,
+`jugement.html`, `inrace.php`.
 
 macOS ne fournit plus PHP : `mock/php-lite.js` évalue le petit sous-ensemble
 utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
@@ -242,10 +242,55 @@ calées au même coin haut-gauche : **c'est la régie qui les décale**, chaque
 source étant positionnée indépendamment. Pour les régler depuis l'URL plutôt
 que depuis OBS, jouer sur `top` de chacune.
 
+## Nouvelle page : podium de fin d'épreuve
+
+`canoe/tv_podium.html` — les trois premiers sur un podium à marches 2-1-3,
+plein écran centré, déclenché automatiquement **quand une épreuve se termine**.
+La page ne peint rien le reste du temps.
+
+**Fin d'épreuve** : tous les bateaux de l'épreuve ont une valeur dans `Tps`.
+competFFCK laisse cette colonne vide tant qu'un bateau n'a pas de résultat, et
+y met une valeur négative pour DNF/DNS/DSQ — un abandon compte donc comme un
+bateau traité, pas comme un bateau attendu. Une épreuve n'est jouée qu'une
+fois ; `<run_erase>` la rend rejouable.
+
+Séquence : le titre descend, puis les marches montent dans l'ordre 3 → 2 → 1
+avec un léger dépassement, et un éclat balaie la marche du vainqueur. Sortie
+d'un bloc après `delay`. Un voile radial assombrit le fond, sans quoi le
+podium se lit mal sur une image de rivière en mouvement.
+
+| paramètre | défaut | rôle |
+|---|---|---|
+| `delay=15000` | 15000 | durée d'affichage en ms |
+| `scale=0.8` | 1 | facteur de taille |
+| `epreuve=K1H&force=1` | — | joue ce podium tout de suite et sans fin, pour régler le cadrage en répétition |
+| `no_scrim` | voile actif | retire le voile assombrissant |
+| `fmt=XSCC` | selon l'activité | format du chrono |
+| `bg=1` | transparent | fond magenta pour une régie chroma-key |
+| `anim=0` | animé | tout apparaît d'un coup |
+
+Moins de trois classés : les marches vides disparaissent plutôt que d'afficher
+un bloc sans nom.
+
+L'or vient de `img/60_140_Y.jpg`. **L'argent et le bronze ne viennent d'aucun
+gabarit maison** — il n'en existe pas — ce sont des valeurs conventionnelles,
+à ajuster si la FFCK en a.
+
+Pour déclencher un podium depuis le bouchon : bouton « Terminer l'épreuve en
+cours » du panneau, ou `POST /mock/api/finish-categ`.
+
+### Attention à `wsMain.delay`
+
+`ws.Context` possède un champ `delay` qui sert à **différer la distribution de
+toutes les trames** (`ws.js`, `onmessage_command_delay`). Y écrire une durée
+métier paralyse la page : c'est ce qui est arrivé en écrivant la durée
+d'affichage du podium dans `wsMain.delay`, et la page ne recevait plus rien
+pendant 15 s. Un test le vérifie désormais.
+
 ## Tests de non-régression
 
 ```bash
-npm test                    # 42 cas
+npm test                    # 46 cas
 node tools/smoke.js --only tv
 ```
 
