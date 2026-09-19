@@ -83,7 +83,9 @@ const descente = {
   epreuves: descenteEpreuves,
   boats: buildBoats({
     epreuves: descenteEpreuves,
-    perEpreuve: 6,
+    // 12 par épreuve : il en faut plus que les 8 places de tv_leaders pour que
+    // le cas « dernier arrivé hors du classement affiché » existe.
+    perEpreuve: 12,
     baseTimeMs: 88000,
     spreadMs: 22000,
     seed: 20260516,

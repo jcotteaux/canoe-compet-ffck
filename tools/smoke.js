@@ -63,6 +63,21 @@ const INTO_EPREUVE = `${CLICK_RACE} >> ${CLICK_EPREUVE}`;
  * la page est affichée. C'est là que se trouvent les cas qu'on ne peut pas
  * provoquer sur une vraie compétition.
  */
+/**
+ * 11 K1H arrivés avec des temps imposés (le 12e reste sur l'eau, ce qui fixe
+ * l'épreuve courante à K1H). Les temps sont imposés plutôt que chronométrés :
+ * sinon il faudrait attendre la durée réelle de la course.
+ */
+function classementK1H() {
+  const s = [];
+  for (let i = 1; i <= 11; i++) {
+    s.push(['bib-start', { bib: i }]);
+    s.push(['bib-finish', { bib: i, time: 89000 + i * 900 }]);
+  }
+  s.push(['bib-start', { bib: 12 }]);
+  return s;
+}
+
 const CASES = [
   { name: 'live / liste des compétitions', url: '/canoe/live.html' },
 
@@ -156,12 +171,48 @@ const CASES = [
     evalExpr: "JSON.stringify({finished: document.querySelectorAll('.racer.finished').length})" },
 
   { name: 'tv_oncourse / filtre epreuve', url: '/canoe/tv_oncourse.html?epreuve=K1H&max=3',
-    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 7 }]], settle: 8000,
+    // 1 = K1H, 13 = K1D (12 bateaux par épreuve)
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 13 }]], settle: 8000,
     expect: (r) => (r.eval && r.eval.rows === 1 ? null : `le filtre K1H devrait laisser 1 ligne, vu ${r.eval && r.eval.rows}`),
     evalExpr: "JSON.stringify({rows: document.querySelectorAll('.racer:not(.leaving)').length})" },
 
   { name: 'tv_oncourse / effacement de manche', url: '/canoe/tv_oncourse.html',
     setup: [['bib-start', { bib: 1 }]], events: [[5000, 'erase', {}]], settle: 10000 },
+
+  { name: 'tv_leaders / classement de l epreuve en cours', url: '/canoe/tv_leaders.html',
+    setup: classementK1H(), settle: 8000,
+    expect: (r) => (r.eval && r.eval.categ === 'K1H' && r.eval.rows === 8
+      ? null : `attendu K1H et 8 lignes, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({categ: document.getElementById('leaders_categ').textContent, rows: document.querySelectorAll('#leaders_list .leader').length})" },
+
+  { name: 'tv_leaders / dernier arrive hors des 8', url: '/canoe/tv_leaders.html',
+    setup: classementK1H(),
+    events: [[5000, 'bib-finish', { bib: 12, time: 104500 }]], settle: 10000,
+    expect: (r) => (r.eval && r.eval.pied === 1 && r.eval.piedRank === '12'
+      ? null : `attendu 1 ligne en pied avec la place 12, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const p=document.querySelector('#leaders_last .leader'); return JSON.stringify({pied: document.querySelectorAll('#leaders_last .leader').length, piedRank: p ? p.querySelector('.rank').textContent : null}); })()" },
+
+  { name: 'tv_leaders / dernier arrive dans les 8', url: '/canoe/tv_leaders.html',
+    setup: classementK1H(),
+    events: [[5000, 'bib-finish', { bib: 12, time: 91200 }]], settle: 10000,
+    expect: (r) => (r.eval && r.eval.surligne === 1 && r.eval.pied === 0
+      ? null : `attendu 1 ligne surlignee et aucun pied, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({surligne: document.querySelectorAll('#leaders_list .leader.last').length, pied: document.querySelectorAll('#leaders_last .leader').length})" },
+
+  { name: 'tv_leaders / bascule de categorie', url: '/canoe/tv_leaders.html',
+    setup: classementK1H().concat([
+      ['bib-start', { bib: 13 }], ['bib-finish', { bib: 13, time: 103500 }],
+      ['bib-start', { bib: 14 }], ['bib-finish', { bib: 14, time: 104000 }],
+    ]),
+    events: [[5000, 'bib-remove', { bib: 12 }], [5500, 'bib-start', { bib: 16 }]], settle: 10000,
+    expect: (r) => (r.eval && r.eval.categ === 'K1D' && r.eval.rows === 2
+      ? null : `le depart d'un K1D aurait du basculer le classement, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({categ: document.getElementById('leaders_categ').textContent, rows: document.querySelectorAll('#leaders_list .leader').length})" },
+
+  { name: 'tv_leaders / aucun classe', url: '/canoe/tv_leaders.html',
+    setup: [['bib-start', { bib: 1 }]], settle: 7000,
+    expect: (r) => (r.eval && r.eval.hidden ? null : 'le bloc devrait etre masque'),
+    evalExpr: "JSON.stringify({hidden: document.getElementById('leaders').classList.contains('empty')})" },
 
   { name: 'tv_ranking', url: '/canoe/tv_ranking.html', settle: 8000 },
   { name: 'tv_startlist', url: '/canoe/tv_startlist.html', settle: 8000 },

@@ -67,7 +67,8 @@ de rupture.
 ### Pages servies
 
 `live.html`, `monitor_race.html`, `tv_inrace.html`, `tv_oncourse.html`,
-`tv_startlist.html`, `tv_ranking.html`, `jugement.html`, `inrace.php`.
+`tv_leaders.html`, `tv_startlist.html`, `tv_ranking.html`, `jugement.html`,
+`inrace.php`.
 
 macOS ne fournit plus PHP : `mock/php-lite.js` évalue le petit sous-ensemble
 utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
@@ -141,10 +142,51 @@ navigateur réel :
 - un bateau remis en course après avoir été marqué sortant était quand même
   supprimé par le minuteur de sortie lancé auparavant.
 
+## Nouvelle page : classement des premiers
+
+`canoe/tv_leaders.html` — les premiers de l'épreuve **en cours de
+chronométrage**, en surimpression en bas à gauche, avec le dernier arrivé en
+pied de bloc.
+
+L'épreuve suit le chronométrage : quand un K1H prend le départ, le classement
+bascule sur les K1H. C'est le champ `epreuve` du flux `<on_course>` qui porte
+cette information, le même que `live.js` utilise pour son mode scrolling.
+
+Le **dernier arrivé** est mis en évidence. S'il figure déjà dans les premiers,
+sa ligne y est simplement colorée ; sinon elle apparaît sous un trait de
+séparation, pour qu'on ne la lise pas comme la place suivante.
+
+Le classement est celui de competFFCK (`Cltc`), repris tel quel pour ne pas
+diverger de lui en cas d'ex æquo ; la position dans la liste triée ne sert que
+de repli. Les statuts DNF/DNS/DSQ sont des valeurs négatives et sortent donc
+naturellement du classement.
+
+| paramètre | défaut | rôle |
+|---|---|---|
+| `max=8` | 8 | nombre de places affichées |
+| `epreuve=K1H` | suit le chrono | fige l'épreuve |
+| `bottom=` / `left=` | 40 | position en pixels |
+| `width=` | 620 | largeur du bloc |
+| `scale=1.2` | 1 | facteur de taille |
+| `libelle=1` | code court | libellé complet de l'épreuve |
+| `no_last` | affiché | masque la ligne du dernier arrivé |
+| `no_categ` | affiché | masque l'en-tête d'épreuve |
+| `fmt=XSCC` | selon l'activité | format du chrono |
+| `bg=1` | transparent | fond magenta pour une régie chroma-key |
+| `anim=0` | animé | coupe les animations |
+
+Même charte que `tv_oncourse`, à une exception près : le bloc étant ancré à
+gauche, c'est `apparitionG` (entrée par la gauche) qui s'applique, et non
+`apparitionD`.
+
+`tv_oncourse` et `tv_leaders` sont deux pages distinctes, comme le veut la
+convention maison (une page = une incrustation). Toutes deux transparentes,
+elles se superposent sans se gêner et la régie peut les activer séparément.
+
 ## Tests de non-régression
 
 ```bash
-npm test                    # 29 cas
+npm test                    # 34 cas
 node tools/smoke.js --only tv
 ```
 

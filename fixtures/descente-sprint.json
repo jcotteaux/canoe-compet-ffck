@@ -99,147 +99,339 @@
     },
     {
       "bib": 7,
-      "epreuve": "K1D",
-      "nom": "GUILLET Marion",
+      "epreuve": "K1H",
+      "nom": "GUILLET Théo",
       "club": "US Ivry CK",
       "nation": "FRA",
-      "ref_time_ms": 97721
+      "ref_time_ms": 88721
     },
     {
       "bib": 8,
-      "epreuve": "K1D",
-      "nom": "HEBERT Émilie",
+      "epreuve": "K1H",
+      "nom": "HEBERT Baptiste",
       "club": "Sablé CK",
       "nation": "FRA",
-      "ref_time_ms": 105376
+      "ref_time_ms": 96376
     },
     {
       "bib": 9,
-      "epreuve": "K1D",
-      "nom": "BLANCHARD Jeanne",
+      "epreuve": "K1H",
+      "nom": "BLANCHARD Mathis",
       "club": "CK Pau-Béarn",
       "nation": "FRA",
-      "ref_time_ms": 110371
+      "ref_time_ms": 101371
     },
     {
       "bib": 10,
-      "epreuve": "K1D",
-      "nom": "LEROY Alice",
+      "epreuve": "K1H",
+      "nom": "LEROY Maxime",
       "club": "Canoë Club Vallée Ubaye",
       "nation": "FRA",
-      "ref_time_ms": 112500
+      "ref_time_ms": 103500
     },
     {
       "bib": 11,
-      "epreuve": "K1D",
-      "nom": "FAURE Léa",
+      "epreuve": "K1H",
+      "nom": "FAURE Enzo",
       "club": "ASCPA Tours",
       "nation": "FRA",
-      "ref_time_ms": 109202
+      "ref_time_ms": 100202
     },
     {
       "bib": 12,
-      "epreuve": "K1D",
-      "nom": "MARCHAND Camille",
+      "epreuve": "K1H",
+      "nom": "MARCHAND Lucas",
       "club": "Annecy CK",
       "nation": "FRA",
-      "ref_time_ms": 111517
+      "ref_time_ms": 102517
     },
     {
       "bib": 13,
-      "epreuve": "C1H",
-      "nom": "AUBERT Arthur",
+      "epreuve": "K1D",
+      "nom": "AUBERT Louise",
       "club": "CKC Argentat",
       "nation": "FRA",
-      "ref_time_ms": 101737
+      "ref_time_ms": 104737
     },
     {
       "bib": 14,
-      "epreuve": "C1H",
-      "nom": "BARBIER Hugo",
+      "epreuve": "K1D",
+      "nom": "BARBIER Anaïs",
       "club": "CK Metz",
       "nation": "FRA",
-      "ref_time_ms": 95270
+      "ref_time_ms": 98270
     },
     {
       "bib": 15,
-      "epreuve": "C1H",
-      "nom": "MASSON Quentin",
+      "epreuve": "K1D",
+      "nom": "MASSON Sarah",
       "club": "CK Saint-Pierre",
       "nation": "FRA",
-      "ref_time_ms": 101673
+      "ref_time_ms": 104673
     },
     {
       "bib": 16,
-      "epreuve": "C1H",
-      "nom": "DELAUNAY Nolan",
+      "epreuve": "K1D",
+      "nom": "DELAUNAY Clara",
       "club": "ACA Aviron Canoë",
       "nation": "FRA",
-      "ref_time_ms": 99793
+      "ref_time_ms": 102793
     },
     {
       "bib": 17,
-      "epreuve": "C1H",
-      "nom": "NEVEU Antoine",
+      "epreuve": "K1D",
+      "nom": "NEVEU Chloé",
       "club": "US Ivry CK",
       "nation": "FRA",
-      "ref_time_ms": 95676
+      "ref_time_ms": 98676
     },
     {
       "bib": 18,
-      "epreuve": "C1H",
-      "nom": "BONNET Gabin",
+      "epreuve": "K1D",
+      "nom": "BONNET Manon",
       "club": "Sablé CK",
       "nation": "FRA",
-      "ref_time_ms": 104275
+      "ref_time_ms": 107275
     },
     {
       "bib": 19,
-      "epreuve": "C1D",
+      "epreuve": "K1D",
       "nom": "PICHON Marion",
       "club": "CK Pau-Béarn",
       "nation": "FRA",
-      "ref_time_ms": 116298
+      "ref_time_ms": 110298
     },
     {
       "bib": 20,
-      "epreuve": "C1D",
+      "epreuve": "K1D",
       "nom": "PERRIN Émilie",
       "club": "Canoë Club Vallée Ubaye",
       "nation": "FRA",
-      "ref_time_ms": 119952
+      "ref_time_ms": 113952
     },
     {
       "bib": 21,
-      "epreuve": "C1D",
+      "epreuve": "K1D",
       "nom": "COLIN Jeanne",
       "club": "ASCPA Tours",
       "nation": "FRA",
-      "ref_time_ms": 112485
+      "ref_time_ms": 106485
     },
     {
       "bib": 22,
-      "epreuve": "C1D",
+      "epreuve": "K1D",
       "nom": "ROUSSEL Alice",
       "club": "Annecy CK",
       "nation": "FRA",
-      "ref_time_ms": 107465
+      "ref_time_ms": 101465
     },
     {
       "bib": 23,
-      "epreuve": "C1D",
+      "epreuve": "K1D",
       "nom": "DUMAS Léa",
       "club": "CKC Argentat",
       "nation": "FRA",
-      "ref_time_ms": 115782
+      "ref_time_ms": 109782
     },
     {
       "bib": 24,
-      "epreuve": "C1D",
+      "epreuve": "K1D",
       "nom": "MERCIER Camille",
       "club": "CK Metz",
       "nation": "FRA",
-      "ref_time_ms": 103846
+      "ref_time_ms": 97846
+    },
+    {
+      "bib": 25,
+      "epreuve": "C1H",
+      "nom": "CHEVALIER Arthur",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 103247
+    },
+    {
+      "bib": 26,
+      "epreuve": "C1H",
+      "nom": "RIVIERE Hugo",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 112907
+    },
+    {
+      "bib": 27,
+      "epreuve": "C1H",
+      "nom": "VASSEUR Quentin",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 97603
+    },
+    {
+      "bib": 28,
+      "epreuve": "C1H",
+      "nom": "GAUDIN Nolan",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 105429
+    },
+    {
+      "bib": 29,
+      "epreuve": "C1H",
+      "nom": "LEMOINE Antoine",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 110635
+    },
+    {
+      "bib": 30,
+      "epreuve": "C1H",
+      "nom": "ROYER Gabin",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 111888
+    },
+    {
+      "bib": 31,
+      "epreuve": "C1H",
+      "nom": "GUILLET Théo",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 111676
+    },
+    {
+      "bib": 32,
+      "epreuve": "C1H",
+      "nom": "HEBERT Baptiste",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 95519
+    },
+    {
+      "bib": 33,
+      "epreuve": "C1H",
+      "nom": "BLANCHARD Mathis",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 95655
+    },
+    {
+      "bib": 34,
+      "epreuve": "C1H",
+      "nom": "LEROY Maxime",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 102087
+    },
+    {
+      "bib": 35,
+      "epreuve": "C1H",
+      "nom": "FAURE Enzo",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 112811
+    },
+    {
+      "bib": 36,
+      "epreuve": "C1H",
+      "nom": "MARCHAND Lucas",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 103796
+    },
+    {
+      "bib": 37,
+      "epreuve": "C1D",
+      "nom": "AUBERT Louise",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 117408
+    },
+    {
+      "bib": 38,
+      "epreuve": "C1D",
+      "nom": "BARBIER Anaïs",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 123009
+    },
+    {
+      "bib": 39,
+      "epreuve": "C1D",
+      "nom": "MASSON Sarah",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 115800
+    },
+    {
+      "bib": 40,
+      "epreuve": "C1D",
+      "nom": "DELAUNAY Clara",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 124000
+    },
+    {
+      "bib": 41,
+      "epreuve": "C1D",
+      "nom": "NEVEU Chloé",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 114460
+    },
+    {
+      "bib": 42,
+      "epreuve": "C1D",
+      "nom": "BONNET Manon",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 117437
+    },
+    {
+      "bib": 43,
+      "epreuve": "C1D",
+      "nom": "PICHON Marion",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 110483
+    },
+    {
+      "bib": 44,
+      "epreuve": "C1D",
+      "nom": "PERRIN Émilie",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 123793
+    },
+    {
+      "bib": 45,
+      "epreuve": "C1D",
+      "nom": "COLIN Jeanne",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 104931
+    },
+    {
+      "bib": 46,
+      "epreuve": "C1D",
+      "nom": "ROUSSEL Alice",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 121083
+    },
+    {
+      "bib": 47,
+      "epreuve": "C1D",
+      "nom": "DUMAS Léa",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 118619
+    },
+    {
+      "bib": 48,
+      "epreuve": "C1D",
+      "nom": "MERCIER Camille",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 105274
     }
   ]
 }

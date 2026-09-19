@@ -48,6 +48,7 @@ class Engine extends EventEmitter {
       ...b,
       hour_start: b.hour_start !== undefined ? P.parseClock(b.hour_start) : firstStart + i * interval,
       state: 'waiting',              // waiting | running | finished
+      autoStart: true,               // false = départ supprimé par l'opérateur
       status: null,                  // null | 'DNF' | 'DNS' | 'DSQ' | 'DES'
       chrono: null,                  // temps d'arrivée en ms
       inters: {},                    // { 1: ms, 2: ms }
@@ -99,7 +100,7 @@ class Engine extends EventEmitter {
     for (const b of this.boats) {
       if (b.status === 'DNS') continue;
 
-      if (b.state === 'waiting' && this.clock >= b.hour_start) {
+      if (b.state === 'waiting' && b.autoStart !== false && this.clock >= b.hour_start) {
         b.state = 'running';
         this.currentEpreuve = b.epreuve;
       }
@@ -176,6 +177,7 @@ class Engine extends EventEmitter {
     const b = this.boat(bib);
     if (!b) return;
     b.hour_start = this.clock;
+    b.autoStart = true;
     b.state = 'running';
     b.status = null;
     b.chrono = null;
@@ -183,10 +185,16 @@ class Engine extends EventEmitter {
     this.currentEpreuve = b.epreuve;
   }
 
-  forceFinish(bib) {
+  /**
+   * `timeMs` permet d'imposer le temps d'arrivée au lieu de le déduire de
+   * l'horloge : sans cela, un test qui veut un bateau en 12e position devrait
+   * attendre le temps réel de la course.
+   */
+  forceFinish(bib, timeMs) {
     const b = this.boat(bib);
     if (!b || b.state !== 'running') return;
-    this.finish(b, Math.round(this.clock - b.hour_start));
+    const t = Number(timeMs);
+    this.finish(b, t > 0 ? Math.round(t) : Math.round(this.clock - b.hour_start));
   }
 
   /**
@@ -200,6 +208,9 @@ class Engine extends EventEmitter {
     b.state = 'waiting';
     b.chrono = null;
     b.inters = {};
+    // Sans cela le tick suivant le relancerait aussitôt : son heure de départ
+    // est déjà passée, et il réimposerait son épreuve comme épreuve courante.
+    b.autoStart = false;
   }
 
   setStatus(bib, status) {

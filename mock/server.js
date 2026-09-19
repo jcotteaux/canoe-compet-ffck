@@ -213,7 +213,7 @@ function handleApi(req, res, pathname, url) {
         case 'reset': engine.reset(); break;
         case 'speed': engine.setSpeed(p.speed); break;
         case 'bib-start': engine.forceStart(p.bib); break;
-        case 'bib-finish': engine.forceFinish(p.bib); break;
+        case 'bib-finish': engine.forceFinish(p.bib, p.time); break;
         case 'bib-status': engine.setStatus(p.bib, p.status); break;
         case 'bib-remove': engine.removeFromCourse(p.bib); break;
         case 'penalty': engine.addPenalty(p.bib, p.porte, p.value); break;
@@ -314,6 +314,7 @@ server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log(`  monitor              http://localhost:${HTTP_PORT}/canoe/monitor_race.html`);
   console.log(`  tv inrace            http://localhost:${HTTP_PORT}/canoe/tv_inrace.html`);
   console.log(`  tv oncourse          http://localhost:${HTTP_PORT}/canoe/tv_oncourse.html`);
+  console.log(`  tv leaders           http://localhost:${HTTP_PORT}/canoe/tv_leaders.html`);
   console.log(`  tv ranking           http://localhost:${HTTP_PORT}/canoe/tv_ranking.html`);
   console.log(`  tv startlist         http://localhost:${HTTP_PORT}/canoe/tv_startlist.html`);
   console.log(`  jugement             http://localhost:${HTTP_PORT}/canoe/jugement.html`);

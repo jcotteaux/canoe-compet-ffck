@@ -1,0 +1,246 @@
+/*
+ * Classement des premiers de l'épreuve en cours, en surimpression en bas à
+ * gauche, avec le dernier arrivé en pied de bloc.
+ *
+ * Même charte que tv_oncourse.css, elle-même relevée dans les gabarits des
+ * autres pages TV :
+ *   - Calibri gras blanc, tailles en pt              (tv_inrace.css)
+ *   - dégradé de ligne #030910 -> #256eb5            (img/block_name.png)
+ *   - pavé de temps bleu pâle, texte rgb(0,27,90)    (img/block_running.png)
+ *   - vert d'arrivée #338d31                         (img/block_finish_green.png)
+ *   - animation apparitionG 0.7s ease-out            (tv_ranking.css, tv_startlist.css)
+ *   - magenta #D500FF pour le repli chroma-key       (toutes les pages tv_*)
+ *
+ * Le bloc étant ancré à gauche, c'est apparitionG (entrée par la gauche) qui
+ * s'applique, et non apparitionD comme sur tv_oncourse.
+ */
+
+/*
+ * Les autres pages écrivent `font-family: Calibri` sans jamais déclarer la
+ * fonte, alors qu'elle est livrée dans ./font. Sur un poste sans Calibri
+ * (macOS, Linux) le rendu diverge donc silencieusement. On la déclare ici.
+ */
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+/* Animation maison des blocs positionnés à gauche (tv_ranking, tv_startlist). */
+@keyframes apparitionG
+{
+	from { opacity: 0; transform: translateX(-900px); }
+	to   { opacity: 1; transform: translateX(0px); }
+}
+
+:root
+{
+	--leaders-bottom: 40px;
+	--leaders-left: 40px;
+	--leaders-width: 620px;
+	--leaders-scale: 1;
+
+	/* dégradé du bandeau d'identité de tv_inrace (img/block_name.png) */
+	--leaders-row-dark: #030910;
+	--leaders-row-mid: #123558;
+	--leaders-row-blue: #256eb5;
+
+	/* pavé de temps de tv_inrace (img/block_running.png) */
+	--leaders-time-bg: #c4dbef;
+	--leaders-time-bg2: #d0e0f1;
+	--leaders-time-text: rgb(0, 27, 90);
+
+	/* vert d'arrivée (relevé dans img/block_finish_green.png) */
+	--leaders-finish-green: #338d31;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: transparent;		/* la vidéo passe au travers */
+	overflow: hidden;
+	font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
+}
+
+/* Repli chroma-key : ?bg=1 pour une régie qui incruste par couleur. */
+body.chroma
+{
+	background: #D500FF;
+}
+
+#leaders
+{
+	position: absolute;
+	bottom: var(--leaders-bottom);
+	left: var(--leaders-left);
+	width: var(--leaders-width);
+
+	transform: scale(var(--leaders-scale));
+	transform-origin: bottom left;
+
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+
+	animation: apparitionG 0.7s ease-out;
+}
+
+/* Tant qu'aucun bateau de l'épreuve n'est classé, on n'affiche rien. */
+#leaders.empty
+{
+	display: none;
+}
+
+/* En-tête : le code de l'épreuve en cours de chronométrage. */
+#leaders_categ
+{
+	align-self: flex-start;
+
+	background: linear-gradient(90deg, var(--leaders-row-dark) 0%, var(--leaders-row-blue) 100%);
+	color: white;
+
+	padding: 6px 18px;
+	font-size: 20pt;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+}
+
+#leaders_list,
+#leaders_last
+{
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+/*
+ * Le dernier arrivé hors des premiers est séparé du classement par un trait,
+ * pour qu'on ne le lise pas comme la place suivante.
+ */
+#leaders_last
+{
+	margin-top: 7px;
+	padding-top: 7px;
+	border-top: 3px solid rgba(255, 255, 255, 0.75);
+}
+
+.leader
+{
+	display: flex;
+	align-items: stretch;
+
+	background: linear-gradient(90deg,
+		var(--leaders-row-dark) 0%,
+		var(--leaders-row-mid) 45%,
+		var(--leaders-row-blue) 100%);
+
+	color: white;
+	font-weight: bold;
+	font-size: 19pt;
+
+	animation: leader-in 0.7s ease-out;
+}
+
+/* Le dernier arrivé, qu'il soit dans les premiers ou en pied de bloc. */
+.leader.last
+{
+	background: linear-gradient(90deg,
+		var(--leaders-row-dark) 0%,
+		#14391b 30%,
+		var(--leaders-finish-green) 100%);
+}
+
+/*
+ * Alignement vertical : les cellules n'ont pas la même taille de police, donc
+ * pas la même hauteur de boîte de ligne par défaut, et leurs textes se
+ * retrouvent décalés. On impose la même boîte de ligne et le même retrait
+ * vertical partout : quelle que soit la taille de police, tous les textes sont
+ * centrés sur la même ligne.
+ *
+ * `line-height` doit rester supérieure à la plus grande police de la ligne
+ * (21pt = 28px pour le temps), sinon les glyphes débordent de leur boîte.
+ */
+.leader > div
+{
+	padding-top: 8px;
+	padding-bottom: 8px;
+	line-height: 32px;
+}
+
+.leader .rank
+{
+	flex: 0 0 auto;
+	min-width: 56px;
+
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: center;
+	font-size: 21pt;
+}
+
+/* Le dossard est une information secondaire dans un classement : on le pose
+   en retrait pour que la place et l'identité ressortent. */
+.leader .bib
+{
+	flex: 0 0 auto;
+	min-width: 48px;
+
+	padding-left: 6px;
+	padding-right: 10px;
+	text-align: right;
+	font-size: 15pt;
+	color: rgba(255, 255, 255, 0.72);
+}
+
+.leader .name
+{
+	flex: 1 1 auto;
+	min-width: 0;
+
+	padding-left: 4px;
+	padding-right: 12px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.leader .time
+{
+	flex: 0 0 auto;
+
+	background: linear-gradient(180deg, var(--leaders-time-bg) 0%, var(--leaders-time-bg2) 100%);
+	color: var(--leaders-time-text);
+
+	padding-left: 12px;
+	padding-right: 12px;
+	font-size: 21pt;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	min-width: 4.6em;
+}
+
+@keyframes leader-in
+{
+	from { opacity: 0; transform: translateX(-120px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Sur un poste qui n'aime pas les animations (vieille machine de régie), on
+   coupe tout : ?anim=0 ajoute cette classe sur <body>. */
+body.no-anim #leaders,
+body.no-anim .leader
+{
+	animation: none;
+}
