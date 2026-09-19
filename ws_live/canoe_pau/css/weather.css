@@ -1,0 +1,177 @@
+@font-face{
+	font-family: "Montserrat";
+	src: url("../font/static/Montserrat-SemiBold.ttf") format("truetype");
+}
+@font-face{
+	font-family: "Montserrat-Bold";
+	src: url("../font/static/Montserrat-Bold.ttf") format("truetype");
+}
+
+body
+{
+
+	background-color:pink;
+	padding:0px;
+	margin:0px;
+}
+
+@keyframes apparition {
+	from{
+		opacity: 0;
+		transform: translateX(-1000px);
+	}
+	to{
+		opacity: 1;
+		transform: translateX(0px);
+	}
+}
+
+#head 
+{
+	position: absolute;
+	background-image: url("../img/block_info.png");
+	background-repeat: no-repeat;
+
+	left:0px;
+	top:0px;
+	width:1000px;
+	height:1000px;
+	animation: apparition 1s ease-out;		
+}
+
+#head .label_title
+{
+	position: absolute;
+
+	left:55px;
+	width:400px;
+	top:385px;
+	
+	font-family: Montserrat-Bold;
+	font-size:25pt;
+	color:white;
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .air_temp
+{
+	position: absolute;
+
+	left:390px;
+	width:600px;
+	top:462px;
+	
+	font-family: Montserrat-Bold;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .water_temp
+{
+	position: absolute;
+
+	left:390px;
+	width:600px;
+	top:528px;
+	
+	font-family: Montserrat-Bold;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .wind_speed
+{
+	position: absolute;
+
+	left:390px;
+	width:600px;
+	top:592px;
+	
+	font-family: Montserrat-Bold;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .label_air_temp
+{
+	position: absolute;
+
+	left:150px;
+	width:430px;
+	top:462px;
+	
+	font-family: Montserrat;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .label_water_temp
+{
+	position: absolute;
+
+	left:150px;
+	width:435px;
+	top:528px;
+	
+	font-family: Montserrat;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .label_wind_speed
+{
+	position: absolute;
+
+	left:150px;
+	width:430px;
+	top:592px;
+	
+	font-family: Montserrat;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+
+#head .picture
+{
+	position: absolute;
+	background-image: url("../img/meteo/3.png");
+	background-repeat: no-repeat;
+	/*
+	1-nuage soleil
+	2-nuageux
+	3-ensoleillé 
+	4-pluie avec soleil
+	5-neige avec pluie
+	6-orage avec pluie
+	7-neige
+	8-pluie
+	9-neige avec nuage
+	*/
+
+	left: 480px;
+	top: 475px;
+	width: 200px;
+	height: 200px;
+
+}

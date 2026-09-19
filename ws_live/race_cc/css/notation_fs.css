@@ -1,0 +1,53 @@
+td.gate_std {
+	color:black;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+}
+
+td.gate_inv {
+	color:red;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+}
+
+td.gate {
+	border: 2px solid black;
+	padding: 20px; 
+	width: 25%;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+}
+
+tr[data-pen="-1"] td.gate {
+	background-color: white;
+	color:black;
+	font-weight: bold;
+}
+
+tr[data-pen="0"] td.gate[data-value="0"] {
+	background-color: green;
+	color:white;
+	font-weight: bold;
+}
+
+tr[data-pen="2"] td.gate[data-value="2"] {
+	background-color: yellow;
+	color:black;
+	font-weight: bold;
+}
+
+tr[data-pen="50"] td.gate[data-value="50"] {
+	background-color: red;
+	color:white;
+	font-weight: bold;
+}
+
+tr td.gate_inv {
+	color:red;
+}
+
+
+

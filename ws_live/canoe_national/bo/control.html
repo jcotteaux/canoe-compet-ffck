@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>bo-live</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="/live/bootstrap-5.0.1/css/bootstrap.min.css" rel="stylesheet">
+		
+		<link rel="shortcut icon" href="./16x16_admin.png" />
+		<link rel="icon" href="./16x16_admin.png"/>
+	</head>
+
+	<body>
+		<main id="main" class="container-fluid">
+		</main>
+
+		<div class="container" id="container_message">
+			<div class="d-flex align-items-center" col>
+				<strong id="message">Loading...</strong>
+				<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+			</div>
+		</div>
+
+		<div class="container">
+			<button onclick="OnStop()" type="button" class="btn btn-outline-primary col">Stop</button>
+			<button onclick="OnStart()" type="button" class="btn btn-outline-primary col">Start</button>
+			<button onclick="OnReStart()" type="button" class="btn btn-outline-primary col">Re-Start</button>
+			
+			<button onclick="OnRefresh()" type="button" class="btn btn-outline-primary col">Ping Web-Socket</button>
+			<button onclick="OnSendPingSocket()" type="button" class="btn btn-outline-primary col">Ping Socket</button>
+		</div>
+		
+		<footer></footer>
+		
+		<script src="/live/bootstrap-5.0.1/js/bootstrap.min.js"></script>
+		
+		<script src="/live/adv/ws.js"></script>
+		<script src="/live/adv/adv.js"></script>
+		<script src="/live/adv/ws_params.js"></script>
+		
+		<script src="/live/canoe/bo/js/control.js?v2"></script>
+		
+		<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+	</body>
+</html>

@@ -1,0 +1,37 @@
+body
+{
+
+	background-color:pink;
+	padding:0px;
+	margin:0px;
+
+
+}
+
+@keyframes apparitionD {
+	from{
+		opacity: 0;
+		transform: translateX(1500px);
+	}
+	to{
+		opacity: 1;
+		transform: translateX(0px);
+	}
+}
+
+#head 
+{
+	position: absolute;
+	background-image: url("../img/block_presentation.png");
+	background-repeat: no-repeat;
+
+	left:0px;
+	top:0px;
+	width:1920px;
+	height:1080px;
+
+	animation: apparitionD 1s ease-out;	
+	
+
+}
+

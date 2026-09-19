@@ -1,0 +1,1 @@
+const wsParams = {url:'ws://localhost', port:8080};

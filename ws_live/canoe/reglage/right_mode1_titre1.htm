@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html coupert-item="9AF8D9A4E502F3784AD24272D81F0381" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>live</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="../../bootstrap-5.0.1/css/bootstrap.min.css" rel="stylesheet">
+		<link href="../css/live.css" rel="stylesheet">
+		
+		<link rel="shortcut icon" href="../img/32x32_ffck.png">
+		<link rel="icon" href="../img/32x32_ffck.png">
+	</head>
+	<body>
+		<header id="header" class="page-header" style="min-height: 70px; display: none;">
+			<h1 id="title">Championnat de France Slalom 2023 - Qualification 1</h1>
+			<h2 id="sub_title" style="display: none;">Q1, Q2 et Finale - Qualification 1 - K1HU23</h2>
+		</header>
+		
+		<nav id="navigation_epreuve" class="navbar navbar-expand-lg navbar-dark bg-dark" style="display: block; padding: 0px;"> 
+			 <div class="container-fluid d-flex align-items-center">
+  				<a class="navbar-brand" href="../live.html">
+					<img src="../img/32x32_ffck.png" alt="" width="32" height="32">
+				</a>
+				
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				  <span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav mb-2 mb-lg-0">
+						<li class="nav-item">
+						  <a class="nav-link" id="navigation_prev" aria-current="page" href="#" onclick="PrevEpreuve();">&lt;&lt;&nbsp;Précédent</a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" id="navigation_next" aria-current="page" href="#" onclick="NextEpreuve();">Suivant&nbsp;&gt;&gt;</a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-link" aria-current="page" href="#" onclick="SetBodyEpreuves();">Selection</a>
+						</li>
+					</ul>	
+					<div class="navbar-text mx-auto">
+						<h4 class="text-white fw-bold"><span id="titre">Classement</span></h4>
+					</div>
+					<span class="navbar-text">
+						<h4><span id="sel_epreuve">K1HU23</span>&nbsp;&nbsp;<span id="clock" class="badge bg-success">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></h4>
+					</span>
+				</div>
+			</div>
+		</nav>
+		<div id="saut" style="display: none;"><br></div>
+    <main id="main" class="container-fluid">
+      <table class="table table-striped">
+        <thead class="table-dark" id="onCourseHeader">
+          <tr>
+						<th class="text-end">Clt</th>
+						<th class="text-center">Dos.</th>
+						<th class="text-center">Identité</th>
+						<th class="text-center" style="display:none">IdentitéTmp</th>
+						<th class="text-center" style="display:none">ClubTmp</th>
+						<th class="text-center">Club</th>
+						<th class="text-end">Chrono</th>
+            <th>Péna</th>
+            <th class="text-end">T.Arrivée</th>
+          </tr>
+        </thead>
+        <tbody id="onCourse">
+          <tr data-bib="383">
+            <td class="rank">1</td>
+            <td class="bib">383</td>
+            <td class="name" style="display:none">GRAPOTTE PIERRE</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB NAUTIQUE DE LA PLATIERE</td>
+            <td class="chrono">39.01</td>
+            <td class="penalite">0</td>
+            <td class="time">39,01</td>
+          </tr>
+          <tr data-bib="380">
+            <td class="rank">...</td>
+            <td class="bib">380</td>
+            <td class="name" style="display:none">DEMO AFFICHAGE</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB LOISIRS POP. LOCHRIST</td>
+            <td class="chrono">39.02</td>
+            <td class="penalite">0</td>
+            <td class="time">39,02</td>
+          </tr>
+          <tr data-bib="381">
+            <td class="rank">...</td>
+            <td class="bib">381</td>
+            <td class="name" style="display:none">MODE REGLAGE</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB LOISIRS POP. LOCHRIST</td>
+            <td class="chrono">39.02</td>
+            <td class="penalite">0</td>
+            <td class="time">39,02</td>
+          </tr>
+          <tr data-bib="386">
+            <td class="rank">2</td>
+            <td class="bib">386</td>
+            <td class="name" style="display:none">MEM JORIS</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB LOISIRS POP. LOCHRIST</td>
+            <td class="chrono">39.02</td>
+            <td class="penalite">0</td>
+            <td class="time">39,02</td>
+          </tr>
+          <tr data-bib="367">
+            <td class="rank">3</td>
+            <td class="bib">367</td>
+            <td class="name" style="display:none">HUGUENIN NATHAN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">TORCY CK</td>
+            <td class="chrono">40.00</td>
+            <td class="penalite">0</td>
+            <td class="time">40,00</td>
+          </tr>
+          <tr data-bib="368">
+            <td class="rank">4</td>
+            <td class="bib">368</td>
+            <td class="name" style="display:none">MESMOUDI ADRIEN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">PAU CANOE-KAYAK CLUB UNIVERSITAIRE</td>
+            <td class="chrono">40.01</td>
+            <td class="penalite">0</td>
+            <td class="time">40,01</td>
+          </tr>
+          <tr data-bib="370">
+            <td class="rank">5</td>
+            <td class="bib">370</td>
+            <td class="name" style="display:none">PEDRON NATHANAEL</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">GOLBEY EPINAL ST NABORD</td>
+            <td class="chrono">40.03</td>
+            <td class="penalite">0</td>
+            <td class="time">40,03</td>
+          </tr>
+          <tr data-bib="371">
+            <td class="rank">6</td>
+            <td class="bib">371</td>
+            <td class="name" style="display:none">VERRONS ARNAUD</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">PAU CANOE-KAYAK CLUB UNIVERSITAIRE</td>
+            <td class="chrono">40.04</td>
+            <td class="penalite">0</td>
+            <td class="time">40,04</td>
+          </tr>
+          <tr data-bib="372">
+            <td class="rank">7</td>
+            <td class="bib">372</td>
+            <td class="name" style="display:none">BRUN THEO</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB CK DES GORGES DE L'ARDECHE</td>
+            <td class="chrono">40.05</td>
+            <td class="penalite">0</td>
+            <td class="time">40,05</td>
+          </tr>
+          <tr data-bib="373">
+            <td class="rank">8</td>
+            <td class="bib">373</td>
+            <td class="name" style="display:none">DELAGE-GAREZ FANTIN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK ATURIN</td>
+            <td class="chrono">40.06</td>
+            <td class="penalite">0</td>
+            <td class="time">40,06</td>
+          </tr>
+          <tr data-bib="375">
+            <td class="rank">9</td>
+            <td class="bib">375</td>
+            <td class="name" style="display:none">COURTIADE EMILIEN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">ETOILE AMOU CK</td>
+            <td class="chrono">40.07</td>
+            <td class="penalite">0</td>
+            <td class="time">40,07</td>
+          </tr>
+          <tr data-bib="376">
+            <td class="rank">10</td>
+            <td class="bib">376</td>
+            <td class="name" style="display:none">REBY THEO</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">ANCERVILLE-BAR LE DUC</td>
+            <td class="chrono">40.08</td>
+            <td class="penalite">0</td>
+            <td class="time">40,08</td>
+          </tr>
+          <tr data-bib="377">
+            <td class="rank">11</td>
+            <td class="bib">377</td>
+            <td class="name" style="display:none">ADISSON GAEL</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB DE CANOE-KAYAK DES ECRINS</td>
+            <td class="chrono">40.09</td>
+            <td class="penalite">0</td>
+            <td class="time">40,09</td>
+          </tr>
+          <tr data-bib="374">
+            <td class="rank">12</td>
+            <td class="bib">374</td>
+            <td class="name" style="display:none">SIMEANT DJENDY</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK HAUTE ISERE</td>
+            <td class="chrono">40.10</td>
+            <td class="penalite">0</td>
+            <td class="time">40,10</td>
+          </tr>
+          <tr data-bib="378">
+            <td class="rank">13</td>
+            <td class="bib">378</td>
+            <td class="name" style="display:none">AUBERTIN MAXIME</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">GOLBEY EPINAL ST NABORD</td>
+            <td class="chrono">40.40</td>
+            <td class="penalite">0</td>
+            <td class="time">40,40</td>
+          </tr>
+          <tr data-bib="379">
+            <td class="rank">14</td>
+            <td class="bib">379</td>
+            <td class="name" style="display:none">SENECHAULT YOHANN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK CLUB FRANCE</td>
+            <td class="chrono">40.41</td>
+            <td class="penalite">0</td>
+            <td class="time">40,41</td>
+          </tr>
+          <tr data-bib="380">
+            <td class="rank">15</td>
+            <td class="bib">380</td>
+            <td class="name" style="display:none">DAVY MAXENCE</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">F.L.CK CHALONNES</td>
+            <td class="chrono">40.45</td>
+            <td class="penalite">0</td>
+            <td class="time">40,45</td>
+          </tr>
+          <tr data-bib="381">
+            <td class="rank">16</td>
+            <td class="bib">381</td>
+            <td class="name" style="display:none">BUSSON FLORIAN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK CLUB SABOLIEN</td>
+            <td class="chrono">40.46</td>
+            <td class="penalite">0</td>
+            <td class="time">40,46</td>
+          </tr>
+          <tr data-bib="369">
+            <td class="rank">17</td>
+            <td class="bib">369</td>
+            <td class="name" style="display:none">PEREZ ELLIOT</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">ALCK BAGNERES DE BIGORRE</td>
+            <td class="chrono">40.02</td>
+            <td class="penalite">2</td>
+            <td class="time">42,02</td>
+          </tr>
+          <tr data-bib="382">
+            <td class="rank">18</td>
+            <td class="bib">382</td>
+            <td class="name" style="display:none">CAIL CYPRIEN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK TOULOUSAIN</td>
+            <td class="chrono">45.00</td>
+            <td class="penalite">0</td>
+            <td class="time">45,00</td>
+          </tr>
+          <tr data-bib="384">
+            <td class="rank">19</td>
+            <td class="bib">384</td>
+            <td class="name" style="display:none">BERNES MAEL</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">ALCK BAGNERES DE BIGORRE</td>
+            <td class="chrono">47.00</td>
+            <td class="penalite">0</td>
+            <td class="time">47,00</td>
+          </tr>
+          <tr data-bib="385">
+            <td class="rank">20</td>
+            <td class="bib">385</td>
+            <td class="name" style="display:none">HERVAULT MAEL</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">EYRIEUX CK</td>
+            <td class="chrono">49.00</td>
+            <td class="penalite">0</td>
+            <td class="time">49,00</td>
+          </tr>
+          <tr data-bib="358">
+            <td class="rank">21</td>
+            <td class="bib">358</td>
+            <td class="name" style="display:none">COUCHOUD CLEMENT</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB CK VIENNE</td>
+            <td class="chrono">50.00</td>
+            <td class="penalite">0</td>
+            <td class="time">50,00</td>
+          </tr>
+          <tr data-bib="360">
+            <td class="rank">22</td>
+            <td class="bib">360</td>
+            <td class="name" style="display:none">DEVIS MAXIME</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">GOLBEY EPINAL ST NABORD</td>
+            <td class="chrono">50.01</td>
+            <td class="penalite">0</td>
+            <td class="time">50,01</td>
+          </tr>
+          <tr data-bib="361">
+            <td class="rank">23</td>
+            <td class="bib">361</td>
+            <td class="name" style="display:none">AFFRE LORIS SHAYAM</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK LE MAS D'AGENAIS</td>
+            <td class="chrono">50.02</td>
+            <td class="penalite">0</td>
+            <td class="time">50,02</td>
+          </tr>
+          <tr data-bib="362">
+            <td class="rank">24</td>
+            <td class="bib">362</td>
+            <td class="name" style="display:none">UKALOVIC THOMAS</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">VAL DE L'INDRE CK</td>
+            <td class="chrono">50.03</td>
+            <td class="penalite">0</td>
+            <td class="time">50,03</td>
+          </tr>
+          <tr data-bib="363">
+            <td class="rank">25</td>
+            <td class="bib">363</td>
+            <td class="name" style="display:none">DERAME MAX</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">C.K. CHATEAU THEBAUD</td>
+            <td class="chrono">50.04</td>
+            <td class="penalite">0</td>
+            <td class="time">50,04</td>
+          </tr>
+          <tr data-bib="364">
+            <td class="rank">26</td>
+            <td class="bib">364</td>
+            <td class="name" style="display:none">FLEGEAU KILLIAN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CLUB LOISIRS POP. LOCHRIST</td>
+            <td class="chrono">50.05</td>
+            <td class="penalite">0</td>
+            <td class="time">50,05</td>
+          </tr>
+          <tr data-bib="365">
+            <td class="rank">27</td>
+            <td class="bib">365</td>
+            <td class="name" style="display:none">LANDREAU CEDRIC</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">PAU CANOE-KAYAK CLUB UNIVERSITAIRE</td>
+            <td class="chrono">50.06</td>
+            <td class="penalite">0</td>
+            <td class="time">50,06</td>
+          </tr>
+          <tr data-bib="366">
+            <td class="rank">28</td>
+            <td class="bib">366</td>
+            <td class="name" style="display:none">BRUNEAU ROMAIN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CK CLISSON</td>
+            <td class="chrono">50.07</td>
+            <td class="penalite">0</td>
+            <td class="time">50,07</td>
+          </tr>
+          <tr data-bib="359">
+            <td class="rank">29</td>
+            <td class="bib">359</td>
+            <td class="name" style="display:none">BRUCHER AMAURY</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">RED STAR CLUB CHAMPIGNY</td>
+            <td class="chrono">50.10</td>
+            <td class="penalite">0</td>
+            <td class="time">50,10</td>
+          </tr>
+          <tr data-bib="357">
+            <td class="rank">30</td>
+            <td class="bib">357</td>
+            <td class="name" style="display:none">LOUVEAU ALEX</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">J.S.P.A. MAYENNE</td>
+            <td class="chrono">55.00</td>
+            <td class="penalite">0</td>
+            <td class="time">55,00</td>
+          </tr>
+          <tr data-bib="387">
+            <td class="rank">31</td>
+            <td class="bib">387</td>
+            <td class="name" style="display:none">PERREAU NOE</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">TORCY CK</td>
+            <td class="chrono">56.00</td>
+            <td class="penalite">0</td>
+            <td class="time">56,00</td>
+          </tr>
+          <tr data-bib="388">
+            <td class="rank">32</td>
+            <td class="bib">388</td>
+            <td class="name" style="display:none">BOUCHARDON TOM</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">ALBI KAYAK CANOE</td>
+            <td class="chrono">57.00</td>
+            <td class="penalite">0</td>
+            <td class="time">57,00</td>
+          </tr>
+          <tr data-bib="389">
+            <td class="rank">33</td>
+            <td class="bib">389</td>
+            <td class="name" style="display:none">BENINI GINO</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">V.P.A. PONT D'ARC</td>
+            <td class="chrono">58.00</td>
+            <td class="penalite">0</td>
+            <td class="time">58,00</td>
+          </tr>
+          <tr data-bib="390">
+            <td class="rank">34</td>
+            <td class="bib">390</td>
+            <td class="name" style="display:none">REGNIER HUGO</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">KAYAK CLUB DE RENNES</td>
+            <td class="chrono">59.00</td>
+            <td class="penalite">0</td>
+            <td class="time">59,00</td>
+          </tr>
+          <tr data-bib="391">
+            <td class="rank">35</td>
+            <td class="bib">391</td>
+            <td class="name" style="display:none">CASTRYCK TITOUAN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CESSON SEVIGNE CK LES POISSONS VOLANTS</td>
+            <td class="chrono">59.01</td>
+            <td class="penalite">0</td>
+            <td class="time">59,01</td>
+          </tr>
+          <tr data-bib="392">
+            <td class="rank">36</td>
+            <td class="bib">392</td>
+            <td class="name" style="display:none">PAJAUD JULIEN</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">CADPA HUNINGUE</td>
+            <td class="chrono">59.02</td>
+            <td class="penalite">0</td>
+            <td class="time">59,02</td>
+          </tr>
+          <tr data-bib="393">
+            <td class="rank">37</td>
+            <td class="bib">393</td>
+            <td class="name" style="display:none">DELAHAYE VINCENT</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">TORCY CK</td>
+            <td class="chrono">59.03</td>
+            <td class="penalite">0</td>
+            <td class="time">59,03</td>
+          </tr>
+          <tr data-bib="394">
+            <td class="rank">38</td>
+            <td class="bib">394</td>
+            <td class="name" style="display:none">ESTANGUET-SANTAMARIA LUKAS</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">PAU CANOE-KAYAK CLUB UNIVERSITAIRE</td>
+            <td class="chrono">59.04</td>
+            <td class="penalite">0</td>
+            <td class="time">59,04</td>
+          </tr>
+          <tr data-bib="395">
+            <td class="rank">39</td>
+            <td class="bib">395</td>
+            <td class="name" style="display:none">VUITTON LEO</td>
+						<td class="nameaff"></td>
+						<td class="clubaff"></td>
+						<td class="club" style="display:none">MURET OLYMPIQUE C.K.</td>
+            <td class="chrono">59.05</td>
+            <td class="penalite">0</td>
+            <td class="time">59,05</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+		<div class="container" id="container_message"></div>
+		
+		<div class="container">
+			<img id="image">
+		</div>
+		
+		<footer></footer>
+    <script src="../../bootstrap-5.0.1/js/bootstrap.min.js"></script>
+		
+	
+
+<div id="3d9f0dd9-0c8a-4cf9-9ae3-6c8987916ba6" style="display: block !important; z-index: 2147483647 !important;"></div></body></html>

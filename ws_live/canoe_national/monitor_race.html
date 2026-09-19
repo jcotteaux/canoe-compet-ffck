@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Résultats Course</title>
+    <link rel="shortcut icon" href="./16x16_ffck.png" />
+    <link rel="icon" href="./16x16_ffck.png" />
+    <link href="../bootstrap-5.0.1/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .bottomFrame,.bottomFrameRight,.topFrameLeft,.topFrameRight{border:none;overflow:hidden}#demo,#reel,.btn_param,body,html{padding:0;margin:0}#parametrages,.btn_param{vertical-align:top;margin:0}#info,#parametre{cursor:pointer;position:absolute}#info,#parametrages .cadre{margin:0 0 20px;font-size:14px}#info,#parametrages,#parametrages .cadre{padding:10px;box-shadow:5px 5px 5px 2px rgba(0,0,0,.7)}#fullscreen,#info,#info::after,#parametre{position:absolute}body,html{height:100%;background:#333;overflow:hidden}.topFrameLeft{float:left;background:#789;width:54.8%}.topFrameRight{float:right;width:44.8%;background:#abc}.bottomFrame{float:left;width:100%}.bottomFrameRight{float:right;width:49.8%}#demo,#reel{width:100%;height:100%}#fullscreen{left:84px;top:10px;height:32px;padding-top:2px}#parametre{left:42px;top:10px}.btn_param{border-radius:8px;border:1px solid #444;background:linear-gradient(#507090,#a0c0e0)!important;display:flex;justify-content:center;align-items:center;width:32px;height:32px}#parametrages,.cadre_info{background:linear-gradient(#7090b0,#a0c0e0)!important}.btn_param img{max-width:80%;max-height:80%}#parametrages{position:fixed;z-index:150;display:none;left:41px;top:10px;width:500px;border-radius:8px;border:1px solid #444;transition:opacity .3s}#parametrages:not(:hover){opacity:.4}#boutons_validation{text-align:center}#parametrages .cadre{border:2px solid #444;border-radius:14px;background-color:#a0c0e0}.cadre_info{padding:2px 0;margin-bottom:10px}#info{left:80px;top:13px;transition:opacity 2s;border-radius:8px 20px;background-color:#f5ff99}.cache{opacity:0}#info::after{content:"";border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid #f5ff99;left:-14px;top:10px;rotate:90deg}
+    </style>
+  </head>
+  <body>
+    <div id="parametre" title="Paramètres" onclick="OpenParametrage()">
+      <button class="btn_param"><img src="./img/parametres.png" /></button>
+    </div>
+    <button
+      id="fullscreen"
+      class="btn btn-danger"
+      title="Basculer en mode plein écran"
+      onclick="FullScreen(this)"
+    >
+      Plein écran
+    </button>
+    <div id="reel">
+      <iframe
+        id="topFrameLeft"
+        class="topFrameLeft"
+        src=""
+        scrolling="yes"
+        name="Left"
+      ></iframe
+      ><iframe
+        id="topFrameRight"
+        class="topFrameRight"
+        src=""
+        scrolling="yes"
+        name="Right"
+      ></iframe
+      ><iframe
+        id="bottomFrame"
+        class="bottomFrame"
+        src=""
+        scrolling="yes"
+        name="Bottom"
+      ></iframe>
+    </div>
+    <div id="demo">
+      <iframe
+        id="topFrameLeft_demo"
+        class="topFrameLeft"
+        src=""
+        scrolling="yes"
+      ></iframe
+      ><iframe
+        id="topFrameRight_demo"
+        class="topFrameRight"
+        src=""
+        scrolling="yes"
+      ></iframe
+      ><iframe
+        id="bottomFrame_demo"
+        class="bottomFrame"
+        src=""
+        scrolling="yes"
+      ></iframe>
+    </div>
+    <div id="message">
+      <div
+        id="message_provisoire"
+        class="container-fluid d-flex align-items-center bg-dark"
+        style="position: absolute; bottom: 0; width: 100%"
+      >
+        <div class="navbar-text mx-auto">
+          <h4 class="text-danger fw-bold display-6 text-nowrap">
+            <span id="titre"
+              >Résultats provisoires en attente de vérifications</span
+            >
+          </h4>
+        </div>
+      </div>
+    </div>
+    <div id="info" onclick='this.style.display="none"'>
+      Paramétrage de l'affichage
+    </div>
+    <div id="parametrages">
+      <h4>Paramètres d'affichage</h4>
+      <div class="cadre">
+        <div class="rounded-pill cadre_info">
+          <div class="fw-bold text-center">
+            Appuyer sur F11 pour mettre en plein écran
+          </div>
+          <div class="text-center">
+            régler le nb de portes (en bas), prérégler, puis ajuster si besoin.
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="form-label d-flex align-items-center">
+              <label for="zoom" class="m-0">Zoom</label>
+            </div>
+          </div>
+          <div class="col px-0">
+            <input
+              type="range"
+              class="form-range"
+              min="20"
+              max="200"
+              step="2"
+              id="zoom"
+              onchange="Zoom()"
+            />
+          </div>
+          <div class="col-auto form-label"><span id="text_zoom"></span>%</div>
+        </div>
+        <hr class="m-0 p-0" />
+        <div class="fw-bold fst-italic">
+          Choisir le dernier numero du classement visible :
+        </div>
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="form-label d-flex align-items-center">
+              <label for="nb_lg_finish" class="d-block m-0"
+                >Nbre de lignes derniers arrivés</label
+              >
+            </div>
+          </div>
+          <div class="col px-0">
+            <input
+              type="range"
+              class="form-range"
+              min="3"
+              max="60"
+              id="nb_lg_finish"
+              onchange="valeurs.scrolling=this.value,ChangeText(frame_demo)"
+            />
+          </div>
+          <div class="col-auto form-label">
+            <span id="text_nb_lg_finish" class="form-label"></span>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="form-label d-flex align-items-center">
+              <label for="largeur" class="m-0">Lg Zone Gauche</label>
+            </div>
+          </div>
+          <div class="col px-0">
+            <input
+              type="range"
+              class="form-range"
+              min="0"
+              max="100"
+              step="0.2"
+              id="largeur"
+              onchange="RedimensionnerLargeur(frame_demo)"
+            />
+          </div>
+          <div class="col-auto form-label">
+            <span id="text_largeur"></span>%
+          </div>
+        </div>
+        <hr class="m-0 p-0" />
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="form-label d-flex align-items-center">
+              <label for="delay" class="m-0">Temps affichage classement</label>
+            </div>
+          </div>
+          <div class="col px-0">
+            <input
+              type="range"
+              class="form-range"
+              min="5"
+              max="60"
+              id="delay"
+              onchange="valeurs.delay=this.value,ChangeText(frame_demo)"
+            />
+          </div>
+          <div class="col-auto form-label">
+            <span id="text_delay" class="small"></span>sec
+          </div>
+        </div>
+        <hr class="m-0 p-0" />
+        <div class="row align-items-center">
+          <div class="col-8">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="switch_scroll"
+                onchange='valeurs.Vscroll=this.checked?"yes":"no",ChangeScroll(frame_demo)'
+              /><label class="form-check-label" for="switch_scroll"
+                >Afficher barre de scroll</label
+              >
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="switch_titre"
+                onchange="ChangeTitre(this)"
+              /><label class="form-check-label" for="switch_titre"
+                >Afficher le bandeau titre de la course</label
+              >
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="switch_mode"
+                onchange="ChangeMode(this)"
+              /><label class="form-check-label" for="switch_mode"
+                >Mode 2 colonnes derniers arrivés</label
+              >
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="switch_bandeau"
+                onchange="ChangeBandeau(this)"
+              /><label class="form-check-label" for="switch_bandeau"
+                >Afficher bandeau Résultats provisoires</label
+              >
+            </div>
+          </div>
+          <div class="col-4 align-self-end pb-1">
+            <button class="btn btn-primary float-end" onclick="Preregler()">
+              Prérégler
+            </button>
+          </div>
+        </div>
+        <hr class="m-0 p-0" />
+        <hr class="m-0 p-0" />
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="form-label d-flex align-items-center">
+              <label for="nb_porte" class="m-0"
+                >Nb de Portes réglage démo</label
+              >
+            </div>
+          </div>
+          <div class="col px-0">
+            <input
+              type="range"
+              class="form-range"
+              min="0"
+              max="25"
+              step="1"
+              id="nb_porte"
+              onchange="ChangeNbPorte(this)"
+            />
+          </div>
+          <div class="col-auto form-label">
+            <span id="text_nb_porte"></span>
+          </div>
+        </div>
+      </div>
+      <div id="boutons_validation">
+        <div class="row">
+          <div class="col-sm-4">
+            <button type="button" class="btn btn-warning" onclick="Defaut()">
+              Réinitialiser
+            </button>
+          </div>
+          <div class="col-sm-8 text-right">
+            <button type="button" class="btn btn-danger" onclick="Annuler()">
+              Annuler</button
+            ><button type="button" class="btn btn-success" onclick="Valider()">
+              Valider
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        var mode_change;let valeurs,frame_reel={},frame_demo={},div={};function InitElement(e,t=null){return t?t[e]:document.getElementById(e)}function InitFrames(e,t=""){let l=["topFrameLeft","topFrameRight"];["left","right"].forEach((r,a)=>{e[r]=InitElement(`${l[a]}${t}`)})}function InitDivElements(){["info","demo","reel","parametrages","switch_mode","switch_scroll","switch_bandeau","switch_titre","ht_podium","nb_porte","largeur","delay","nb_lg_finish","zoom","text_largeur","text_delay","text_nb_lg_finish","text_zoom","text_h_podium","text_nb_porte"].forEach(e=>{div[e]=InitElement(e)})}function LoadSave(){let e;!0==(null!=localStorage.getItem("valeurs"))?LoadParametres():SaveParametres()}function LoadParametres(){valeurs=JSON.parse(localStorage.getItem("valeurs"))}function SaveParametres(){localStorage.setItem("valeurs",JSON.stringify(valeurs))}function OpenParametrage(){div.info.classList.add("cache"),div.parametrages.style.display="block",div.demo.style.display="block",div.reel.style.display="none",mode_change=div.switch_mode.checked,TextResizeDemo()}function Defaut(){valeurs={scrolling:22,delay:15,mode:1,zoom_val:60,topFrameHeight:85,bottomFrameHeight:15,topFrameHeight_m2:100,bottomFrameHeight_m2:0,leftFrameWidth:59.8,rightFrameWidth:39.8,Vscroll:"yes",Bandeau:"yes",titre:1,nb_porte:21},InitVal(),InitFrame(frame_demo)}function Annuler(){LoadParametres(),InitVal(),InitFrame(frame_reel),InitFrame(frame_demo),div.demo.style.display="none",div.reel.style.display="block",div.parametrages.style.display="none"}function Valider(){SaveParametres(),InitFrame(frame_reel),div.demo.style.display="none",div.reel.style.display="block",div.parametrages.style.display="none",div.switch_mode.checked!==mode_change&&AfficheFrameRight(),postMessageFrame()}function InitFrame(e){ChangeScroll(e),RedimensionnerHauteur(e),RedimensionnerLargeur(e)}function InitVal(){div.switch_mode.checked=valeurs.mode-1,div.switch_scroll.checked="yes"===valeurs.Vscroll?1:0,div.switch_bandeau.checked="yes"===valeurs.Bandeau?1:0,div.switch_titre.checked=valeurs.titre,div.largeur.value=valeurs.leftFrameWidth,div.delay.value=valeurs.delay,div.nb_lg_finish.value=valeurs.scrolling,div.zoom.value=valeurs.zoom_val,div.nb_porte.value=valeurs.nb_porte,2===valeurs.mode?div.largeur.disabled=!0:div.largeur.disabled=!1,"yes"===valeurs.Bandeau?document.getElementById("message").style.display="block":document.getElementById("message").style.display="none",ChangeText(),Zoom()}function ChangeText(){div.text_delay.innerHTML=valeurs.delay,div.text_nb_lg_finish.innerHTML=valeurs.scrolling,div.text_zoom.innerHTML=valeurs.zoom_val,div.text_nb_porte.innerHTML=valeurs.nb_porte}function Zoom(){valeurs.zoom_val=parseInt(div.zoom.value),div.text_zoom.innerHTML=valeurs.zoom_val,document.body.style.height=`${1e4/valeurs.zoom_val}%`,document.body.style.width=`${1e4/valeurs.zoom_val}%`,document.body.style.transform=`scale(${valeurs.zoom_val/100})`,document.body.style.transformOrigin="top left",vitesse=2,div.parametrages.style.transform=`scale(${100/valeurs.zoom_val*(((100-valeurs.zoom_val)/vitesse+valeurs.zoom_val)/100)})`,div.parametrages.style.transformOrigin="top left",TextResizeDemo()}function RedimensionnerHauteur(e){let t=100-valeurs.bottomFrameHeight;e.left.style.height=`${t}%`,e.right.style.height=`${t}%`}function RedimensionnerLargeur(e){1===valeurs.mode?(valeurs.leftFrameWidth=div.largeur.value,valeurs.rightFrameWidth=99.6-valeurs.leftFrameWidth,div.text_largeur.innerHTML=valeurs.leftFrameWidth,e.left.style.width=`${valeurs.leftFrameWidth}%`,e.right.style.width=`${valeurs.rightFrameWidth}%`):(div.text_largeur.innerHTML=50,e.left.style.width="50%",e.right.style.width="50%")}function ChangeScroll(e){e.left.scrolling=valeurs.Vscroll,e.right.scrolling=valeurs.Vscroll}function ChangeMode(e){valeurs.mode=e.checked?2:1,div.largeur.disabled=e.checked,RedimensionnerLargeur(frame_demo),RedimensionnerHauteur(frame_demo),AfficheDemo()}function ChangeBandeau(e){valeurs.Bandeau=e.checked?"yes":0,"yes"===valeurs.Bandeau?document.getElementById("message").style.display="block":document.getElementById("message").style.display="none",resizeBottom(),AfficheDemo()}function ChangeTitre(e){valeurs.titre=e.checked?1:0,AfficheDemo()}function AfficheDemo(){frame_demo.left.src=`reglage/left_titre${valeurs.titre}.htm`,frame_demo.right.src=`reglage/right_mode${valeurs.mode}_titre${valeurs.titre}.htm`,frame_demo.left.addEventListener("load",TextResizeDemo),frame_demo.right.addEventListener("load",TextResizeDemo)}function Affiche(){AfficheDemo(),frame_reel.left.src=`live.html?saut=0&entete=${valeurs.titre}&mini=1&no_club&textadapt=name;club&last_finish=${valeurs.scrolling}#`,AfficheFrameRight()}function AfficheFrameRight(){let e=parseInt(valeurs.scrolling)+2*parseInt(valeurs.titre);1===valeurs.mode?frame_reel.right.src=`live.html?scrolling=${e}&entete=0&delay=${valeurs.delay}&textadapt=name;club&horaire=0&titre=Classement&no_pena&saut=0&mini=1#`:frame_reel.right.src=`live.html?saut=0&entete=0&mini=1&no_club&textadapt=name;club&last_finish=${e}&decalage=${valeurs.scrolling}#`}function ChangeNbPorte(){let e=div.nb_porte.value;for(el in valeurs.nb_porte=e,div.text_nb_porte.innerHTML=e,frame_demo)if(frame_demo[el].contentDocument.querySelectorAll('th[data-col="1"]').length>0){for(gate=1;gate<=div.nb_porte.max;gate++)elements=frame_demo[el].contentDocument.querySelectorAll('[data-col="'+gate.toString()+'"]'),[].forEach.call(elements,function(t){gate>e?t.style.display="none":t.style.display=""});elements=frame_demo[el].contentDocument.getElementsByClassName("clubaff"),[].forEach.call(elements,function(t){"0"===e?t.style.display="block":t.style.display="none"})}}function TextResizeDemo(){var e,t="texte_temp";null==document.getElementById(t)&&document.body.insertAdjacentHTML("afterend","<div id='texte_temp'  style='visibility:hidden;position:fixed;left: 0px;bottom: 0px;white-space:nowrap;display:inline-block;width:auto;'><div>");var l=document.getElementById(t);!1===IsFullScreen()&&(document.getElementById("fullscreen").style.display=""),["name","club"].forEach(function(t){for(el in frame_demo)if(nameclassaff=t+"aff",e=frame_demo[el].contentDocument.getElementsByClassName(t),elementsaff=frame_demo[el].contentDocument.getElementsByClassName(nameclassaff),e.length>0){var r=window.getComputedStyle(e[0]).getPropertyValue("font-weight"),a=parseInt(window.getComputedStyle(e[0]).getPropertyValue("font-size")),n=parseInt(window.getComputedStyle(e[0]).getPropertyValue("padding-right"));l.style.fontSize=a||"",l.style.fontWeight=r?parseInt(r):"";var o=e[0].offsetWidth-2*n;[].forEach.call(e,function(e,n){var i=e.innerHTML;l.innerHTML=i;var s=parseInt(l.offsetWidth),m=a;if(s>o){if("name"===t){let d=i.split("/");for(j in d)(chaine=d[j].split(" "))[chaine.length-1]=chaine[chaine.length-1][0]+".",d[j]=chaine.join(" ");i=d.join("/")}l.innerHTML=i,s=parseInt(l.offsetWidth),m=Math.min(a*o/s,a)}n<elementsaff.length&&(elementsaff[n].innerHTML=`<div style='width:${o}px !important;font-weight:${r}; font-size:${m}px; white-space:nowrap; overflow: hidden;'>${i}</div>`)})}}),ChangeNbPorte()}function IsFullScreen(){return!!document.fullscreenElement||!!document.mozFullScreenElement||!!document.webkitFullscreenElement||!!document.msFullscreenElement}function FullScreen(e){e.style.display="none";var t=document.documentElement;t.requestFullScreen?t.requestFullScreen():t.requestFullscreen?t.requestFullscreen():t.mozRequestFullScreen?t.mozRequestFullScreen():t.webkitRequestFullscreen?t.webkitRequestFullScreen():t.msRequestFullscreen&&t.msRequestFullScreen()}function Preregler(){let e=div.zoom.value;div.zoom.value=100,Zoom(),el="left";let t=window.screen.width,{scrollWidth:l}=frame_demo[el].contentDocument.querySelector("body")||{},{scrollWidth:r}=frame_demo.right.contentDocument.querySelector("body"),{offsetHeight:a}=frame_demo[el].contentDocument.querySelector("#onCourse td"),n=frame_demo[el].contentDocument.querySelector("header"),o=frame_demo[el].contentDocument.getElementById("title"),i=frame_demo[el].contentDocument.getElementById("navigation_epreuve"),s=frame_demo[el].contentDocument.getElementById("onCourseHeader"),m=n?n.offsetHeight:0,d=o?window.getComputedStyle(o).marginBottom:0,u=i?i.offsetHeight:0,c=s?s.offsetHeight:0,f=(m+u+c+parseInt(d))*valeurs.zoom_val/100;if(l){let v=Math.floor(1e3*t/(l+r+7+2*("yes"===valeurs.Vscroll?16:0)))/10;var g=document.getElementById("message_provisoire").offsetHeight;let h=document.body.offsetHeight,y=Math.floor(h-("yes"===valeurs.Bandeau?g:0)),$=Math.floor((y-f*v/valeurs.zoom_val)/(a*v/100)),p=2===valeurs.mode?50:Math.floor(10*v*(l+("yes"===valeurs.Vscroll?16:0))/t)/10;div.zoom.value=v,Zoom(),div.nb_lg_finish.value=$,valeurs.scrolling=$,ChangeText(frame_demo),div.largeur.value=p,RedimensionnerLargeur(frame_demo),valeurs.bottomFrameHeight=Math.floor(10*(100-100*y/h))/10,RedimensionnerHauteur(frame_demo)}else div.zoom.value=e,Zoom()}function resizeBottom(){el="left";var e=document.getElementById("message_provisoire").offsetHeight;let t=document.body.offsetHeight,l=Math.floor(t-("yes"===valeurs.Bandeau?e:0));valeurs.bottomFrameHeight=Math.floor(10*(100-100*l/t))/10,RedimensionnerHauteur(frame_demo),RedimensionnerHauteur(frame_reel)}function postMessageFrame(){messageL={entete:valeurs.titre,last_finish:valeurs.scrolling},messageR=1===valeurs.mode?{scrolling:parseInt(valeurs.scrolling)+2*parseInt(valeurs.titre),scrolling_delay:1e3*parseInt(valeurs.delay)}:{last_finish:parseInt(valeurs.scrolling)+2*parseInt(valeurs.titre),decalage:valeurs.scrolling},window.frames.Left.postMessage(messageL,"*"),window.frames.Right.postMessage(messageR,"*")}function Init(){setTimeout(function(){div.info.classList.add("cache")},4e3),setTimeout(function(){div.info.style.display="none"},6e3),InitFrames(frame_reel),InitFrames(frame_demo,"_demo"),InitDivElements(),Defaut(),LoadSave(),InitVal(),InitFrame(frame_reel),InitFrame(frame_demo),Affiche(),resizeBottom(),window.addEventListener("resize",resizeBottom),window.addEventListener("resize",TextResizeDemo)}
+    </script>
+    <script src="../bootstrap-5.0.1/js/bootstrap.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        Init();
+      });
+    </script>
+  </body>
+</html>

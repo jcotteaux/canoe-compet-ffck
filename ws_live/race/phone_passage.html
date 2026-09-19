@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Phone Passage</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="../bootstrap-5.0.1/css/bootstrap.min.css" rel="stylesheet">
+		<link href="./css/phone_passage.css" rel="stylesheet">
+		
+		<link rel="shortcut icon" href="./16x16_chrono.png" />
+		<link rel="icon" href="./16x16_chrono.png"/>
+	</head>
+
+	<body>
+		<main id="main" class="container"></main>
+
+		<div class="container" id="container_message">
+			<br>
+			<div class="d-flex align-items-center" col>
+				<strong id="message">Loading...</strong>
+				<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+			</div>
+		</div>
+
+		<br>
+		<div id="histo" class="container">
+		</div>
+
+		<footer>
+		</footer>
+		
+		<script src="../bootstrap-5.0.1/js/bootstrap.min.js"></script>
+		<script src="../adv/ws_params.js"></script>
+		<script src="../adv/ws.js"></script>
+		<script src="../adv/adv.js"></script>
+
+		<script src="../adv/ski.js"></script>
+		<script src="../adv/canoe.js"></script>
+
+		<script src="./js/phone_passage.js?v1"></script>
+
+		<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+	</body>
+</html>

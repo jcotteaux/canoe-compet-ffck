@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="P2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 130">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Dégradé_sans_nom_9);
+        stroke-width: 0px;
+      }
+    </style>
+    <linearGradient id="Dégradé_sans_nom_9" data-name="Dégradé sans nom 9" x1="-5.85" y1="65.02" x2="1929.92" y2="65.02" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#20265b"/>
+      <stop offset="1" stop-color="#69b9e6"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-1" x="-5.85" y="-8.01" width="1935.77" height="146.06"/>
+  <image width="4072" height="3105" transform="translate(19.36 10.23) scale(.04)" xlink:href="../../../../FFCK/Site d&apos;Équipe (Intranet) - Livret d&apos;Accueil FFCK/06 - COMMUNICATION/CHARTE INSTITUTIONNELLE/FFCK/BLANC/FFCK BLANC.png"/>
+  <image width="4725" height="4725" transform="translate(1800.59 5.69) scale(.03)" xlink:href="../../../../FFCK/Site d&apos;Équipe (Intranet) - Librairie DCPE/COMMUNICATION/OËKA - LA TRIBU/1. OËKA GÉNÉRIQUE/3. CHARTE GRAPHIQUE/V2 logo/OËKA POUR FOND COULEUR TEXTE BLANC/V2 OËKA POUR FOND COULEUR TEXTE BLANC.png"/>
+</svg>

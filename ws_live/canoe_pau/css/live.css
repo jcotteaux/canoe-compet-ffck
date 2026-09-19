@@ -1,0 +1,187 @@
+header {
+	min-height: 120px;
+
+	background-position: center;
+	background-image: url('../img/vague_1920.jpg');
+	background-repeat: no-repeat;
+	
+	width:100%;
+	text-align:center;
+	color:black;
+	font-weight: bold;
+	
+	padding-top:12px;
+}
+
+img {
+	display:inline-block;
+	margin: 0 auto;
+}
+
+th.gate_inv
+{
+	color:red;
+}
+
+td.gate {
+	border: 1px solid black;
+	padding: 2px; 
+	width: 2%;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+}
+
+td.gate[data-pen="0"] {
+	background-color: green;
+}
+
+td.gate[data-pen="2"] {
+	background-color: yellow;
+	color:black;
+}
+
+td.gate[data-pen="50"] {
+	background-color: red;
+	color:white;
+}
+
+td.gate[data-pen="-1"] {
+	background-color: white;
+}
+
+td button {
+	width: 150px;
+	display: inline-block;
+}
+
+td.rank {
+	text-align: right;
+	font-weight: bold;
+	color:black;
+}
+
+td.rank_inter, td.time_inter {
+	text-align: right;
+	color:black;
+}
+
+td.bib {
+	text-align: right;
+}
+
+td.name {
+	font-weight: bold;
+}
+
+td.hour {
+	text-align: center;
+	color:black;
+}
+
+td.chrono {
+	text-align: right;
+}
+
+td.chrono[data-oncourse="2"] {
+	background-repeat: no-repeat;
+	background-color: yellow;
+	color:black;
+}
+
+td.chrono[data-oncourse="3"] {
+	background-color: white;
+	color:black;
+	transition: background-color 3s linear;
+	background-repeat: no-repeat;
+}
+
+td.time {
+	text-align: right;
+	font-weight: bold;
+	color:black;
+}
+
+td.time[data-oncourse="1"] {
+	background-color: black;
+	background-position: 4px,center;
+	background-image: url('../img/16x16_chronometer.png');
+	background-repeat: no-repeat;
+
+	color:green;
+}
+
+td.time[data-oncourse="2"] {
+	background-color: yellow;
+
+	background-position: 4px,center;
+	background-image: url('../img/16x16_ranking.png');
+	background-repeat: no-repeat;
+
+	color:black;
+}
+
+td.time[data-oncourse="red"] {
+	background-color: red;
+
+	background-position: 4px,center;
+	background-image: url('../img/16x16_ranking.png');
+	background-repeat: no-repeat;
+
+	color:white;
+}
+
+td.time[data-oncourse="green"] {
+	background-color: green;
+
+	background-position: 4px,center;
+	background-image: url('../img/16x16_ranking.png');
+	background-repeat: no-repeat;
+
+	color:white;
+}
+
+td.time[data-oncourse="yellow"] {
+	background-color: yellow;
+	transition: background-color 3s linear;
+	
+	background-position: 4px,center;
+	background-image: url('../img/16x16_ranking.png');
+	background-repeat: no-repeat;
+
+	color:black;
+}
+
+td.time[data-oncourse="3"] {
+	background-color: white;
+	transition: background-color 3s linear;
+	
+	background-position: 4px,center;
+	background-image: url('../img/16x16_ranking.png');
+	background-repeat: no-repeat;
+
+	color:black;
+}
+
+td.time_inter[data-oncourse="red"] {
+	background-color: red;
+	font-weight: bold;
+	color:white;
+}
+
+td.time_inter[data-oncourse="green"] {
+	background-color: green;
+	font-weight: bold;
+	color:white;
+}
+
+td.time_inter[data-oncourse="end"] {
+	background-color: white;
+	transition: background-color 3s linear;
+	color:black;
+}
+	
+canvas
+{
+  border: 1px solid red ;
+}

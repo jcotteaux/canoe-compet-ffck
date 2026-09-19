@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Wather</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png"/>
+	
+	<link href="./css/weather.css" rel="stylesheet">
+</head>
+<body> 
+	<div id ="head">
+		<div class='label_title'>Weather Conditions</div>
+		<div class='label_air_temp'>Air Temperature</div>
+		<div class='label_water_temp'>Water Temperature</div>
+		<div class='label_wind_speed'>Wind Speed</div>
+
+		<div class='air_temp'>2°C</div>
+		<div class='water_temp'>5°C</div>
+		<div class='wind_speed'>2m/s</div>
+		<div class='picture'></div>
+	</div>
+	
+	<script src="./bootstrap-5.0.1/js/bootstrap.min.js"></script>
+	<script src="./adv/ws.js"></script>
+	<script src="./adv/adv.js"></script>
+	<script src="./adv/canoe.js"></script>
+	
+	<script src="./js/ws_params.js"></script>
+	<script src="./js/weather.js"></script>
+	
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

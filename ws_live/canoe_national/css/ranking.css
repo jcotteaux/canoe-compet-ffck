@@ -1,0 +1,624 @@
+#block_ranking
+{
+	position: absolute;
+
+	left:0px;
+	top:160px;
+	width:100%;
+}	
+
+#block_ranking .row_label
+{
+	position: absolute;
+
+	left:0px;
+	top:0px;
+	width:1910px;
+	height:60px;
+
+	background-image: url("../img/60_170_Gray.jpg");
+	background-repeat: repeat;
+
+}
+#block_ranking .label_rank
+{
+	position: absolute;
+
+	left:0px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_ranking .label_bib
+{
+	position: absolute;
+
+	left:170px;
+	width:150px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_ranking .label_identity
+{
+	position: absolute;
+
+	left:820px;
+	width:1000px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:left;
+	padding-top:6px;
+	padding-left:30px;
+}
+
+#block_ranking .label_nation
+{
+	position: absolute;
+
+	left:1530px;
+	width:160px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:10px;
+}
+
+#block_ranking .label_time
+{
+	position: absolute;
+
+	left:1750px;
+	width:100px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:right;
+	padding-top:6px;
+	padding-right:30px;
+}
+
+#block_ranking .label_categ
+{
+	position: absolute;
+
+	left:1500px;
+	width:100px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:6px;
+}
+
+#block_ranking .row1
+{
+	position: absolute;
+
+	left:0px;
+	top:60px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row2
+{
+	position: absolute;
+
+	left:0px;
+	top:120px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row3
+{
+	position: absolute;
+
+	left:0px;
+	top:180px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row4
+{
+	position: absolute;
+
+	left:0px;
+	top:240px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row5
+{
+	position: absolute;
+
+	left:0px;
+	top:300px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row6
+{
+	position: absolute;
+
+	left:0px;
+	top:360px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row7
+{
+	position: absolute;
+
+	left:0px;
+	top:420px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row8
+{
+	position: absolute;
+
+	left:0px;
+	top:480px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row9
+{
+	position: absolute;
+
+	left:0px;
+	top:540px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row10
+{
+	position: absolute;
+
+	left:0px;
+	top:600px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row11
+{
+	position: absolute;
+
+	left:0px;
+	top:660px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row12
+{
+	position: absolute;
+
+	left:0px;
+	top:720px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row13
+{
+	position: absolute;
+
+	left:0px;
+	top:780px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row14
+{
+	position: absolute;
+
+	left:0px;
+	top:840px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .row15
+{
+	position: absolute;
+
+	left:0px;
+	top:900px;
+	width:100%;
+	height:60px;
+}
+
+#block_ranking .rank
+{
+	position: absolute;
+
+	left:0px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:4px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking .bib
+{
+	position: absolute;
+
+	left:170px;
+	width:130px;
+	height:60px;
+	top:0px;
+	
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:4px;
+	
+	background-image: url("../img/60_10_Gray.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .identity
+{
+	position: absolute;
+
+	left:300px;
+	width:1240px;
+	height:60px;
+	top:0px;
+
+	font-size:36px;
+	font-weight:bold;
+
+	color:white;
+	text-align:left;
+	padding-left:32px;
+	padding-top:6px;
+	
+	background-image: url("../img/60_1240_B_Bar_right_left.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking .img_nation
+{
+	position: absolute;
+
+	left:1540px;
+	width:88px;
+	height:60px;
+	top:0px;
+	padding-top:8px;
+	padding-left:24px;
+
+	background-image: url("../img/60_10_Gray.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .nation
+{
+	position: absolute;
+
+	left:1628px;
+	width:112px;
+	height:60px;
+	top:0px;
+
+	font-size:32px;
+	font-weight:bold;
+
+	color:black;
+	text-align:left;
+	padding-top:16px;
+	padding-left:2px;
+
+	background-image: url("../img/60_10_Gray.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .yellow
+{
+	color:black;
+	background-image: url("../img/60_140_Y.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .red
+{
+	color:white;
+	background-image: url("../img/60_140_R.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .green
+{
+	color:white;
+	background-image: url("../img/60_140_G.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .empty
+{
+	color:black;
+	background-image: url("../img/60_10_Gray.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_ranking .time
+{
+	position: absolute;
+
+	left:1740px;
+	width:170px;
+	height:60px;
+	top:0px;
+	
+	font-size:32px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:8px;
+	
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_ranking .categ
+{
+	position: absolute;
+
+	left:1540px;
+	width:85px;
+	height:60px;
+	top:0px;
+
+	font-size:28px;
+	font-weight:bold;
+
+	color:white;
+	text-align:center;
+	padding-top:10px;
+
+	background-image: url("../img/60_10_Gray.jpg");
+	background-repeat: repeat-x;
+}
+
+#block_running
+{
+	position: absolute;
+
+	left:0px;
+	top:940px;
+	width:1910px;
+	height:100px;
+
+	background-color:black;
+}	
+
+#block_running .best_identity
+{
+	position: absolute;
+
+	top:0px;
+	left:1400px;
+	width:510px;
+	height:40px;
+	
+	font-size:18px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:8px;
+
+	background-image: url("../img/45_170_Y.jpg");
+	background-repeat: repeat;
+}
+
+#block_running .best_time
+{
+	position: absolute;
+
+	top:40px;
+	left:1400px;
+	width:510px;
+	height:40px;
+	
+	font-size:22px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:8px;
+
+	background-image: url("../img/60_170_Gray.jpg");
+	background-repeat: repeat;
+}
+
+#block_running .bib
+{
+	position: absolute;
+
+	top:79px;
+	left:0px;
+	width:170px;
+	height:50px;
+
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_50_Gray.jpg");
+	background-repeat: repeat;
+}
+
+#block_running .identity
+{
+	position: absolute;
+
+	top:79px;
+	left:170px;
+	width:1200px;
+	height:50px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:left;
+	padding-top:2px;
+	padding-left:20px;
+
+	background-image: url("../img/60_1240_B_Bar_right_left.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .nation
+{
+	position: absolute;
+
+	top:79px;
+	left:1220px;
+	width:200px;
+	height:50px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:left;
+	padding-top:2px;
+	padding-left:20px;
+}
+
+#block_running .img_nation
+{
+	position: absolute;
+
+	top:81px;
+	left:1338px;
+	width:48px;
+	height:48px;
+}
+
+#block_running .rank
+{
+	position: absolute;
+
+	left:1410px;
+	top:79px;
+	width:170px;
+	height:50px;
+
+	font-size:40px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_Y.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .time
+{
+	position: absolute;
+
+	left:1580px;
+	top:79px;
+	width:170px;
+	height:50px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_B.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .diff.green
+{
+	position: absolute;
+
+	left:1750px;
+	top:79px;
+	width:160px;
+	height:50px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_G.jpg");
+	background-repeat: no-repeat;
+}
+
+#block_running .diff.red
+{
+	position: absolute;
+
+	left:1750px;
+	top:79px;
+	width:160px;
+	height:50px;
+
+	font-size:40px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	padding-top:2px;
+
+	background-image: url("../img/60_170_R.jpg");
+	background-repeat: no-repeat;
+}

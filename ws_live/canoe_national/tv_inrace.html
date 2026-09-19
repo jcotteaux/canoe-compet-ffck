@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>TV inrace</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png"/>
+	
+	<link href="./css/tv_inrace.css?v1" rel="stylesheet">
+</head>
+
+<body> 
+	<div id="block_start" class="template" style="display:none">
+		<div class="bib">99</div>
+ 		<div class="name">Name</div>
+		<div class="nation">Nat</div>
+ 		<img class="img_nation" src="./img/Flags/Empty.png" alt="" height="35" width="45" />
+		<div class="categ">Categ</div>
+ 	</div>
+
+	<div id="block_inter" class="template red" style="display:none">
+ 		<div class="time">1:59.99</div>
+ 		<div class="diff">+99.99</div>
+		<div class="leader_name">P.ABCDEFGHIJK</div>
+ 		<div class="leader_time">1:59.99</div>
+ 	</div>
+	
+	<div id="block_finish" class="template" style="display:none">
+		<div class="bib">99</div>
+ 		<div class="name">Name</div>
+		<div class="nation">Nat</div>
+ 		<img class="img_nation" src="./img/Flags/Empty.png" alt="" height="35" width="45">
+		<div class="categ">Categ</div>
+		<div class="rank">999</div>
+ 		<div class="time">1:59.99</div>
+ 		<div class="diff red">+99.99</div>
+		<div class="pena"></div>
+ 	</div>
+
+	<div id="block_running" class="template" style="display:none">
+		<div class="time_chrono">9:59:99</div>
+		<div class="time">9:59:99</div>
+		<div id="block_running_pena" class="pena"></div>
+	</div>
+
+	<div id="block_leader" class="template" style="display:none">
+		<div class="name">P.ABCDEFGHIJK</div>
+ 		<div class="time">1:59.99</div>
+ 	</div>
+
+	<script src="../bootstrap-5.0.1/js/bootstrap.min.js"></script>
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v2"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/canoe.js"></script>
+	
+	<script src="./js/tv_order.js?v1"></script>
+	<script src="./js/tv_inrace.js?v4"></script>
+	
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

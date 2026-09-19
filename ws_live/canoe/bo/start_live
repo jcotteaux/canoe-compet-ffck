@@ -1,0 +1,3 @@
+#!/bin/bash
+export DISPLAY=:1
+/home/adv/robotLive/bin/Release/robotLive &

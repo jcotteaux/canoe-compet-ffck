@@ -1,0 +1,1 @@
+const wsParams = {url:'ws://192.168.43.178', port:20000};

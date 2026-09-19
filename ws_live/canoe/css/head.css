@@ -1,0 +1,163 @@
+body
+{
+	background:black;
+}
+
+body{
+	transform-origin: left;
+}
+
+@media( min-width:800px){
+	body{
+		transform: scale(0.416);
+	}
+}
+@media( min-width:1024px){
+	body{
+		transform: scale(0.533);
+	}
+}
+@media( min-width:1152px){
+	body{
+		transform: scale(0.6);
+	}
+}
+@media( min-width:1280px){
+	body{
+		transform: scale(0.666);
+	}
+}
+@media( min-width:1360px){
+	body{
+		transform: scale(0.708);
+	}
+}		
+@media( min-width:1366px){
+	body{
+		transform: scale(0.711);
+	}
+}
+@media( min-width:1440px){
+	body{
+		transform: scale(0.75);
+	}
+}
+@media( min-width:1600px){
+	body{
+		transform: scale(0.833);
+	}
+}
+@media( min-width:1680px){
+	body{
+		transform: scale(0.875);
+	}
+}
+@media( min-width:1920px){
+	body{
+		transform: scale(1);
+	}
+}
+
+.img_center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+}
+
+#head
+{
+	position:absolute;
+
+	top:0px;
+	left:0px;
+	width:1910px;
+	height:160px;
+	
+	background-image: url("../img/head_1920.png");
+	background-repeat: no-repeat;
+}
+
+#head .logo_left
+{
+	position:absolute;
+	top:0px;
+	left:10px;
+	width:166px;
+	height:122px;
+	
+	background-image: url("../img/logo_ffck.png");
+	background-repeat: no-repeat;
+}
+
+#head .logo_right
+{
+	position:absolute;
+	top:0px;
+	left:1745px;
+	width:164px;
+	height:122px;
+
+	background-image: url("../img/logo_ffck.png");
+	background-repeat: no-repeat;
+}
+
+#head .name
+{
+	position: absolute;
+
+	top:0px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:32px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#head .place
+{
+	position:absolute;
+
+	top:40px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:32px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#head .title
+{
+	position:absolute;
+
+	top:80px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:30px;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#head .mode
+{
+	position:absolute;
+
+	top:118px;
+	left:0px;
+	width:100%;
+		
+	font-family:Calibri;
+	font-size:30px;
+	font-weight:bold;
+	color:black;
+	text-align:center;
+}

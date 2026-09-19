@@ -1,0 +1,202 @@
+body
+{
+	background-color:white;
+	padding:0px;
+	margin:0px;
+}
+
+#block_running
+{
+	position: absolute;
+
+	left:10px;
+	top:10px;
+	width:1900px;
+	height:1060px;
+}	
+
+#block_running .bib
+{
+	position: absolute;
+
+	top:0px;
+	left:0px;
+	width:15%;
+	height:33%;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size:130px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	vertical-align: middle;
+
+	background: linear-gradient(#414141, #B3B3B3);
+}
+
+#block_running .identity
+{
+	position: absolute;
+
+	top:0px;
+	left:15%;
+	width:70%;
+	height:33%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size:96px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	vertical-align: middle;
+	
+	background: linear-gradient(#46475B, #12122C);
+}
+
+#block_running .nation
+{
+	position: absolute;
+
+	top:0px;
+	left:85%;
+	width:15%;
+	height:33%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	background: linear-gradient(#414141, #B3B3B3);
+}
+
+#block_running .rank
+{
+	position: absolute;
+
+	top:66%;
+	left:0%;
+	width:30%;
+	height:33%;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size:180px;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+	vertical-align: middle;
+
+	background: linear-gradient(#C6A617, #F0C819);
+}
+
+#block_running .time
+{
+	position: absolute;
+
+	top:66%;
+	left:30%;
+	width:40%;
+	height:33%;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size:180px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	vertical-align: middle;
+	
+	background: linear-gradient(#46475B, #12122C);
+}
+
+#block_running .diff.green
+{
+	position: absolute;
+
+	top:66%;
+	left:70%;
+	width:30%;
+	height:33%;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size:150px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+
+	background: linear-gradient(#1E702E, #289F41);
+}
+
+#block_running .diff.red
+{
+	position: absolute;
+
+	top:66%;
+	left:70%;
+	width:30%;
+	height:33%;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size:120px;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	
+	background: linear-gradient(#8D0102, #C00301);
+}
+
+#block_running .pena
+{
+	position: absolute;
+
+	top:33%;
+	left:0%;
+	width:100%;
+	height:33%;
+}
+
+td.gate {
+	border: 2px solid black;
+	padding: 0px; 
+	width: 74px;
+	height:342px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+	font-size:70px;
+}
+
+td.gate[data-pen="0"] {
+	background-color: green;
+}
+
+td.gate[data-pen="2"] {
+	background-color: yellow;
+	color:black;
+}
+
+td.gate[data-pen="50"] {
+	background-color: red;
+	color:white;
+}
+
+td.gate[data-pen="-1"] {
+	background-color: white;
+}
+

@@ -1,0 +1,163 @@
+@font-face{
+	font-family: "Montserrat";
+	src: url("../font/static/Montserrat-SemiBold.ttf") format("truetype");
+}
+@font-face{
+	font-family: "Montserrat-Bold";
+	src: url("../font/static/Montserrat-Bold.ttf") format("truetype");
+}
+
+body
+{
+
+	background-color:pink;
+	padding:0px;
+	margin:0px;
+}
+
+@keyframes apparitionG {
+	from{
+		opacity: 0;
+		transform: translateX(-1000px);
+	}
+	to{
+		opacity: 1;
+		transform: translateX(0px);
+	}
+}
+
+#head 
+{
+	position: absolute;
+	background-image: url("../img/block_info.png");
+	background-repeat: no-repeat;
+
+	left:0px;
+	top:0px;
+	width:1000px;
+	height:1000px;
+	animation: apparitionG 1s ease-out;
+}
+
+#head .label_title
+{
+	position: absolute;
+
+	left:55px;
+	width:400px;
+	top:385px;
+	
+	font-family: Montserrat-Bold;
+	font-size:25pt;
+	color:white;
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .length
+{
+	position: absolute;
+
+	left:330px;
+	width:350px;
+	top:462px;
+	
+	font-family: Montserrat-Bold;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .upstream
+{
+	position: absolute;
+
+	left:330px;
+	width:350px;
+	top:528px;
+	
+	font-family: Montserrat-Bold;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .gates
+{
+	position: absolute;
+
+	left:330px;
+	width:350px;
+	top:592px;
+	font-family: Montserrat-Bold;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .label_length
+{
+	position: absolute;
+
+	left:150px;
+	width:370px;
+	top:462px;
+	
+	font-family: Montserrat;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .label_upstream
+{
+	position: absolute;
+
+	left:150px;
+	width:435px;
+	top:528px;
+	
+	font-family: Montserrat;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .label_gates
+{
+	position: absolute;
+
+	left:150px;
+	width:430px;
+	top:592px;
+	
+	font-family: Montserrat;
+	font-size:17pt;
+	color:rgb(0,27,90);
+
+	font-weight:bold;
+	text-align:left;
+}
+
+#head .picture
+{
+	position: absolute;
+	background-image: url("../img/whitewater.png");
+	background-repeat: no-repeat;
+
+	left:495px;
+	top:444px;
+	width:230px;
+	height:230px;
+}
