@@ -136,7 +136,6 @@ body.chroma
 	color: white;
 	font-weight: bold;
 	font-size: 19pt;
-	line-height: 1;
 
 	/* Entrée plus courte que apparitionD : un bateau part toutes les 45 s, une
 	   translation de 800 px à chaque départ serait pénible. Même durée et même
@@ -150,12 +149,30 @@ body.chroma
 	animation: racer-out 0.9s ease-in forwards;
 }
 
+/*
+ * Alignement vertical : les cellules n'ont pas la même taille de police, donc
+ * pas la même hauteur de boîte de ligne par défaut, et leurs textes se
+ * retrouvent décalés les uns par rapport aux autres. On impose la même boîte
+ * de ligne et le même retrait vertical partout : quelle que soit la taille de
+ * police, tous les textes sont alors centrés sur la même ligne.
+ *
+ * `line-height` doit rester supérieure à la plus grande police de la ligne
+ * (21pt = 28px pour le temps), sinon les glyphes débordent de leur boîte.
+ */
+.racer > div
+{
+	padding-top: 8px;
+	padding-bottom: 8px;
+	line-height: 32px;
+}
+
 .racer .bib
 {
 	flex: 0 0 auto;
 	min-width: 62px;
 
-	padding: 9px 10px;
+	padding-left: 10px;
+	padding-right: 10px;
 	text-align: center;
 	font-size: 17pt;
 }
@@ -165,7 +182,8 @@ body.chroma
 	flex: 1 1 auto;
 	min-width: 0;
 
-	padding: 9px 12px 9px 2px;
+	padding-left: 2px;
+	padding-right: 12px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -183,7 +201,8 @@ body.chroma
 		var(--oncourse-pena-bot) 100%);
 	color: white;
 
-	padding: 9px 10px;
+	padding-left: 10px;
+	padding-right: 10px;
 	font-size: 17pt;
 	font-variant-numeric: tabular-nums;
 	text-align: center;
@@ -201,7 +220,8 @@ body.chroma
 		var(--oncourse-rank-bot) 100%);
 	color: black;
 
-	padding: 9px 10px;
+	padding-left: 10px;
+	padding-right: 10px;
 	font-size: 19pt;
 	font-variant-numeric: tabular-nums;
 	text-align: center;
@@ -216,7 +236,8 @@ body.chroma
 	background: linear-gradient(180deg, var(--oncourse-time-bg) 0%, var(--oncourse-time-bg2) 100%);
 	color: var(--oncourse-time-text);
 
-	padding: 9px 12px;
+	padding-left: 12px;
+	padding-right: 12px;
 	font-size: 21pt;
 	font-variant-numeric: tabular-nums;
 	text-align: right;
