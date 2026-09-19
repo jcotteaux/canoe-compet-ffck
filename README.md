@@ -163,6 +163,10 @@ des classés. Sinon elle remonte le programme à l'envers jusqu'à la dernière
 épreuve qui en a : ouvrir la page pendant les K1D alors que seuls les K1H ont
 des résultats doit montrer les K1H, pas un bloc vide.
 
+Chaque ligne porte la place et le dossard dans leur propre pavé, détachés du
+dégradé : ce sont les deux repères que le spectateur cherche en premier, ils ne
+sont pas du texte posé sur le fond.
+
 Le **dernier arrivé** est mis en évidence. S'il figure déjà dans les premiers,
 sa ligne y est simplement colorée ; sinon elle apparaît sous un trait de
 séparation, pour qu'on ne la lise pas comme la place suivante.

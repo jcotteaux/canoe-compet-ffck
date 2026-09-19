@@ -193,38 +193,46 @@ body.ancre-bas #leaders
  * centrés sur la même ligne.
  *
  * `line-height` doit rester supérieure à la plus grande police de la ligne
- * (21pt = 28px pour le temps), sinon les glyphes débordent de leur boîte.
+ * (24pt = 32px pour la place), sinon les glyphes débordent de leur boîte.
  */
 .leader > div
 {
-	padding-top: 8px;
-	padding-bottom: 8px;
-	line-height: 32px;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	line-height: 36px;
 }
 
+/*
+ * Place et dossard sont les deux repères que le spectateur cherche en premier.
+ * Ils ont donc chacun leur pavé, détaché du dégradé de la ligne, plutôt que
+ * d'être du texte posé dessus.
+ */
 .leader .rank
 {
 	flex: 0 0 auto;
-	min-width: 56px;
+	min-width: 72px;
+
+	background: var(--leaders-row-dark);
 
 	padding-left: 10px;
 	padding-right: 10px;
 	text-align: center;
-	font-size: 21pt;
+	font-size: 24pt;
 }
 
-/* Le dossard est une information secondaire dans un classement : on le pose
-   en retrait pour que la place et l'identité ressortent. */
 .leader .bib
 {
 	flex: 0 0 auto;
-	min-width: 48px;
+	min-width: 62px;
 
-	padding-left: 6px;
-	padding-right: 10px;
-	text-align: right;
-	font-size: 15pt;
-	color: rgba(255, 255, 255, 0.72);
+	/* un ton au-dessus du pavé de la place, pour les distinguer sans ajouter
+	   de filet entre les deux */
+	background: rgba(255, 255, 255, 0.13);
+
+	padding-left: 8px;
+	padding-right: 8px;
+	text-align: center;
+	font-size: 20pt;
 }
 
 .leader .name
@@ -232,7 +240,7 @@ body.ancre-bas #leaders
 	flex: 1 1 auto;
 	min-width: 0;
 
-	padding-left: 4px;
+	padding-left: 14px;
 	padding-right: 12px;
 	white-space: nowrap;
 	overflow: hidden;
