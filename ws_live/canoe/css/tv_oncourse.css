@@ -2,13 +2,47 @@
  * Liste des bateaux en course, en surimpression en haut à droite.
  *
  * Fond transparent : la page est destinée à être superposée à une vidéo (OBS,
- * navigateur en overlay). Chaque ligne porte donc son propre fond sombre et un
- * liseré clair, sinon le texte devient illisible dès que l'image est claire
- * (eau, écume, ciel).
+ * navigateur en overlay). Chaque ligne porte donc son propre fond, sinon le
+ * texte devient illisible dès que l'image est claire (eau, écume, ciel).
+ *
+ * Charte reprise des autres pages TV :
+ *   - Calibri gras blanc, tailles en pt              (tv_inrace.css)
+ *   - dégradé de ligne #030910 -> #256eb5            (img/block_name.png)
+ *   - pavé de temps bleu pâle, texte rgb(0,27,90)    (img/block_running.png)
+ *   - animation apparitionD 0.7s ease-out            (tv_ranking.css, tv_startlist.css)
+ *   - magenta #D500FF pour le repli chroma-key       (toutes les pages tv_*)
  *
  * Les positions et la taille sont pilotées par des variables CSS que le
  * JavaScript renseigne depuis les paramètres d'URL.
  */
+
+/*
+ * Les autres pages écrivent `font-family: Calibri` sans jamais déclarer la
+ * fonte, alors qu'elle est livrée dans ./font. Sur un poste sans Calibri
+ * (macOS, Linux) le rendu diverge donc silencieusement. On la déclare ici.
+ */
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+/* Animation maison des blocs positionnés à droite (tv_ranking, tv_startlist). */
+@keyframes apparitionD
+{
+	from { opacity: 0; transform: translateX(800px); }
+	to   { opacity: 1; transform: translateX(0px); }
+}
 
 :root
 {
@@ -17,11 +51,15 @@
 	--oncourse-width: 520px;
 	--oncourse-scale: 1;
 
-	--oncourse-bg: rgba(10, 16, 24, 0.82);
-	--oncourse-bg-accent: rgba(23, 86, 140, 0.88);
-	--oncourse-border: rgba(255, 255, 255, 0.22);
-	--oncourse-text: #ffffff;
-	--oncourse-time: #8fd8ff;
+	/* dégradé du bandeau d'identité de tv_inrace (img/block_name.png) */
+	--oncourse-row-dark: #030910;
+	--oncourse-row-mid: #123558;
+	--oncourse-row-blue: #256eb5;
+
+	/* pavé de temps de tv_inrace (img/block_running.png) */
+	--oncourse-time-bg: #c4dbef;
+	--oncourse-time-bg2: #d0e0f1;
+	--oncourse-time-text: rgb(0, 27, 90);
 }
 
 html, body
@@ -31,13 +69,13 @@ html, body
 	height: 100%;
 	background: transparent;		/* la vidéo passe au travers */
 	overflow: hidden;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
 }
 
 /* Repli chroma-key : ?bg=1 pour une régie qui incruste par couleur. */
 body.chroma
 {
-	background: #cc00cc;
+	background: #D500FF;
 }
 
 #oncourse
@@ -52,7 +90,9 @@ body.chroma
 
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 5px;
+
+	animation: apparitionD 0.7s ease-out;
 }
 
 /* Le bandeau disparaît quand personne n'est en course : sur une incrustation
@@ -62,72 +102,49 @@ body.chroma
 	display: none;
 }
 
-#oncourse_title
-{
-	background: var(--oncourse-bg-accent);
-	border: 1px solid var(--oncourse-border);
-	border-radius: 4px;
-
-	color: var(--oncourse-text);
-	font-size: 20px;
-	font-weight: bold;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	padding: 7px 14px;
-}
-
-#oncourse_title .count
-{
-	float: right;
-	opacity: 0.85;
-	font-variant-numeric: tabular-nums;
-}
-
 #oncourse_list
 {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 5px;
 }
 
 .racer
 {
 	display: flex;
-	align-items: center;
-	gap: 12px;
+	align-items: stretch;
 
-	background: var(--oncourse-bg);
-	border: 1px solid var(--oncourse-border);
-	border-radius: 4px;
-	padding: 9px 14px;
+	/* même dégradé que le bandeau d'identité de tv_inrace */
+	background: linear-gradient(90deg,
+		var(--oncourse-row-dark) 0%,
+		var(--oncourse-row-mid) 45%,
+		var(--oncourse-row-blue) 100%);
 
-	color: var(--oncourse-text);
-	font-size: 26px;
-	line-height: 1.15;
+	color: white;
+	font-weight: bold;
+	font-size: 19pt;
+	line-height: 1;
 
-	animation: racer-in 220ms ease-out;
+	/* Entrée plus courte que apparitionD : un bateau part toutes les 45 s, une
+	   translation de 800 px à chaque départ serait pénible. Même durée et même
+	   courbe que la charte. */
+	animation: racer-in 0.7s ease-out;
 }
 
-/* Le bateau vient de franchir la ligne : on le laisse une seconde de plus,
-   estompé, pour que le spectateur comprenne qu'il est arrivé. */
+/* Le bateau vient de quitter la course : on le laisse un instant, estompé. */
 .racer.leaving
 {
-	animation: racer-out 900ms ease-in forwards;
+	animation: racer-out 0.9s ease-in forwards;
 }
 
 .racer .bib
 {
 	flex: 0 0 auto;
-	min-width: 52px;
+	min-width: 62px;
+
+	padding: 9px 10px;
 	text-align: center;
-
-	background: var(--oncourse-bg-accent);
-	border-radius: 3px;
-	padding: 2px 8px;
-
-	font-size: 24px;
-	font-weight: bold;
-	font-variant-numeric: tabular-nums;
+	font-size: 17pt;
 }
 
 .racer .name
@@ -135,7 +152,7 @@ body.chroma
 	flex: 1 1 auto;
 	min-width: 0;
 
-	font-weight: bold;
+	padding: 9px 12px 9px 2px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -145,28 +162,33 @@ body.chroma
 {
 	flex: 0 0 auto;
 
-	color: var(--oncourse-time);
-	font-weight: bold;
+	/* pavé de temps de tv_inrace : bleu pâle, texte bleu nuit */
+	background: linear-gradient(180deg, var(--oncourse-time-bg) 0%, var(--oncourse-time-bg2) 100%);
+	color: var(--oncourse-time-text);
+
+	padding: 9px 12px;
+	font-size: 21pt;
 	font-variant-numeric: tabular-nums;
-	/* évite que la ligne tressaute à chaque dixième */
-	min-width: 5.2em;
 	text-align: right;
+	/* évite que la ligne tressaute à chaque dixième */
+	min-width: 4.6em;
 }
 
 @keyframes racer-in
 {
-	from { opacity: 0; transform: translateX(28px); }
+	from { opacity: 0; transform: translateX(120px); }
 	to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes racer-out
 {
 	from { opacity: 1; transform: translateX(0); }
-	to   { opacity: 0; transform: translateX(28px); }
+	to   { opacity: 0; transform: translateX(120px); }
 }
 
 /* Sur un poste qui n'aime pas les animations (vieille machine de régie), on
    coupe tout : ?anim=0 ajoute cette classe sur <body>. */
+body.no-anim #oncourse,
 body.no-anim .racer,
 body.no-anim .racer.leaving
 {

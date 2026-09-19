@@ -66,8 +66,8 @@ de rupture.
 
 ### Pages servies
 
-`live.html`, `monitor_race.html`, `tv_inrace.html`, `tv_startlist.html`,
-`tv_ranking.html`, `jugement.html`, `inrace.php`.
+`live.html`, `monitor_race.html`, `tv_inrace.html`, `tv_oncourse.html`,
+`tv_startlist.html`, `tv_ranking.html`, `jugement.html`, `inrace.php`.
 
 macOS ne fournit plus PHP : `mock/php-lite.js` évalue le petit sous-ensemble
 utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
@@ -82,11 +82,23 @@ choisi par `GetBibSelect`). Cette page les montre **tous**, en surimpression en
 haut à droite.
 
 Fond **transparent** : elle se superpose à une vidéo dans OBS ou un navigateur
-en overlay. Chaque ligne porte son propre fond sombre, sinon le texte devient
-illisible dès que l'image est claire (écume, ciel).
+en overlay. Chaque ligne porte son propre fond, sinon le texte devient illisible
+dès que l'image est claire (écume, ciel).
 
-Le bandeau disparaît quand personne n'est en course : un cadre vide à l'écran
-est pire que pas de cadre.
+Pas d'en-tête : seules les lignes s'affichent, et elles disparaissent
+entièrement quand personne n'est en course — un cadre vide à l'écran est pire
+que pas de cadre.
+
+Le style reprend celui des autres pages TV, valeurs relevées dans leurs
+gabarits : Calibri gras blanc et tailles en `pt` (`tv_inrace.css`), dégradé de
+ligne `#030910 → #256eb5` (`img/block_name.png`), pavé de temps bleu pâle sur
+texte `rgb(0,27,90)` (`img/block_running.png`), animation `apparitionD 0.7s`
+(`tv_ranking.css`) et magenta `#D500FF` pour le repli chroma-key.
+
+Au passage, la fonte Calibri est **déclarée** en `@font-face` sur les `.ttf`
+déjà livrés dans `canoe/font/`. Les autres pages écrivent `font-family: Calibri`
+sans jamais la déclarer : sur un poste sans Calibri (macOS, Linux) leur rendu
+diverge silencieusement.
 
 | paramètre | défaut | rôle |
 |---|---|---|
@@ -95,7 +107,6 @@ est pire que pas de cadre.
 | `scale=1.2` | 1 | facteur de taille |
 | `top=` / `right=` | 40 | position en pixels |
 | `width=` | 520 | largeur du bandeau |
-| `titre=Sur l'eau` | `En course` | libellé de l'en-tête ; vide pour le masquer |
 | `time_pena=0` | avec | slalom : temps tournant sans les pénalités |
 | `fmt=XSCC` | selon l'activité | format du chrono |
 | `bg=1` | transparent | fond magenta pour une régie chroma-key |
@@ -117,7 +128,7 @@ navigateur réel :
 ## Tests de non-régression
 
 ```bash
-npm test                    # 20 cas
+npm test                    # 26 cas
 node tools/smoke.js --only tv
 ```
 

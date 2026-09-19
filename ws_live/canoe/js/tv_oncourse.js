@@ -15,7 +15,6 @@
  *   scale=1.2       facteur de taille (défaut : 1)
  *   top=40 right=40 position en pixels
  *   width=520       largeur du bandeau en pixels
- *   titre=Sur l'eau libellé de l'en-tête ; titre= (vide) le masque
  *   time_pena=0     slalom : temps tournant sans les pénalités (défaut : avec)
  *   fmt=XSCC        format du chrono (défaut : selon l'activité)
  *   bg=1            fond magenta au lieu de transparent (régie chroma-key)
@@ -139,10 +138,6 @@ function Render()
 
 	elBlock.classList.toggle('empty', shown.length == 0);
 
-	const elCount = document.getElementById('oncourse_count');
-	if (elCount != null)
-		elCount.textContent = racers.length.toString();
-
 	// Mise à jour en place : recréer le HTML à chaque trame (10 Hz) relancerait
 	// l'animation d'entrée en boucle et ferait clignoter le bandeau.
 	const seen = {};
@@ -218,13 +213,6 @@ function Init()
 		document.body.classList.add('chroma');
 	if (urlParams.get('anim') === '0')
 		document.body.classList.add('no-anim');
-
-	const elTitle = document.getElementById('oncourse_title');
-	const titre = urlParams.has('titre') ? urlParams.get('titre') : 'En course';
-	if (titre === '')
-		elTitle.style.display = 'none';
-	else
-		elTitle.innerHTML = titre + '<span class="count" id="oncourse_count">0</span>';
 
 	wsMain.mapCommand.set('<race_load>', OnCommandRaceLoad);
 	wsMain.mapCommand.set('<epreuve_load>', OnCommandEpreuveLoad);
