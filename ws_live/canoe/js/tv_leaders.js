@@ -29,6 +29,8 @@
  *   libelle=1         libellé complet de l'épreuve au lieu du code court
  *   no_last           masque la ligne du dernier arrivé
  *   no_pena           masque le cumul de pénalités (slalom)
+ *   ecart=precedent   écart avec le concurrent précédent au lieu du premier
+ *   no_ecart          masque la colonne des écarts
  *   no_categ          masque l'en-tête d'épreuve
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
  *   bg=1              fond magenta au lieu de transparent (régie chroma-key)
@@ -210,6 +212,15 @@ function GetClassement()
 	{
 		if (out[i].rank === 0)
 			out[i].rank = i + 1;
+
+		// Écart avec le premier (usage courant des affichages de résultats) ou
+		// avec le concurrent précédent, selon ?ecart=.
+		if (i === 0)
+			out[i].diff = 0;
+		else if (wsMain.ecartPrecedent)
+			out[i].diff = out[i].time - out[i - 1].time;
+		else
+			out[i].diff = out[i].time - out[0].time;
 	}
 
 	return out;
@@ -223,6 +234,27 @@ function RowId(bib)
 function GetFmt()
 {
 	return wsMain.fmtChrono ? wsMain.fmtChrono : canoe.GetFmtChrono();
+}
+
+/**
+ * Un écart se lit en secondes tant qu'il reste sous la minute (« +3,20 ») ;
+ * au-delà la forme minutes est plus lisible (« +1:30.00 »).
+ * adv.GetChronoDiff rend '' pour un écart nul, ce qui laisse la case du
+ * premier vide sans traitement particulier.
+ *
+ * `temps` est le temps déjà formaté de la même ligne. adv.js écrit la virgule
+ * dans ses formats « secondes » et le point dans ses formats « minutes » : en
+ * descente on obtiendrait sinon « 1:30.15 » suivi de « +1,15 » sur la même
+ * ligne. On aligne donc le séparateur de l'écart sur celui du temps.
+ */
+function FormatEcart(diff, temps)
+{
+	const txt = adv.GetChronoDiff(diff, Math.abs(diff) >= 60000 ? 'MMSSCC' : 'XSCC');
+
+	if (String(temps).indexOf(',') >= 0)
+		return txt.replace('.', ',');
+
+	return txt.replace(',', '.');
 }
 
 /**
@@ -243,7 +275,8 @@ function SyncRow(container, r, ordre, estDernier)
 		el.id = id;
 		el.className = 'leader';
 		el.innerHTML = '<div class="rank"></div><div class="bib"></div>'
-			+ '<div class="name"></div><div class="pena"></div><div class="time"></div>';
+			+ '<div class="name"></div><div class="pena"></div>'
+			+ '<div class="time"></div><div class="diff"></div>';
 		container.appendChild(el);
 
 		// textContent : les identités viennent du serveur, on ne les
@@ -261,7 +294,9 @@ function SyncRow(container, r, ordre, estDernier)
 	el.style.order = ordre;
 	el.classList.toggle('last', estDernier);
 	el.querySelector('.rank').textContent = r.rank;
-	el.querySelector('.time').textContent = adv.GetChrono(r.time, GetFmt());
+
+	const temps = adv.GetChrono(r.time, GetFmt());
+	el.querySelector('.time').textContent = temps;
 
 	// Cumul de pénalités, en slalom seulement et tant qu'il est non nul :
 	// afficher « +0 » sur chaque ligne n'apprendrait rien.
@@ -275,6 +310,12 @@ function SyncRow(container, r, ordre, estDernier)
 	{
 		elPena.style.display = 'none';
 	}
+
+	const elDiff = el.querySelector('.diff');
+	if (wsMain.showEcart)
+		elDiff.textContent = FormatEcart(r.diff, temps);
+	else
+		elDiff.style.display = 'none';
 
 	return el;
 }
@@ -427,6 +468,8 @@ function Init()
 	wsMain.lastBib = null;
 	wsMain.showLast = !urlParams.has('no_last');
 	wsMain.showPena = !urlParams.has('no_pena');
+	wsMain.showEcart = !urlParams.has('no_ecart');
+	wsMain.ecartPrecedent = urlParams.get('ecart') === 'precedent';
 	wsMain.showCateg = !urlParams.has('no_categ');
 	wsMain.libelle = urlParams.get('libelle') === '1';
 	wsMain.fmtChrono = urlParams.has('fmt') ? urlParams.get('fmt') : '';
@@ -444,7 +487,7 @@ function Init()
 	{
 		root.setProperty('--leaders-top', num('top', 40) + 'px');
 	}
-	root.setProperty('--leaders-width', num('width', 620) + 'px');
+	root.setProperty('--leaders-width', num('width', wsMain.showEcart ? 760 : 620) + 'px');
 	root.setProperty('--leaders-scale', num('scale', 1));
 
 	if (urlParams.get('bg') === '1')

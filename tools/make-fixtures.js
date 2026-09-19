@@ -120,7 +120,10 @@ const slalom = {
   epreuves: slalomEpreuves,
   boats: buildBoats({
     epreuves: slalomEpreuves,
-    perEpreuve: 4,
+    // 12 par épreuve, comme la descente : il en faut plus que les 8 places de
+    // tv_leaders pour que le classement se remplisse et que le cas « dernier
+    // arrivé hors du classement » existe.
+    perEpreuve: 12,
     baseTimeMs: 96000,
     spreadMs: 26000,
     seed: 20260620,

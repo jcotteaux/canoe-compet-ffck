@@ -4,7 +4,7 @@
  * Bouchon competFFCK : sert les pages ws_live et parle le protocole WebSocket
  * du logiciel, sans MySQL ni competFFCK.exe.
  *
- *   node mock/server.js [--fixture descente-sprint] [--speed 4] [--record out.jsonl]
+ *   node mock/server.js [--fixture slalom-finale] [--speed 4] [--record out.jsonl]
  */
 
 const http = require('http');
@@ -22,7 +22,7 @@ const args = parseArgs(process.argv.slice(2));
 const HTTP_PORT = Number(args.port || process.env.PORT || 3000);
 const WS_PORT = Number(args['ws-port'] || process.env.WS_PORT || 20000);
 
-const fixtureName = args.fixture || 'descente-sprint';
+const fixtureName = args.fixture || 'slalom-finale';
 const fixture = loadFixture(fixtureName);
 if (args.speed) fixture.speed = Number(args.speed);
 

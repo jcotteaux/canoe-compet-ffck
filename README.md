@@ -12,6 +12,10 @@ npm start
 → <http://localhost:3000/mock/> (panneau de contrôle)
 → <http://localhost:3000/canoe/live.html> (le live)
 
+Le bouchon démarre sur le **slalom**. Les autres compétitions simulées restent
+disponibles (`npm run descente`, `npm run international`) et la suite de tests
+continue de les exercer.
+
 ---
 
 ## Pourquoi
@@ -44,17 +48,17 @@ distribution officielle par zips datés.
 ## Le bouchon
 
 ```bash
-npm start                  # descente sprint (par défaut)
-npm run slalom             # slalom 18 portes, 2 inters
+npm start                  # slalom 18 portes, 2 inters (par défaut)
+npm run descente           # descente sprint
 npm run international      # niveau INT : affichage nations + drapeaux
 
-node mock/server.js --fixture slalom-finale --speed 10
+node mock/server.js --fixture descente-sprint --speed 10
 node mock/server.js --record captures/ma-session.jsonl
 ```
 
 | option | défaut | rôle |
 |---|---|---|
-| `--fixture <id>` | `descente-sprint` | compétition simulée |
+| `--fixture <id>` | `slalom-finale` | compétition simulée |
 | `--speed <n>` | celui de la fixture | accélération du temps |
 | `--port <n>` | 3000 | serveur HTTP |
 | `--ws-port <n>` | 20000 | serveur WebSocket |
@@ -173,6 +177,16 @@ quand il est nul. Le temps affiché (`Tps`) inclut déjà ces secondes : le pav�
 explique donc l'écart entre le chrono du bateau et son temps au classement, et
 pourquoi un bateau à +52 se retrouve derrière des chronos plus lents.
 
+**Écarts**, à droite de chaque temps. Par défaut l'écart avec le premier, qui
+est l'usage des affichages de résultats ; `?ecart=precedent` donne l'écart avec
+le concurrent qui précède au classement. La case du premier reste vide.
+
+Sous la minute l'écart se lit en secondes (`+3,20`), au-delà en minutes
+(`+1:30.00`). `adv.js` écrit la virgule dans ses formats « secondes » et le
+point dans ses formats « minutes » : en descente on obtiendrait donc `1:30.15`
+suivi de `+1,15` sur la même ligne. Le séparateur de l'écart est aligné sur
+celui du temps, et un test le vérifie.
+
 ### Insertion animée
 
 À chaque arrivée, la nouvelle ligne **s'insère** à sa place et celles qui
@@ -202,11 +216,13 @@ que cinq ont glissé.
 | `epreuve=K1H` | suit le chrono | fige l'épreuve |
 | `top=` / `left=` | 40 | position en pixels (ancrage haut-gauche) |
 | `bottom=` | — | ancre le bloc en bas plutôt qu'en haut |
-| `width=` | 620 | largeur du bloc |
+| `width=` | 760 | largeur du bloc (620 sans les écarts) |
 | `scale=1.2` | 1 | facteur de taille |
 | `libelle=1` | code court | libellé complet de l'épreuve |
 | `no_last` | affiché | masque la ligne du dernier arrivé |
 | `no_pena` | affiché | masque le cumul de pénalités (slalom) |
+| `ecart=precedent` | au premier | écart avec le concurrent précédent |
+| `no_ecart` | affiché | masque la colonne des écarts |
 | `no_categ` | affiché | masque l'en-tête d'épreuve |
 | `fmt=XSCC` | selon l'activité | format du chrono |
 | `bg=1` | transparent | fond magenta pour une régie chroma-key |
@@ -225,7 +241,7 @@ que depuis OBS, jouer sur `top` de chacune.
 ## Tests de non-régression
 
 ```bash
-npm test                    # 39 cas
+npm test                    # 42 cas
 node tools/smoke.js --only tv
 ```
 
@@ -337,8 +353,8 @@ pseudo-aléatoire à graine fixe : une fixture donne toujours la même course.
 
 | fixture | activité | particularités |
 |---|---|---|
-| `descente-sprint` | DES | 24 bateaux, 4 épreuves, 1 inter |
-| `slalom-finale` | SLA | 16 bateaux, 18 portes, 2 inters, colonnes `@…` |
+| `slalom-finale` | SLA | 48 bateaux, 4 épreuves, 18 portes, 2 inters, colonnes `@…` |
+| `descente-sprint` | DES | 48 bateaux, 4 épreuves, 1 inter |
 | `descente-internationale` | DES / INT | 16 bateaux, nations et drapeaux |
 
 ## Limites connues

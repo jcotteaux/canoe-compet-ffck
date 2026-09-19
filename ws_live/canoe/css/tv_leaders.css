@@ -48,7 +48,7 @@
 	--leaders-top: 40px;
 	--leaders-bottom: 40px;
 	--leaders-left: 40px;
-	--leaders-width: 620px;
+	--leaders-width: 760px;
 	--leaders-scale: 1;
 
 	/* dégradé du bandeau d'identité de tv_inrace (img/block_name.png) */
@@ -271,6 +271,27 @@ body.ancre-bas #leaders
 	font-variant-numeric: tabular-nums;
 	text-align: right;
 	min-width: 4.6em;
+}
+
+/*
+ * Écart, à droite du temps. Sur le bleu de la ligne plutôt que sur le pavé
+ * pâle : c'est une information secondaire, elle ne doit pas concurrencer le
+ * temps. La case du premier reste vide, adv.GetChronoDiff rendant '' pour un
+ * écart nul.
+ */
+.leader .diff
+{
+	flex: 0 0 auto;
+
+	background: var(--leaders-row-blue);
+	color: white;
+
+	padding-left: 10px;
+	padding-right: 12px;
+	font-size: 17pt;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	min-width: 4.4em;
 }
 
 @keyframes leader-in

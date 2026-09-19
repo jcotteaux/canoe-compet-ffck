@@ -78,6 +78,16 @@ function classementK1H() {
   return s;
 }
 
+/** 4 arrivees espacees de 1,15 s exactement, pour verifier les ecarts. */
+function quatreArrivees() {
+  const a = [];
+  for (let i = 1; i <= 4; i++) {
+    a.push(['bib-start', { bib: i }]);
+    a.push(['bib-finish', { bib: i, time: 89000 + i * 1150 }]);
+  }
+  return a;
+}
+
 const CASES = [
   { name: 'live / liste des compétitions', url: '/canoe/live.html' },
 
@@ -157,7 +167,11 @@ const CASES = [
     expect: (r) => (r.eval && r.eval.pena === '+52' ? null : `badge penalite attendu +52, vu ${r.eval && r.eval.pena}`),
     evalExpr: "(() => { const e=document.querySelector('.racer .pena'); return JSON.stringify({pena: e && e.style.display!=='none' ? e.textContent : null}); })()" },
 
-  { name: 'tv_oncourse / temps et place a l arrivee', url: '/canoe/tv_oncourse.html',
+  // delay_finish allonge : ce cas verifie que la ligne d'arrivee s'affiche avec
+  // sa place, pas qu'elle expire — l'expiration a son propre cas. Avec les
+  // 10 s par defaut, la mesure tombait a ~1 s de l'expiration et le resultat
+  // dependait du temps de demarrage de Chrome.
+  { name: 'tv_oncourse / temps et place a l arrivee', url: '/canoe/tv_oncourse.html?delay_finish=60000',
     setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }]],
     events: [[5000, 'bib-finish', { bib: 1 }]], settle: 11000,
     expect: (r) => (r.eval && r.eval.finished === 1 && r.eval.rank === '1'
@@ -236,6 +250,29 @@ const CASES = [
       ? null : `attendu 7 lignes conservees, 1 neuve et 5 glissees, vu ${JSON.stringify(r.eval)}`),
     evalExpr: "(() => { const l=[...document.querySelectorAll('#leaders_list .leader')]; return JSON.stringify({conserves: l.filter(e=>e.dataset.temoin).length, neufs: l.filter(e=>!e.dataset.temoin).length, glisses: l.filter(e=>String(e.style.transition).indexOf('transform')>=0).length}); })()" },
 
+  { name: 'tv_leaders / ecarts au premier', url: '/canoe/tv_leaders.html',
+    setup: quatreArrivees(), settle: 7000,
+    expect: (r) => (r.eval && r.eval.ecarts.join('|') === '|+1.15|+2.30|+3.45'
+      ? null : `ecarts cumules attendus, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({ecarts: [...document.querySelectorAll('#leaders .leader .diff')].map(e=>e.textContent)})" },
+
+  { name: 'tv_leaders / ecarts au precedent', url: '/canoe/tv_leaders.html?ecart=precedent',
+    setup: quatreArrivees(), settle: 7000,
+    expect: (r) => (r.eval && r.eval.ecarts.join('|') === '|+1.15|+1.15|+1.15'
+      ? null : `ecarts au precedent attendus, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({ecarts: [...document.querySelectorAll('#leaders .leader .diff')].map(e=>e.textContent)})" },
+
+  // adv.js ecrit la virgule dans ses formats « secondes » et le point dans ses
+  // formats « minutes » : temps et ecart d'une meme ligne doivent s'accorder.
+  { name: 'tv_leaders / separateur decimal coherent', url: '/canoe/tv_leaders.html',
+    fixture: 'slalom-finale',
+    setup: [['bib-start', { bib: 1 }], ['bib-finish', { bib: 1, time: 96300 }],
+            ['bib-start', { bib: 2 }], ['bib-finish', { bib: 2, time: 97600 }]],
+    settle: 7000,
+    expect: (r) => (r.eval && r.eval.melanges === 0
+      ? null : `temps et ecart ne doivent pas melanger . et , (${JSON.stringify(r.eval)})`),
+    evalExpr: "(() => { const l=[...document.querySelectorAll('#leaders .leader')]; const sep=t=>t.indexOf(',')>=0?',':(t.indexOf('.')>=0?'.':null); return JSON.stringify({melanges: l.filter(e=>{const a=sep(e.querySelector('.time').textContent), b=sep(e.querySelector('.diff').textContent); return b!==null && a!==null && a!==b;}).length}); })()" },
+
   { name: 'tv_leaders / penalites au classement', url: '/canoe/tv_leaders.html',
     fixture: 'slalom-finale',
     setup: [
@@ -302,8 +339,13 @@ function runBrowse(c) {
   });
 }
 
+// Le bouchon demarre sur le slalom, mais la suite doit couvrir les deux
+// activites : les cas qui ne precisent rien tournent donc en descente, ceux
+// qui testent portes et penalites demandent explicitement le slalom.
+const FIXTURE_PAR_DEFAUT = 'descente-sprint';
+
 async function runCase(c) {
-  await api('fixture', { name: c.fixture || 'descente-sprint' });
+  await api('fixture', { name: c.fixture || FIXTURE_PAR_DEFAUT });
   await api('speed', { speed: 2 });
   await api('start', {});
   for (const [action, body] of c.setup || []) await api(action, body);
