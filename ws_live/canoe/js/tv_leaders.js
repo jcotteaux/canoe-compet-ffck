@@ -28,6 +28,7 @@
  *   scale=1.2         facteur de taille (défaut : 1)
  *   libelle=1         libellé complet de l'épreuve au lieu du code court
  *   no_last           masque la ligne du dernier arrivé
+ *   no_pena           masque le cumul de pénalités (slalom)
  *   no_categ          masque l'en-tête d'épreuve
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
  *   bg=1              fond magenta au lieu de transparent (régie chroma-key)
@@ -198,6 +199,9 @@ function GetClassement()
 			name : tRanking.GetCell('Bateau', row),
 			time : tps,
 			rank : rank > 0 ? rank : 0,
+			// Tps inclut déjà ces secondes : le pavé explique donc l'écart
+			// entre le chrono du bateau et son temps au classement.
+			pena : canoe.GetNbPorte() > 0 ? canoe.GetCurrentSlalomTotalPena(tRanking, row) : 0,
 		});
 	}
 
@@ -239,7 +243,7 @@ function SyncRow(container, r, ordre, estDernier)
 		el.id = id;
 		el.className = 'leader';
 		el.innerHTML = '<div class="rank"></div><div class="bib"></div>'
-			+ '<div class="name"></div><div class="time"></div>';
+			+ '<div class="name"></div><div class="pena"></div><div class="time"></div>';
 		container.appendChild(el);
 
 		// textContent : les identités viennent du serveur, on ne les
@@ -258,6 +262,19 @@ function SyncRow(container, r, ordre, estDernier)
 	el.classList.toggle('last', estDernier);
 	el.querySelector('.rank').textContent = r.rank;
 	el.querySelector('.time').textContent = adv.GetChrono(r.time, GetFmt());
+
+	// Cumul de pénalités, en slalom seulement et tant qu'il est non nul :
+	// afficher « +0 » sur chaque ligne n'apprendrait rien.
+	const elPena = el.querySelector('.pena');
+	if (wsMain.showPena && r.pena > 0)
+	{
+		elPena.textContent = '+' + r.pena;
+		elPena.style.display = '';
+	}
+	else
+	{
+		elPena.style.display = 'none';
+	}
 
 	return el;
 }
@@ -409,6 +426,7 @@ function Init()
 	wsMain.epreuveChrono = '';
 	wsMain.lastBib = null;
 	wsMain.showLast = !urlParams.has('no_last');
+	wsMain.showPena = !urlParams.has('no_pena');
 	wsMain.showCateg = !urlParams.has('no_categ');
 	wsMain.libelle = urlParams.get('libelle') === '1';
 	wsMain.fmtChrono = urlParams.has('fmt') ? urlParams.get('fmt') : '';

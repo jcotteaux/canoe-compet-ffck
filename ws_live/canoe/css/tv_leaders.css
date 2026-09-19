@@ -63,6 +63,11 @@
 
 	/* vert d'arrivée (relevé dans img/block_finish_green.png) */
 	--leaders-finish-green: #338d31;
+
+	/* pavé rouge maison (img/60_140_R.jpg) — le cumul de pénalités */
+	--leaders-pena-top: #770101;
+	--leaders-pena-mid: #c20201;
+	--leaders-pena-bot: #a10101;
 }
 
 html, body
@@ -232,6 +237,25 @@ body.ancre-bas #leaders
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+/* Cumul de pénalités (slalom). Masqué quand il est nul. */
+.leader .pena
+{
+	flex: 0 0 auto;
+
+	background: linear-gradient(180deg,
+		var(--leaders-pena-top) 0%,
+		var(--leaders-pena-mid) 50%,
+		var(--leaders-pena-bot) 100%);
+	color: white;
+
+	padding-left: 10px;
+	padding-right: 10px;
+	font-size: 17pt;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	min-width: 2.6em;
 }
 
 .leader .time

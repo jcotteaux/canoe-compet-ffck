@@ -168,6 +168,11 @@ diverger de lui en cas d'ex æquo ; la position dans la liste triée ne sert que
 de repli. Les statuts DNF/DNS/DSQ sont des valeurs négatives et sortent donc
 naturellement du classement.
 
+**Cumul de pénalités** (slalom) : même pavé rouge que sur `tv_oncourse`, masqué
+quand il est nul. Le temps affiché (`Tps`) inclut déjà ces secondes : le pavé
+explique donc l'écart entre le chrono du bateau et son temps au classement, et
+pourquoi un bateau à +52 se retrouve derrière des chronos plus lents.
+
 ### Insertion animée
 
 À chaque arrivée, la nouvelle ligne **s'insère** à sa place et celles qui
@@ -201,6 +206,7 @@ que cinq ont glissé.
 | `scale=1.2` | 1 | facteur de taille |
 | `libelle=1` | code court | libellé complet de l'épreuve |
 | `no_last` | affiché | masque la ligne du dernier arrivé |
+| `no_pena` | affiché | masque le cumul de pénalités (slalom) |
 | `no_categ` | affiché | masque l'en-tête d'épreuve |
 | `fmt=XSCC` | selon l'activité | format du chrono |
 | `bg=1` | transparent | fond magenta pour une régie chroma-key |
@@ -219,7 +225,7 @@ que depuis OBS, jouer sur `top` de chacune.
 ## Tests de non-régression
 
 ```bash
-npm test                    # 37 cas
+npm test                    # 39 cas
 node tools/smoke.js --only tv
 ```
 

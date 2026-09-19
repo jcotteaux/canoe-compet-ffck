@@ -236,6 +236,29 @@ const CASES = [
       ? null : `attendu 7 lignes conservees, 1 neuve et 5 glissees, vu ${JSON.stringify(r.eval)}`),
     evalExpr: "(() => { const l=[...document.querySelectorAll('#leaders_list .leader')]; return JSON.stringify({conserves: l.filter(e=>e.dataset.temoin).length, neufs: l.filter(e=>!e.dataset.temoin).length, glisses: l.filter(e=>String(e.style.transition).indexOf('transform')>=0).length}); })()" },
 
+  { name: 'tv_leaders / penalites au classement', url: '/canoe/tv_leaders.html',
+    fixture: 'slalom-finale',
+    setup: [
+      ['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }], ['bib-start', { bib: 3 }],
+      ['penalty', { bib: 2, porte: 5, value: 2 }],
+      ['penalty', { bib: 3, porte: 9, value: 50 }],
+      ['penalty', { bib: 3, porte: 11, value: 2 }],
+      ['bib-finish', { bib: 1, time: 96200 }],
+      ['bib-finish', { bib: 2, time: 97400 }],
+      ['bib-finish', { bib: 3, time: 98600 }],
+    ],
+    settle: 8000,
+    // Le dossard 3 (+52) doit tomber derriere les autres : Tps inclut la penalite.
+    expect: (r) => (r.eval && r.eval.penas.join('|') === '|+2|+52' && r.eval.dernier === '3'
+      ? null : `attendu les penalites '', +2, +52 et le dossard 3 en dernier, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const l=[...document.querySelectorAll('#leaders .leader')]; return JSON.stringify({penas: l.map(e=>{const p=e.querySelector('.pena'); return p.style.display==='none'?'':p.textContent;}), dernier: l[l.length-1].querySelector('.bib').textContent}); })()" },
+
+  // En descente il n'y a pas de portes : aucun pave de penalite ne doit sortir.
+  { name: 'tv_leaders / pas de penalites en descente', url: '/canoe/tv_leaders.html',
+    setup: classementK1H(), settle: 8000,
+    expect: (r) => (r.eval && r.eval.visibles === 0 ? null : `aucun pave attendu, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({visibles: [...document.querySelectorAll('#leaders .leader .pena')].filter(e=>e.style.display!=='none').length})" },
+
   { name: 'tv_leaders / amorcage sur une epreuve avec resultats', url: '/canoe/tv_leaders.html',
     setup: classementK1H().concat([['bib-remove', { bib: 12 }], ['bib-start', { bib: 16 }]]),
     settle: 8000,
