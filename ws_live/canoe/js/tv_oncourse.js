@@ -3,22 +3,27 @@
  *
  * tv_inrace.html n'affiche qu'un seul bateau (celui choisi par GetBibSelect).
  * Cette page montre tout le monde, trié du plus proche de l'arrivée au plus
- * récemment parti.
+ * récemment parti, puis garde chaque arrivant un moment avec son temps et sa
+ * place.
  *
  * Source des données :
  *   <on_course>    bateaux en course et temps tournant (10 Hz)
- *   <epreuve_load> le classement, d'où l'on tire l'identité d'un dossard
+ *   <epreuve_load> le classement, d'où l'on tire identité, place et pénalités
+ *   <bib_time>     les passages ; passage < 1 = arrivée
  *
  * Paramètres d'URL :
- *   epreuve=K1H     n'afficher que cette épreuve (défaut : toutes)
- *   max=8           nombre de lignes maximum (défaut : 10)
- *   scale=1.2       facteur de taille (défaut : 1)
- *   top=40 right=40 position en pixels
- *   width=520       largeur du bandeau en pixels
- *   time_pena=0     slalom : temps tournant sans les pénalités (défaut : avec)
- *   fmt=XSCC        format du chrono (défaut : selon l'activité)
- *   bg=1            fond magenta au lieu de transparent (régie chroma-key)
- *   anim=0          désactive les animations
+ *   epreuve=K1H       n'afficher que cette épreuve (défaut : toutes)
+ *   max=8             nombre de lignes maximum (défaut : 10)
+ *   scale=1.2         facteur de taille (défaut : 1)
+ *   top=40 right=40   position en pixels
+ *   width=560         largeur du bandeau en pixels
+ *   delay_finish=6000 durée d'affichage après l'arrivée en ms (défaut : 10000)
+ *   no_pena           masque le cumul de pénalités
+ *   time_pena=0       slalom : temps tournant sans les pénalités (défaut : avec)
+ *                     alias du time_running_pena de tv_inrace
+ *   fmt=XSCC          format du chrono (défaut : selon l'activité)
+ *   bg=1              fond magenta au lieu de transparent (régie chroma-key)
+ *   anim=0            désactive les animations
  */
 
 const wsMain = new ws.Context(wsParams.url, wsParams.port);
@@ -42,10 +47,11 @@ function OnCommandEpreuveLoad(objJSON)
 {
 	canoe.SetRanking(objJSON);
 	canoe.SetColumnNameRanking(canoe.GetTableRanking());
+	RefreshFinished();
 	Render();
 }
 
-/** Recharge le classement : les identités et pénalités ont pu changer. */
+/** Recharge le classement : identités, places et pénalités ont pu changer. */
 function ReloadEpreuve()
 {
 	if (wsMain.websocket && wsMain.websocket.readyState === WebSocket.OPEN)
@@ -54,9 +60,26 @@ function ReloadEpreuve()
 
 function OnBroadcastBibTime(objJSON)
 {
-	// Une arrivée (passage < 1) modifie le classement : on le rafraîchit.
-	if (parseInt(objJSON.passage) < 1)
-		ReloadEpreuve();
+	// passage >= 1 : temps intermédiaire, rien à faire ici.
+	if (parseInt(objJSON.passage) >= 1)
+		return;
+
+	// Arrivée : le bateau va disparaître du flux <on_course>. On le garde
+	// affiché le temps que le spectateur lise son temps et sa place. Le temps
+	// et la place définitifs arrivent avec le <epreuve_load> qui suit ; en
+	// attendant on affiche le chrono brut de la trame.
+	wsMain.finished.set(String(objJSON.bib), {
+		at : Date.now(),
+		time : adv.toNumber(objJSON.time_chrono),
+		rank : 0,
+	});
+
+	// Un rendu de plus à l'expiration : si plus aucun bateau n'est en course,
+	// le flux <on_course> ne rythme plus l'affichage.
+	window.setTimeout(Render, wsMain.delayFinish + 100);
+
+	ReloadEpreuve();
+	Render();
 }
 
 function OnBroadcastPenaltyAdd(objJSON)
@@ -68,6 +91,7 @@ function OnBroadcastPenaltyAdd(objJSON)
 function OnBroadcastRunErase(objJSON)
 {
 	wsMain.onCourse = [];
+	wsMain.finished.clear();
 	ReloadEpreuve();
 	Render();
 }
@@ -89,7 +113,7 @@ function OnFlowOnCourse(objJSON)
 	Render();
 }
 
-/** Identité et épreuve d'un dossard, lues dans le classement. */
+/** Identité, épreuve et pénalités d'un dossard, lues dans le classement. */
 function GetRacer(bib)
 {
 	const tRanking = canoe.GetTableRanking();
@@ -98,10 +122,36 @@ function GetRacer(bib)
 		return null;
 
 	return {
+		row : row,
 		name : tRanking.GetCell('Bateau', row),
 		epreuve : tRanking.GetCell('Code_categorie', row),
 		pena : canoe.GetNbPorte() > 0 ? canoe.GetCurrentSlalomTotalPena(tRanking, row) : 0,
 	};
+}
+
+/** Reprend temps classant et place des arrivants dans le classement à jour. */
+function RefreshFinished()
+{
+	if (wsMain.finished.size == 0)
+		return;
+
+	const tRanking = canoe.GetTableRanking();
+	const course_phase = canoe.GetCodeCoursePhase();
+
+	wsMain.finished.forEach(function(f, bib) {
+		const row = canoe.GetRankingBibIndex(tRanking, bib);
+		if (row < 0)
+			return;
+
+		// Tps inclut les pénalités : c'est le temps qui classe.
+		const tps = tRanking.GetCellInt('Tps' + course_phase, row, 0);
+		if (tps != 0)
+			f.time = tps;
+
+		// GetCellRank rend '' quand le bateau n'est pas classé (DNF, DSQ…).
+		const rank = tRanking.GetCellRank('Cltc' + course_phase, row, 0);
+		f.rank = parseInt(rank) > 0 ? parseInt(rank) : 0;
+	});
 }
 
 function Render()
@@ -112,29 +162,60 @@ function Render()
 		return;
 
 	const fmt = wsMain.fmtChrono ? wsMain.fmtChrono : canoe.GetFmtChrono();
+	const now = Date.now();
+	const slalom = canoe.GetNbPorte() > 0;
+
+	// Les arrivants sortent de la liste passé le délai.
+	wsMain.finished.forEach(function(f, bib) {
+		if (now - f.at > wsMain.delayFinish)
+			wsMain.finished.delete(bib);
+	});
+
+	const keep = function(racer) {
+		return racer != null && (wsMain.epreuve === '' || racer.epreuve == wsMain.epreuve);
+	};
+
+	// Les arrivants d'abord, du plus récent au plus ancien : c'est l'information
+	// neuve, et ils viennent de toute façon de franchir la ligne.
+	const arrived = [];
+	wsMain.finished.forEach(function(f, bib) {
+		const racer = GetRacer(bib);
+		if (!keep(racer))
+			return;
+
+		arrived.push({
+			bib : bib, name : racer.name, time : f.time,
+			rank : f.rank, pena : racer.pena, finished : true, at : f.at,
+		});
+	});
+	arrived.sort(function(a, b) { return b.at - a.at; });
 
 	// On n'affiche que les bateaux dont on connaît l'identité : un dossard nu
 	// n'apprend rien au spectateur, et signale plutôt un classement pas encore
 	// chargé.
-	const racers = [];
+	const running = [];
 	for (const r of (wsMain.onCourse || []))
 	{
+		if (wsMain.finished.has(String(r.bib)))
+			continue;			// déjà arrivé, affiché au-dessus
+
 		const racer = GetRacer(r.bib);
-		if (racer == null)
-			continue;
-		if (wsMain.epreuve !== '' && racer.epreuve != wsMain.epreuve)
+		if (!keep(racer))
 			continue;
 
-		const time = wsMain.timePena ? r.time + racer.pena * 1000 : r.time;
-		// `elapsed` (temps brut) sert au tri, `time` a l'affichage : en slalom
-		// un bateau avec 50 s de penalite n'est pas plus avance sur le parcours
-		// pour autant, il ne doit pas remonter en tete de liste.
-		racers.push({ bib : r.bib, name : racer.name, time : time, elapsed : r.time });
+		running.push({
+			bib : r.bib, name : racer.name,
+			time : wsMain.timePena ? r.time + racer.pena * 1000 : r.time,
+			// `elapsed` (temps brut) sert au tri, `time` a l'affichage : en
+			// slalom un bateau avec 50 s de pénalité n'est pas plus avancé sur
+			// le parcours pour autant, il ne doit pas remonter en tête.
+			elapsed : r.time,
+			rank : 0, pena : racer.pena, finished : false,
+		});
 	}
+	running.sort(function(a, b) { return b.elapsed - a.elapsed; });
 
-	// Le plus proche de l'arrivée en premier : c'est celui qu'on regarde.
-	racers.sort(function(a, b) { return b.elapsed - a.elapsed; });
-	const shown = racers.slice(0, wsMain.max);
+	const shown = arrived.concat(running).slice(0, wsMain.max);
 
 	elBlock.classList.toggle('empty', shown.length == 0);
 
@@ -153,23 +234,50 @@ function Render()
 			el = document.createElement('div');
 			el.id = id;
 			el.className = 'racer';
-			el.innerHTML = '<div class="bib"></div><div class="name"></div><div class="time"></div>';
+			el.innerHTML = '<div class="bib"></div><div class="name"></div>'
+				+ '<div class="pena"></div><div class="rank"></div><div class="time"></div>';
 			elList.appendChild(el);
-			// textContent : les identites viennent du serveur, on ne les
-			// interprete pas comme du HTML.
+			// textContent : les identités viennent du serveur, on ne les
+			// interprète pas comme du HTML.
 			el.querySelector('.bib').textContent = r.bib;
 			el.querySelector('.name').textContent = r.name;
 		}
 
 		el.classList.remove('leaving');
-		// L'ordre passe par la propriete flex `order` : deplacer reellement le
-		// noeud (appendChild) le retire puis le reinsere, ce qui relance ses
-		// animations CSS a chaque trame.
+		el.classList.toggle('finished', r.finished);
+		// L'ordre passe par la propriété flex `order` : déplacer réellement le
+		// nœud (appendChild) le retire puis le réinsère, ce qui relance ses
+		// animations CSS à chaque trame.
 		el.style.order = rank;
+
 		el.querySelector('.time').textContent = adv.GetChrono(r.time, fmt);
+
+		// Cumul de pénalités, en slalom seulement et tant qu'il est non nul.
+		const elPena = el.querySelector('.pena');
+		if (wsMain.showPena && slalom && r.pena > 0)
+		{
+			elPena.textContent = '+' + r.pena;
+			elPena.style.display = '';
+		}
+		else
+		{
+			elPena.style.display = 'none';
+		}
+
+		// Place, uniquement pour un arrivant classé.
+		const elRank = el.querySelector('.rank');
+		if (r.finished && r.rank > 0)
+		{
+			elRank.textContent = r.rank;
+			elRank.style.display = '';
+		}
+		else
+		{
+			elRank.style.display = 'none';
+		}
 	}
 
-	// Les bateaux qui ne sont plus en course sortent en fondu.
+	// Les bateaux qui ne sont plus affichés sortent en fondu.
 	const existing = elList.querySelectorAll('.racer');
 	for (let i = 0; i < existing.length; i++)
 	{
@@ -198,15 +306,22 @@ function Init()
 	};
 
 	wsMain.onCourse = [];
+	wsMain.finished = new Map();
 	wsMain.epreuve = urlParams.has('epreuve') ? urlParams.get('epreuve') : '';
 	wsMain.max = num('max', 10);
-	wsMain.timePena = urlParams.get('time_pena') !== '0';
+	wsMain.delayFinish = num('delay_finish', 10000);
+	wsMain.showPena = !urlParams.has('no_pena');
 	wsMain.fmtChrono = urlParams.has('fmt') ? urlParams.get('fmt') : '';
+
+	// tv_inrace nomme ce réglage time_running_pena, le wiki le documente sous
+	// time_pena : on accepte les deux.
+	wsMain.timePena = urlParams.get('time_pena') !== '0'
+		&& urlParams.get('time_running_pena') !== '0';
 
 	const root = document.documentElement.style;
 	root.setProperty('--oncourse-top', num('top', 40) + 'px');
 	root.setProperty('--oncourse-right', num('right', 40) + 'px');
-	root.setProperty('--oncourse-width', num('width', 520) + 'px');
+	root.setProperty('--oncourse-width', num('width', 560) + 'px');
 	root.setProperty('--oncourse-scale', num('scale', 1));
 
 	if (urlParams.get('bg') === '1')

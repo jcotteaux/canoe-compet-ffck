@@ -106,15 +106,31 @@ diverge silencieusement.
 | `max=8` | 10 | nombre de lignes maximum |
 | `scale=1.2` | 1 | facteur de taille |
 | `top=` / `right=` | 40 | position en pixels |
-| `width=` | 520 | largeur du bandeau |
+| `width=` | 560 | largeur du bandeau |
+| `delay_finish=6000` | 10000 | durée d'affichage après l'arrivée, en ms (même nom que `tv_inrace`) |
+| `no_pena` | affiché | masque le cumul de pénalités |
 | `time_pena=0` | avec | slalom : temps tournant sans les pénalités |
 | `fmt=XSCC` | selon l'activité | format du chrono |
 | `bg=1` | transparent | fond magenta pour une régie chroma-key |
 | `anim=0` | animé | coupe les animations |
 
-Les lignes sont triées du plus proche de l'arrivée au plus récemment parti, sur
-le **temps brut** : en slalom, un bateau à +50 s affiche son temps pénalisé mais
-ne remonte pas en tête, puisqu'il n'est pas plus avancé sur le parcours.
+Les bateaux encore sur l'eau sont triés du plus proche de l'arrivée au plus
+récemment parti, sur le **temps brut** : en slalom, un bateau à +50 s affiche
+son temps pénalisé mais ne remonte pas en tête, puisqu'il n'est pas plus avancé
+sur le parcours.
+
+**Cumul de pénalités** (slalom) : un pavé rouge `+52` sur la ligne, masqué tant
+qu'il est nul. Ce sont les secondes de pénalité, pas le nombre de portes
+touchées — c'est ce qui est déjà ajouté au temps tournant, et le badge explique
+donc pourquoi celui-ci a sauté. `canoe.GetCurrentSlalomCountPena` ne convenait
+pas : elle compte les portes **jugées**, y compris celles à 0.
+
+**À l'arrivée** : le bateau quitte le flux `<on_course>`, mais sa ligne reste
+10 s en tête de liste, passe au vert d'arrivée, et affiche son temps classant
+(pénalités comprises) plus sa **place** dans un pavé jaune. Le temps et la place
+définitifs viennent du `<epreuve_load>` déclenché par l'arrivée ; en attendant sa
+réponse, la ligne montre le chrono brut de la trame `<bib_time>`. Un bateau non
+classé (DNF, DSQ) n'affiche pas de place.
 
 Deux pièges rencontrés en développant cette page, tous deux invisibles hors
 navigateur réel :
@@ -128,7 +144,7 @@ navigateur réel :
 ## Tests de non-régression
 
 ```bash
-npm test                    # 26 cas
+npm test                    # 29 cas
 node tools/smoke.js --only tv
 ```
 

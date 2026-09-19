@@ -133,6 +133,28 @@ const CASES = [
     events: [[4000, 'penalty', { bib: 1, porte: 5, value: 2 }],
              [5000, 'penalty', { bib: 2, porte: 9, value: 50 }]], settle: 9000 },
 
+  { name: 'tv_oncourse / cumul de penalites', url: '/canoe/tv_oncourse.html',
+    fixture: 'slalom-finale',
+    setup: [['bib-start', { bib: 1 }],
+            ['penalty', { bib: 1, porte: 5, value: 2 }],
+            ['penalty', { bib: 1, porte: 9, value: 50 }]],
+    settle: 8000,
+    expect: (r) => (r.eval && r.eval.pena === '+52' ? null : `badge penalite attendu +52, vu ${r.eval && r.eval.pena}`),
+    evalExpr: "(() => { const e=document.querySelector('.racer .pena'); return JSON.stringify({pena: e && e.style.display!=='none' ? e.textContent : null}); })()" },
+
+  { name: 'tv_oncourse / temps et place a l arrivee', url: '/canoe/tv_oncourse.html',
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }]],
+    events: [[5000, 'bib-finish', { bib: 1 }]], settle: 11000,
+    expect: (r) => (r.eval && r.eval.finished === 1 && r.eval.rank === '1'
+      ? null : `attendu 1 ligne arrivee avec la place 1, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const f=document.querySelector('.racer.finished'); return JSON.stringify({finished: document.querySelectorAll('.racer.finished').length, rank: f ? f.querySelector('.rank').textContent : null}); })()" },
+
+  { name: 'tv_oncourse / arrivee expiree', url: '/canoe/tv_oncourse.html?delay_finish=2000',
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }]],
+    events: [[5000, 'bib-finish', { bib: 1 }]], settle: 11000,
+    expect: (r) => (r.eval && r.eval.finished === 0 ? null : `la ligne d'arrivee aurait du disparaitre, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({finished: document.querySelectorAll('.racer.finished').length})" },
+
   { name: 'tv_oncourse / filtre epreuve', url: '/canoe/tv_oncourse.html?epreuve=K1H&max=3',
     setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 7 }]], settle: 8000,
     expect: (r) => (r.eval && r.eval.rows === 1 ? null : `le filtre K1H devrait laisser 1 ligne, vu ${r.eval && r.eval.rows}`),

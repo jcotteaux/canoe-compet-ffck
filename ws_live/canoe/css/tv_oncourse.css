@@ -48,7 +48,7 @@
 {
 	--oncourse-top: 40px;
 	--oncourse-right: 40px;
-	--oncourse-width: 520px;
+	--oncourse-width: 560px;
 	--oncourse-scale: 1;
 
 	/* dégradé du bandeau d'identité de tv_inrace (img/block_name.png) */
@@ -60,6 +60,19 @@
 	--oncourse-time-bg: #c4dbef;
 	--oncourse-time-bg2: #d0e0f1;
 	--oncourse-time-text: rgb(0, 27, 90);
+
+	/* pavé jaune maison (img/60_140_Y.jpg) — la place à l'arrivée */
+	--oncourse-rank-top: #917a10;
+	--oncourse-rank-mid: #f0c819;
+	--oncourse-rank-bot: #b19414;
+
+	/* pavé rouge maison (img/60_140_R.jpg) — le cumul de pénalités */
+	--oncourse-pena-top: #770101;
+	--oncourse-pena-mid: #c20201;
+	--oncourse-pena-bot: #a10101;
+
+	/* vert d'arrivée (relevé dans img/block_finish_green.png) */
+	--oncourse-finish-green: #338d31;
 }
 
 html, body
@@ -158,6 +171,43 @@ body.chroma
 	text-overflow: ellipsis;
 }
 
+/* Cumul de pénalités du bateau en course (slalom). Masqué tant qu'il est nul :
+   afficher « +0 » sur chaque ligne n'apprendrait rien. */
+.racer .pena
+{
+	flex: 0 0 auto;
+
+	background: linear-gradient(180deg,
+		var(--oncourse-pena-top) 0%,
+		var(--oncourse-pena-mid) 50%,
+		var(--oncourse-pena-bot) 100%);
+	color: white;
+
+	padding: 9px 10px;
+	font-size: 17pt;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	min-width: 2.6em;
+}
+
+/* Place à l'arrivée, sur le jaune maison. */
+.racer .rank
+{
+	flex: 0 0 auto;
+
+	background: linear-gradient(180deg,
+		var(--oncourse-rank-top) 0%,
+		var(--oncourse-rank-mid) 50%,
+		var(--oncourse-rank-bot) 100%);
+	color: black;
+
+	padding: 9px 10px;
+	font-size: 19pt;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	min-width: 2.2em;
+}
+
 .racer .time
 {
 	flex: 0 0 auto;
@@ -172,6 +222,20 @@ body.chroma
 	text-align: right;
 	/* évite que la ligne tressaute à chaque dixième */
 	min-width: 4.6em;
+}
+
+/*
+ * Le bateau vient d'arriver : on le distingue de ceux encore sur l'eau, sinon
+ * le spectateur croit lire un temps tournant. Même construction que la ligne
+ * normale, mais vers le vert d'arrivée maison. block_finish_green.png est un
+ * bandeau composite et non un dégradé : seul son vert (#338d31) en est repris.
+ */
+.racer.finished
+{
+	background: linear-gradient(90deg,
+		var(--oncourse-row-dark) 0%,
+		#14391b 30%,
+		var(--oncourse-finish-green) 100%);
 }
 
 @keyframes racer-in
