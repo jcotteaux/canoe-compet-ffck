@@ -75,6 +75,45 @@ utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
 `advPage` (classes PHP) et n'est pas rendu — le bouchon le signale sur la sortie
 standard au lieu de produire une page silencieusement cassée.
 
+## Nouvelle page : tous les bateaux en course
+
+`canoe/tv_oncourse.html` — `tv_inrace.html` n'affiche qu'un seul bateau (celui
+choisi par `GetBibSelect`). Cette page les montre **tous**, en surimpression en
+haut à droite.
+
+Fond **transparent** : elle se superpose à une vidéo dans OBS ou un navigateur
+en overlay. Chaque ligne porte son propre fond sombre, sinon le texte devient
+illisible dès que l'image est claire (écume, ciel).
+
+Le bandeau disparaît quand personne n'est en course : un cadre vide à l'écran
+est pire que pas de cadre.
+
+| paramètre | défaut | rôle |
+|---|---|---|
+| `epreuve=K1H` | toutes | n'afficher qu'une épreuve |
+| `max=8` | 10 | nombre de lignes maximum |
+| `scale=1.2` | 1 | facteur de taille |
+| `top=` / `right=` | 40 | position en pixels |
+| `width=` | 520 | largeur du bandeau |
+| `titre=Sur l'eau` | `En course` | libellé de l'en-tête ; vide pour le masquer |
+| `time_pena=0` | avec | slalom : temps tournant sans les pénalités |
+| `fmt=XSCC` | selon l'activité | format du chrono |
+| `bg=1` | transparent | fond magenta pour une régie chroma-key |
+| `anim=0` | animé | coupe les animations |
+
+Les lignes sont triées du plus proche de l'arrivée au plus récemment parti, sur
+le **temps brut** : en slalom, un bateau à +50 s affiche son temps pénalisé mais
+ne remonte pas en tête, puisqu'il n'est pas plus avancé sur le parcours.
+
+Deux pièges rencontrés en développant cette page, tous deux invisibles hors
+navigateur réel :
+
+- réordonner avec `appendChild` retire puis réinsère le nœud, ce qui **relance
+  ses animations CSS** ; à 10 Hz les lignes restaient bloquées à 24 % d'opacité.
+  L'ordre passe donc par la propriété flex `order` ;
+- un bateau remis en course après avoir été marqué sortant était quand même
+  supprimé par le minuteur de sortie lancé auparavant.
+
 ## Tests de non-régression
 
 ```bash

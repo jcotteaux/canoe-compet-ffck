@@ -113,6 +113,34 @@ const CASES = [
     setup: [['bib-start', { bib: 1 }]],
     events: [[6000, 'bib-finish', { bib: 1 }]], settle: 10000 },
 
+  { name: 'tv_oncourse / plusieurs en course', url: '/canoe/tv_oncourse.html',
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }], ['bib-start', { bib: 3 }]],
+    settle: 8000,
+    expect: (r) => (r.eval && r.eval.rows >= 3 ? null : `attendu >=3 lignes, vu ${r.eval && r.eval.rows}`),
+    evalExpr: "JSON.stringify({rows: document.querySelectorAll('.racer').length})" },
+
+  { name: 'tv_oncourse / personne en course', url: '/canoe/tv_oncourse.html', settle: 7000,
+    expect: (r) => (r.eval && r.eval.hidden ? null : 'le bandeau devrait etre masque'),
+    evalExpr: "JSON.stringify({hidden: document.getElementById('oncourse').classList.contains('empty')})" },
+
+  { name: 'tv_oncourse / arrivee pendant', url: '/canoe/tv_oncourse.html',
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }]],
+    events: [[5000, 'bib-finish', { bib: 1 }]], settle: 11000 },
+
+  { name: 'tv_oncourse / slalom + penalites', url: '/canoe/tv_oncourse.html',
+    fixture: 'slalom-finale',
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }]],
+    events: [[4000, 'penalty', { bib: 1, porte: 5, value: 2 }],
+             [5000, 'penalty', { bib: 2, porte: 9, value: 50 }]], settle: 9000 },
+
+  { name: 'tv_oncourse / filtre epreuve', url: '/canoe/tv_oncourse.html?epreuve=K1H&max=3',
+    setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 7 }]], settle: 8000,
+    expect: (r) => (r.eval && r.eval.rows === 1 ? null : `le filtre K1H devrait laisser 1 ligne, vu ${r.eval && r.eval.rows}`),
+    evalExpr: "JSON.stringify({rows: document.querySelectorAll('.racer:not(.leaving)').length})" },
+
+  { name: 'tv_oncourse / effacement de manche', url: '/canoe/tv_oncourse.html',
+    setup: [['bib-start', { bib: 1 }]], events: [[5000, 'erase', {}]], settle: 10000 },
+
   { name: 'tv_ranking', url: '/canoe/tv_ranking.html', settle: 8000 },
   { name: 'tv_startlist', url: '/canoe/tv_startlist.html', settle: 8000 },
   { name: 'tv_clear', url: '/canoe/tv_clear.html' },
@@ -127,6 +155,7 @@ function runBrowse(c) {
   const args = [path.join(__dirname, 'browse.js'), BASE + c.url, '--wait', String(c.wait || 2500)];
   if (c.clicks) args.push('--click', c.clicks, '--after', String(c.after || 2500));
   args.push('--settle', String(c.settle || 9000));
+  if (c.evalExpr) args.push('--eval', c.evalExpr);
   args.push('--width', '1920', '--height', '1080');
 
   return new Promise((resolve) => {
@@ -155,6 +184,11 @@ async function runCase(c) {
 
   const report = await runBrowse(c);
   timers.forEach(clearTimeout);
+
+  // browse.js renvoie la valeur brute de --eval : les cas la produisent en JSON
+  if (typeof report.eval === 'string') {
+    try { report.eval = JSON.parse(report.eval); } catch { /* laisse la chaine */ }
+  }
 
   const problems = [...(report.consoleErrors || [])];
   if (c.expect) {

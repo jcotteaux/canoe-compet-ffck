@@ -1,0 +1,174 @@
+/*
+ * Liste des bateaux en course, en surimpression en haut à droite.
+ *
+ * Fond transparent : la page est destinée à être superposée à une vidéo (OBS,
+ * navigateur en overlay). Chaque ligne porte donc son propre fond sombre et un
+ * liseré clair, sinon le texte devient illisible dès que l'image est claire
+ * (eau, écume, ciel).
+ *
+ * Les positions et la taille sont pilotées par des variables CSS que le
+ * JavaScript renseigne depuis les paramètres d'URL.
+ */
+
+:root
+{
+	--oncourse-top: 40px;
+	--oncourse-right: 40px;
+	--oncourse-width: 520px;
+	--oncourse-scale: 1;
+
+	--oncourse-bg: rgba(10, 16, 24, 0.82);
+	--oncourse-bg-accent: rgba(23, 86, 140, 0.88);
+	--oncourse-border: rgba(255, 255, 255, 0.22);
+	--oncourse-text: #ffffff;
+	--oncourse-time: #8fd8ff;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background: transparent;		/* la vidéo passe au travers */
+	overflow: hidden;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Repli chroma-key : ?bg=1 pour une régie qui incruste par couleur. */
+body.chroma
+{
+	background: #cc00cc;
+}
+
+#oncourse
+{
+	position: absolute;
+	top: var(--oncourse-top);
+	right: var(--oncourse-right);
+	width: var(--oncourse-width);
+
+	transform: scale(var(--oncourse-scale));
+	transform-origin: top right;
+
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+/* Le bandeau disparaît quand personne n'est en course : sur une incrustation
+   TV, un cadre vide à l'écran est pire que pas de cadre du tout. */
+#oncourse.empty
+{
+	display: none;
+}
+
+#oncourse_title
+{
+	background: var(--oncourse-bg-accent);
+	border: 1px solid var(--oncourse-border);
+	border-radius: 4px;
+
+	color: var(--oncourse-text);
+	font-size: 20px;
+	font-weight: bold;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	padding: 7px 14px;
+}
+
+#oncourse_title .count
+{
+	float: right;
+	opacity: 0.85;
+	font-variant-numeric: tabular-nums;
+}
+
+#oncourse_list
+{
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.racer
+{
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	background: var(--oncourse-bg);
+	border: 1px solid var(--oncourse-border);
+	border-radius: 4px;
+	padding: 9px 14px;
+
+	color: var(--oncourse-text);
+	font-size: 26px;
+	line-height: 1.15;
+
+	animation: racer-in 220ms ease-out;
+}
+
+/* Le bateau vient de franchir la ligne : on le laisse une seconde de plus,
+   estompé, pour que le spectateur comprenne qu'il est arrivé. */
+.racer.leaving
+{
+	animation: racer-out 900ms ease-in forwards;
+}
+
+.racer .bib
+{
+	flex: 0 0 auto;
+	min-width: 52px;
+	text-align: center;
+
+	background: var(--oncourse-bg-accent);
+	border-radius: 3px;
+	padding: 2px 8px;
+
+	font-size: 24px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+.racer .name
+{
+	flex: 1 1 auto;
+	min-width: 0;
+
+	font-weight: bold;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.racer .time
+{
+	flex: 0 0 auto;
+
+	color: var(--oncourse-time);
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	/* évite que la ligne tressaute à chaque dixième */
+	min-width: 5.2em;
+	text-align: right;
+}
+
+@keyframes racer-in
+{
+	from { opacity: 0; transform: translateX(28px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes racer-out
+{
+	from { opacity: 1; transform: translateX(0); }
+	to   { opacity: 0; transform: translateX(28px); }
+}
+
+/* Sur un poste qui n'aime pas les animations (vieille machine de régie), on
+   coupe tout : ?anim=0 ajoute cette classe sur <body>. */
+body.no-anim .racer,
+body.no-anim .racer.leaving
+{
+	animation: none;
+}

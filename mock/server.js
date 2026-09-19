@@ -313,6 +313,7 @@ server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log(`  live                 http://localhost:${HTTP_PORT}/canoe/live.html`);
   console.log(`  monitor              http://localhost:${HTTP_PORT}/canoe/monitor_race.html`);
   console.log(`  tv inrace            http://localhost:${HTTP_PORT}/canoe/tv_inrace.html`);
+  console.log(`  tv oncourse          http://localhost:${HTTP_PORT}/canoe/tv_oncourse.html`);
   console.log(`  tv ranking           http://localhost:${HTTP_PORT}/canoe/tv_ranking.html`);
   console.log(`  tv startlist         http://localhost:${HTTP_PORT}/canoe/tv_startlist.html`);
   console.log(`  jugement             http://localhost:${HTTP_PORT}/canoe/jugement.html`);
