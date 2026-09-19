@@ -9,7 +9,7 @@
  *   - Calibri gras blanc, tailles en pt              (tv_inrace.css)
  *   - dégradé de ligne #030910 -> #256eb5            (img/block_name.png)
  *   - pavé de temps bleu pâle, texte rgb(0,27,90)    (img/block_running.png)
- *   - animation apparitionD 0.7s ease-out            (tv_ranking.css, tv_startlist.css)
+ *   - animation apparitionG 0.7s ease-out            (tv_ranking.css, tv_startlist.css)
  *   - magenta #D500FF pour le repli chroma-key       (toutes les pages tv_*)
  *
  * Les positions et la taille sont pilotées par des variables CSS que le
@@ -37,7 +37,16 @@
 	font-display: block;
 }
 
-/* Animation maison des blocs positionnés à droite (tv_ranking, tv_startlist). */
+/*
+ * Animations maison (tv_ranking.css, tv_startlist.css) : apparitionG pour un
+ * bloc ancré à gauche, apparitionD pour un bloc ancré à droite.
+ */
+@keyframes apparitionG
+{
+	from { opacity: 0; transform: translateX(-900px); }
+	to   { opacity: 1; transform: translateX(0px); }
+}
+
 @keyframes apparitionD
 {
 	from { opacity: 0; transform: translateX(800px); }
@@ -47,6 +56,7 @@
 :root
 {
 	--oncourse-top: 40px;
+	--oncourse-left: 40px;
 	--oncourse-right: 40px;
 	--oncourse-width: 560px;
 	--oncourse-scale: 1;
@@ -95,17 +105,26 @@ body.chroma
 {
 	position: absolute;
 	top: var(--oncourse-top);
-	right: var(--oncourse-right);
+	left: var(--oncourse-left);
 	width: var(--oncourse-width);
 
 	transform: scale(var(--oncourse-scale));
-	transform-origin: top right;
+	transform-origin: top left;
 
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
 
-	animation: apparitionD 0.7s ease-out;
+	animation: apparitionG 0.7s ease-out;
+}
+
+/* ?right=... ancre le bloc à droite, comme dans la première version. */
+body.ancre-droite #oncourse
+{
+	left: auto;
+	right: var(--oncourse-right);
+	transform-origin: top right;
+	animation-name: apparitionD;
 }
 
 /* Le bandeau disparaît quand personne n'est en course : sur une incrustation
@@ -259,17 +278,33 @@ body.chroma
 		var(--oncourse-finish-green) 100%);
 }
 
+/* Les lignes entrent et sortent du côté où le bloc est ancré. */
 @keyframes racer-in
 {
-	from { opacity: 0; transform: translateX(120px); }
+	from { opacity: 0; transform: translateX(-120px); }
 	to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes racer-out
 {
 	from { opacity: 1; transform: translateX(0); }
+	to   { opacity: 0; transform: translateX(-120px); }
+}
+
+@keyframes racer-in-droite
+{
+	from { opacity: 0; transform: translateX(120px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes racer-out-droite
+{
+	from { opacity: 1; transform: translateX(0); }
 	to   { opacity: 0; transform: translateX(120px); }
 }
+
+body.ancre-droite .racer          { animation-name: racer-in-droite; }
+body.ancre-droite .racer.leaving  { animation-name: racer-out-droite; }
 
 /* Sur un poste qui n'aime pas les animations (vieille machine de régie), on
    coupe tout : ?anim=0 ajoute cette classe sur <body>. */

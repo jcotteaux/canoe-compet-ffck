@@ -1,5 +1,6 @@
 /*
- * Liste de tous les bateaux actuellement en course, en surimpression.
+ * Liste de tous les bateaux actuellement en course, en surimpression en haut à
+ * gauche.
  *
  * tv_inrace.html n'affiche qu'un seul bateau (celui choisi par GetBibSelect).
  * Cette page montre tout le monde, trié du plus proche de l'arrivée au plus
@@ -15,7 +16,8 @@
  *   epreuve=K1H       n'afficher que cette épreuve (défaut : toutes)
  *   max=8             nombre de lignes maximum (défaut : 10)
  *   scale=1.2         facteur de taille (défaut : 1)
- *   top=40 right=40   position en pixels
+ *   top=40 left=40    position en pixels (ancrage haut-gauche)
+ *   right=40          ancre le bloc à droite plutôt qu'à gauche
  *   width=560         largeur du bandeau en pixels
  *   delay_finish=6000 durée d'affichage après l'arrivée en ms (défaut : 10000)
  *   no_pena           masque le cumul de pénalités
@@ -320,7 +322,17 @@ function Init()
 
 	const root = document.documentElement.style;
 	root.setProperty('--oncourse-top', num('top', 40) + 'px');
-	root.setProperty('--oncourse-right', num('right', 40) + 'px');
+
+	// Ancrage à gauche par défaut ; ?right=... bascule à droite.
+	if (urlParams.has('right'))
+	{
+		document.body.classList.add('ancre-droite');
+		root.setProperty('--oncourse-right', num('right', 40) + 'px');
+	}
+	else
+	{
+		root.setProperty('--oncourse-left', num('left', 40) + 'px');
+	}
 	root.setProperty('--oncourse-width', num('width', 560) + 'px');
 	root.setProperty('--oncourse-scale', num('scale', 1));
 

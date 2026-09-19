@@ -2,10 +2,17 @@
  * Classement des premiers de l'épreuve en cours, en surimpression en bas à
  * gauche, avec le dernier arrivé en pied de bloc.
  *
- * L'épreuve affichée suit celle qui est chronométrée : quand un K1H part, le
- * classement bascule sur les K1H. C'est le champ `epreuve` du flux
- * <on_course> qui porte cette information, comme pour le mode scrolling de
- * live.js (live.js:9-20).
+ * L'épreuve affichée est celle du DERNIER ARRIVÉ : le classement ne bascule
+ * qu'au moment où le premier bateau de la nouvelle épreuve franchit la ligne.
+ * Basculer au départ viderait le bloc, puisque la nouvelle épreuve n'a alors
+ * encore aucun classé.
+ *
+ * Au tout premier affichage, faute d'arrivée observée, on prend l'épreuve
+ * chronométrée que porte le flux <on_course> (le même champ que le mode
+ * scrolling de live.js, live.js:9-20) — mais seulement si elle a déjà des
+ * classés. Sinon on remonte le programme à l'envers jusqu'à la dernière
+ * épreuve qui en a : ouvrir la page pendant les K1D alors que seuls les K1H
+ * ont des résultats doit montrer les K1H, pas un bloc vide.
  *
  * Source des données :
  *   <on_course>    épreuve en cours de chronométrage
@@ -15,7 +22,8 @@
  * Paramètres d'URL :
  *   max=8             nombre de places affichées (défaut : 8)
  *   epreuve=K1H       fige l'épreuve au lieu de suivre le chronométrage
- *   bottom=40 left=40 position en pixels
+ *   top=40 left=40    position en pixels (ancrage haut-gauche)
+ *   bottom=40         ancre le bloc en bas plutôt qu'en haut
  *   width=620         largeur du bloc en pixels
  *   scale=1.2         facteur de taille (défaut : 1)
  *   libelle=1         libellé complet de l'épreuve au lieu du code court
@@ -47,6 +55,21 @@ function OnCommandEpreuveLoad(objJSON)
 {
 	canoe.SetRanking(objJSON);
 	canoe.SetColumnNameRanking(canoe.GetTableRanking());
+
+	// C'est ici que la bascule d'épreuve a lieu : il faut le classement à jour
+	// pour connaître la catégorie du dossard qui vient d'arriver.
+	if (wsMain.epreuveForcee === '' && wsMain.lastBib !== null)
+	{
+		const tRanking = canoe.GetTableRanking();
+		const row = canoe.GetRankingBibIndex(tRanking, wsMain.lastBib);
+		if (row >= 0)
+		{
+			const categ = tRanking.GetCell('Code_categorie', row);
+			if (categ !== '' && categ !== wsMain.epreuve)
+				wsMain.epreuve = categ;
+		}
+	}
+
 	Render();
 }
 
@@ -58,16 +81,14 @@ function ReloadEpreuve()
 
 function OnFlowOnCourse(objJSON)
 {
-	// L'épreuve chronométrée pilote le classement affiché, sauf si l'URL en
-	// impose une.
-	if (wsMain.epreuveForcee === '' && typeof objJSON.epreuve === 'string' && objJSON.epreuve !== '')
-	{
-		if (objJSON.epreuve !== wsMain.epreuve)
-		{
-			wsMain.epreuve = objJSON.epreuve;
-			Render();
-		}
-	}
+	if (typeof objJSON.epreuve === 'string')
+		wsMain.epreuveChrono = objJSON.epreuve;
+
+	// Tant qu'aucune épreuve n'est retenue, chaque trame est une occasion
+	// d'amorcer. Une fois retenue, seules les arrivées la font changer : on ne
+	// re-rend donc pas à 10 Hz, ce qui relancerait les animations des lignes.
+	if (wsMain.epreuveForcee === '' && wsMain.epreuve === '')
+		Render();
 }
 
 function OnBroadcastBibTime(objJSON)
@@ -90,6 +111,61 @@ function OnBroadcastRunErase(objJSON)
 	wsMain.lastBib = null;
 	ReloadEpreuve();
 	Render();
+}
+
+/** Y a-t-il au moins un bateau classé dans cette épreuve ? */
+function HasClasses(categ)
+{
+	if (categ === '')
+		return false;
+
+	const tRanking = canoe.GetTableRanking();
+	const course_phase = canoe.GetCodeCoursePhase();
+
+	for (let row = 0; row < tRanking.GetNbRows(); row++)
+	{
+		if (tRanking.GetCell('Code_categorie', row) != categ)
+			continue;
+		if (tRanking.GetCellInt('Tps' + course_phase, row, adv.chrono.KO) >= adv.chrono.OK)
+			return true;
+	}
+
+	return false;
+}
+
+/**
+ * Choix de l'épreuve au premier affichage, faute d'arrivée observée.
+ * Ensuite, seule une arrivée fait basculer le classement.
+ */
+function EnsureEpreuve()
+{
+	if (wsMain.epreuveForcee !== '')
+	{
+		wsMain.epreuve = wsMain.epreuveForcee;
+		return;
+	}
+
+	if (wsMain.epreuve !== '')
+		return;
+
+	if (HasClasses(wsMain.epreuveChrono))
+	{
+		wsMain.epreuve = wsMain.epreuveChrono;
+		return;
+	}
+
+	// Le programme est dans l'ordre de déroulement : on le remonte à l'envers
+	// pour tomber sur l'épreuve la plus avancée ayant des résultats.
+	const tEpreuves = canoe.GetTable('Competition_Course_Phase_Manche_Epreuve');
+	for (let r = tEpreuves.GetNbRows() - 1; r >= 0; r--)
+	{
+		const code = tEpreuves.GetCell('Libelle_court', r);
+		if (HasClasses(code))
+		{
+			wsMain.epreuve = code;
+			return;
+		}
+	}
 }
 
 /**
@@ -169,6 +245,7 @@ function Render()
 	if (elBlock == null || elList == null)
 		return;
 
+	EnsureEpreuve();
 	const classement = wsMain.epreuve === '' ? [] : GetClassement();
 	const tete = classement.slice(0, wsMain.max);
 
@@ -237,6 +314,7 @@ function Init()
 	wsMain.max = num('max', 8);
 	wsMain.epreuveForcee = urlParams.has('epreuve') ? urlParams.get('epreuve') : '';
 	wsMain.epreuve = wsMain.epreuveForcee;
+	wsMain.epreuveChrono = '';
 	wsMain.lastBib = null;
 	wsMain.showLast = !urlParams.has('no_last');
 	wsMain.showCateg = !urlParams.has('no_categ');
@@ -244,8 +322,18 @@ function Init()
 	wsMain.fmtChrono = urlParams.has('fmt') ? urlParams.get('fmt') : '';
 
 	const root = document.documentElement.style;
-	root.setProperty('--leaders-bottom', num('bottom', 40) + 'px');
 	root.setProperty('--leaders-left', num('left', 40) + 'px');
+
+	// Ancrage en haut par défaut ; ?bottom=... bascule en bas.
+	if (urlParams.has('bottom'))
+	{
+		document.body.classList.add('ancre-bas');
+		root.setProperty('--leaders-bottom', num('bottom', 40) + 'px');
+	}
+	else
+	{
+		root.setProperty('--leaders-top', num('top', 40) + 'px');
+	}
 	root.setProperty('--leaders-width', num('width', 620) + 'px');
 	root.setProperty('--leaders-scale', num('scale', 1));
 

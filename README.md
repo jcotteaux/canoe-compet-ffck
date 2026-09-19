@@ -80,7 +80,7 @@ standard au lieu de produire une page silencieusement cassée.
 
 `canoe/tv_oncourse.html` — `tv_inrace.html` n'affiche qu'un seul bateau (celui
 choisi par `GetBibSelect`). Cette page les montre **tous**, en surimpression en
-haut à droite.
+haut à gauche.
 
 Fond **transparent** : elle se superpose à une vidéo dans OBS ou un navigateur
 en overlay. Chaque ligne porte son propre fond, sinon le texte devient illisible
@@ -106,7 +106,8 @@ diverge silencieusement.
 | `epreuve=K1H` | toutes | n'afficher qu'une épreuve |
 | `max=8` | 10 | nombre de lignes maximum |
 | `scale=1.2` | 1 | facteur de taille |
-| `top=` / `right=` | 40 | position en pixels |
+| `top=` / `left=` | 40 | position en pixels (ancrage haut-gauche) |
+| `right=` | — | ancre le bloc à droite plutôt qu'à gauche |
 | `width=` | 560 | largeur du bandeau |
 | `delay_finish=6000` | 10000 | durée d'affichage après l'arrivée, en ms (même nom que `tv_inrace`) |
 | `no_pena` | affiché | masque le cumul de pénalités |
@@ -144,13 +145,19 @@ navigateur réel :
 
 ## Nouvelle page : classement des premiers
 
-`canoe/tv_leaders.html` — les premiers de l'épreuve **en cours de
-chronométrage**, en surimpression en bas à gauche, avec le dernier arrivé en
-pied de bloc.
+`canoe/tv_leaders.html` — les premiers de l'épreuve, en surimpression en haut
+à gauche, avec le dernier arrivé en pied de bloc.
 
-L'épreuve suit le chronométrage : quand un K1H prend le départ, le classement
-bascule sur les K1H. C'est le champ `epreuve` du flux `<on_course>` qui porte
-cette information, le même que `live.js` utilise pour son mode scrolling.
+L'épreuve affichée est celle du **dernier arrivé** : le classement ne bascule
+qu'au moment où le premier bateau de la nouvelle épreuve franchit la ligne.
+Basculer au départ viderait le bloc, puisque la nouvelle épreuve n'a alors
+encore aucun classé.
+
+Au premier affichage, faute d'arrivée observée, la page prend l'épreuve
+chronométrée que porte le flux `<on_course>` — mais seulement si elle a déjà
+des classés. Sinon elle remonte le programme à l'envers jusqu'à la dernière
+épreuve qui en a : ouvrir la page pendant les K1D alors que seuls les K1H ont
+des résultats doit montrer les K1H, pas un bloc vide.
 
 Le **dernier arrivé** est mis en évidence. S'il figure déjà dans les premiers,
 sa ligne y est simplement colorée ; sinon elle apparaît sous un trait de
@@ -165,7 +172,8 @@ naturellement du classement.
 |---|---|---|
 | `max=8` | 8 | nombre de places affichées |
 | `epreuve=K1H` | suit le chrono | fige l'épreuve |
-| `bottom=` / `left=` | 40 | position en pixels |
+| `top=` / `left=` | 40 | position en pixels (ancrage haut-gauche) |
+| `bottom=` | — | ancre le bloc en bas plutôt qu'en haut |
 | `width=` | 620 | largeur du bloc |
 | `scale=1.2` | 1 | facteur de taille |
 | `libelle=1` | code court | libellé complet de l'épreuve |
@@ -175,18 +183,20 @@ naturellement du classement.
 | `bg=1` | transparent | fond magenta pour une régie chroma-key |
 | `anim=0` | animé | coupe les animations |
 
-Même charte que `tv_oncourse`, à une exception près : le bloc étant ancré à
-gauche, c'est `apparitionG` (entrée par la gauche) qui s'applique, et non
-`apparitionD`.
+Même charte que `tv_oncourse`. Les deux blocs étant ancrés à gauche, c'est
+`apparitionG` (entrée par la gauche) qui s'applique ; `apparitionD` reste en
+place pour l'ancrage à droite.
 
 `tv_oncourse` et `tv_leaders` sont deux pages distinctes, comme le veut la
-convention maison (une page = une incrustation). Toutes deux transparentes,
-elles se superposent sans se gêner et la régie peut les activer séparément.
+convention maison (une page = une incrustation). Toutes deux transparentes et
+calées au même coin haut-gauche : **c'est la régie qui les décale**, chaque
+source étant positionnée indépendamment. Pour les régler depuis l'URL plutôt
+que depuis OBS, jouer sur `top` de chacune.
 
 ## Tests de non-régression
 
 ```bash
-npm test                    # 34 cas
+npm test                    # 36 cas
 node tools/smoke.js --only tv
 ```
 

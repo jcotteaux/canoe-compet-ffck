@@ -45,6 +45,7 @@
 
 :root
 {
+	--leaders-top: 40px;
 	--leaders-bottom: 40px;
 	--leaders-left: 40px;
 	--leaders-width: 620px;
@@ -83,18 +84,26 @@ body.chroma
 #leaders
 {
 	position: absolute;
-	bottom: var(--leaders-bottom);
+	top: var(--leaders-top);
 	left: var(--leaders-left);
 	width: var(--leaders-width);
 
 	transform: scale(var(--leaders-scale));
-	transform-origin: bottom left;
+	transform-origin: top left;
 
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 
 	animation: apparitionG 0.7s ease-out;
+}
+
+/* ?bottom=... ancre le bloc en bas : il grandit alors vers le haut. */
+body.ancre-bas #leaders
+{
+	top: auto;
+	bottom: var(--leaders-bottom);
+	transform-origin: bottom left;
 }
 
 /* Tant qu'aucun bateau de l'épreuve n'est classé, on n'affiche rien. */

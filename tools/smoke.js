@@ -199,14 +199,29 @@ const CASES = [
       ? null : `attendu 1 ligne surlignee et aucun pied, vu ${JSON.stringify(r.eval)}`),
     evalExpr: "JSON.stringify({surligne: document.querySelectorAll('#leaders_list .leader.last').length, pied: document.querySelectorAll('#leaders_last .leader').length})" },
 
-  { name: 'tv_leaders / bascule de categorie', url: '/canoe/tv_leaders.html',
-    setup: classementK1H().concat([
-      ['bib-start', { bib: 13 }], ['bib-finish', { bib: 13, time: 103500 }],
-      ['bib-start', { bib: 14 }], ['bib-finish', { bib: 14, time: 104000 }],
-    ]),
+  // Le depart d'une nouvelle epreuve ne doit PAS faire basculer le classement :
+  // elle n'a encore aucun classe, le bloc se viderait.
+  { name: 'tv_leaders / pas de bascule au depart', url: '/canoe/tv_leaders.html',
+    setup: classementK1H(),
     events: [[5000, 'bib-remove', { bib: 12 }], [5500, 'bib-start', { bib: 16 }]], settle: 10000,
-    expect: (r) => (r.eval && r.eval.categ === 'K1D' && r.eval.rows === 2
-      ? null : `le depart d'un K1D aurait du basculer le classement, vu ${JSON.stringify(r.eval)}`),
+    expect: (r) => (r.eval && r.eval.categ === 'K1H' && r.eval.rows === 8
+      ? null : `le classement K1H aurait du rester affiche, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({categ: document.getElementById('leaders_categ').textContent, rows: document.querySelectorAll('#leaders_list .leader').length})" },
+
+  { name: 'tv_leaders / bascule a la premiere arrivee', url: '/canoe/tv_leaders.html',
+    setup: classementK1H().concat([['bib-start', { bib: 16 }]]),
+    events: [[5000, 'bib-finish', { bib: 16, time: 103500 }]], settle: 10000,
+    expect: (r) => (r.eval && r.eval.categ === 'K1D' && r.eval.rows === 1
+      ? null : `l'arrivee d'un K1D aurait du basculer le classement, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({categ: document.getElementById('leaders_categ').textContent, rows: document.querySelectorAll('#leaders_list .leader').length})" },
+
+  // Page ouverte alors qu'une epreuve sans resultat est chronometree : il faut
+  // afficher la derniere epreuve qui en a, pas un bloc vide.
+  { name: 'tv_leaders / amorcage sur une epreuve avec resultats', url: '/canoe/tv_leaders.html',
+    setup: classementK1H().concat([['bib-remove', { bib: 12 }], ['bib-start', { bib: 16 }]]),
+    settle: 8000,
+    expect: (r) => (r.eval && r.eval.categ === 'K1H' && r.eval.rows === 8
+      ? null : `attendu le classement K1H, vu ${JSON.stringify(r.eval)}`),
     evalExpr: "JSON.stringify({categ: document.getElementById('leaders_categ').textContent, rows: document.querySelectorAll('#leaders_list .leader').length})" },
 
   { name: 'tv_leaders / aucun classe', url: '/canoe/tv_leaders.html',
