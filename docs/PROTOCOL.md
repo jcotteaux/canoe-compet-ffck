@@ -200,7 +200,18 @@ automatiquement un `<epreuve_load>`.
 `diff_categ` est optionnel : écart avec le meilleur temps de la catégorie,
 affiché en vert (négatif) ou rouge (positif).
 
-### `<penalty_add>`, `<mode_chrono>`, `<run_erase>`
+### `<penalty_add>` — pénalité slalom
+
+```json
+{ "key": "<penalty_add>", "bib": 12, "gate": 5, "penalty": "2" }
+```
+
+⚠️ Les noms de champs ne suivent pas la convention française du reste du
+protocole : le client lit `gate` et `penalty`, **pas** `porte` et `pena`
+(`live.js:307-309`). `penalty` est une **chaîne** : `SetOnCoursePenalty`
+(`live.js:336-345`) la compare à `'0'`, `'2'` et `'50'` sans conversion.
+
+### `<mode_chrono>`, `<run_erase>`
 
 `<run_erase>` porte `Code_competition`, `Code_course`, `Code_phase` : le client
 ne remet à zéro que si les trois correspondent à la course affichée

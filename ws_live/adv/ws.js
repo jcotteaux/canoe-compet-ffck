@@ -25,6 +25,7 @@ ws.Context = function(url='ws://localhost', port=8080)
 
 	this.keyCommand = 'key';
 	this.mapCommand = new Map();
+	this.allowedFunctions = new Set();	// noms autorises pour le champ `fn`
 
 	// Reconnexion automatique
 	this.reconnect = true;			// mettre à false pour désactiver
@@ -132,92 +133,126 @@ ws.Context.prototype.Close = function()
 		this.websocket.close();
 }
 
-ws.Context.prototype.onmessage_command = function(evt)
+/**
+ * Autorise une fonction globale à être appelée via le champ `fn` d'une trame.
+ * Sans cela, `fn` est refusé : voir ResolveFunction.
+ */
+ws.Context.prototype.AllowFunction = function(name)
 {
-	var objJSON = null;
-	try 
+	this.allowedFunctions.add(name);
+}
+
+/**
+ * Resout le champ `fn` d'une trame.
+ *
+ * Le code d'origine faisait `window[objJSON.fn](objJSON)` : le serveur
+ * choisissait donc n'importe quelle fonction globale de la page. Sur un reseau
+ * de course ouvert, quiconque se fait passer pour le serveur execute du code
+ * arbitraire. On n'accepte plus que les noms explicitement autorises par la
+ * page via AllowFunction(), et on journalise bruyamment les refus pour que le
+ * cas legitime, s'il existe, soit visible immediatement.
+ */
+ws.Context.prototype.ResolveFunction = function(name)
+{
+	if (!this.allowedFunctions.has(name))
 	{
-		objJSON = JSON.parse(evt.data);
-	} 
-	catch (e) 
+		console.warn('WebSocket : fonction "'+name+'" refusee (non autorisee). '
+			+ 'Si elle est legitime : wsContext.AllowFunction("'+name+'").');
+		return null;
+	}
+
+	const fn = window[name];
+	if (typeof fn !== 'function')
 	{
-		console.log(`Parsing error / data : ${evt.data} / exception : {e}`);
+		console.warn('WebSocket : fonction "'+name+'" autorisee mais introuvable.');
+		return null;
+	}
+
+	return fn;
+}
+
+/**
+ * Repartition d'une trame vers son handler.
+ *
+ * Tout appel de handler est protege : auparavant, une seule exception dans un
+ * handler (une colonne absente, un element de DOM manquant) interrompait le
+ * traitement et la page cessait silencieusement de se mettre a jour jusqu'au
+ * prochain F5. On journalise et on continue.
+ */
+ws.Context.prototype.Dispatch = function(objJSON, schedule)
+{
+	if (!objJSON || typeof objJSON !== 'object')
+		return;
+
+	const call = (fn, label) => {
+		const guarded = (arg) => {
+			try
+			{
+				fn(arg);
+			}
+			catch (e)
+			{
+				console.error('WebSocket : erreur dans le handler '+label, e, arg);
+			}
+		};
+		schedule(guarded, objJSON);
+	};
+
+	// Priorite 1 : fonction de retour specifiee par la trame
+	if (objJSON.fn !== undefined && typeof objJSON.fn === 'string')
+	{
+		const fn = this.ResolveFunction(objJSON.fn);
+		if (fn)
+			call(fn, objJSON.fn);
 		return;
 	}
 
-	if (objJSON && typeof objJSON === "object") 
+	// Priorite 2 : handler enregistre pour cette cle
+	const key = objJSON[this.keyCommand];
+	if (typeof key === 'string' || typeof key === 'number')
 	{
-		if (objJSON.fn !== undefined && typeof objJSON.fn == "string")
+		const fn = this.mapCommand.get(key);
+		if (typeof fn === 'function')
 		{
-			// Priorité 1 : Function de retour spécifié ...
-			window[objJSON.fn](objJSON);
-		}
-		else
-		{
-			const typeObj = typeof objJSON[this.keyCommand];
-			if (typeObj === "string" || typeObj === "number")
-			{
-				const fn = this.mapCommand.get(objJSON[this.keyCommand]);
-				if (fn && typeof fn === "function")
-				{
-					// Priorité 2 : Map Function spécifié ...
-					fn(objJSON);
-					return;
-				}
-			}
-
-			const fnDefault = this.mapCommand.get('*');
-			if (fnDefault && typeof fnDefault === "function")
-			{
-				// Priorité 3 : Map Function par défaut 
-				fnDefault(objJSON);
-			}
+			call(fn, String(key));
+			return;
 		}
 	}
+
+	// Priorite 3 : handler par defaut
+	const fnDefault = this.mapCommand.get('*');
+	if (typeof fnDefault === 'function')
+	{
+		call(fnDefault, '*');
+		return;
+	}
+
+	if (key !== undefined)
+		console.debug('WebSocket : aucune fonction pour la cle', key);
+}
+
+ws.Context.prototype.ParseFrame = function(evt)
+{
+	try
+	{
+		return JSON.parse(evt.data);
+	}
+	catch (e)
+	{
+		console.warn('WebSocket : trame illisible, ignoree', String(evt.data).slice(0, 200));
+		return null;
+	}
+}
+
+ws.Context.prototype.onmessage_command = function(evt)
+{
+	this.Dispatch(this.ParseFrame(evt), function(fn, arg) { fn(arg); });
 }
 
 ws.Context.prototype.onmessage_command_delay = function(evt)
 {
-	var objJSON = null;
-	try 
-	{
-		objJSON = JSON.parse(evt.data);
-	} 
-	catch (e) 
-	{
-		console.log(`Parsing error / data : ${evt.data} / exception : {e}`);
-		return;
-	}
-
-	if (objJSON && typeof objJSON === "object") 
-	{
-		if (objJSON.fn !== undefined && typeof objJSON.fn == "string")
-		{
-			// Priorité 1 : Function de retour spécifié ...
-			setTimeout(window[objJSON.fn], this.delay, objJSON);
-		}
-		else
-		{
-			const typeObj = typeof objJSON[this.keyCommand];
-			if (typeObj === "string" || typeObj === "number")
-			{
-				const fn = this.mapCommand.get(objJSON[this.keyCommand]);
-				if (fn && typeof fn === "function")
-				{
-					// Priorité 2 : Map Function spécifié ...
-					setTimeout(fn, this.delay, objJSON);
-					return;
-				}
-			}
-
-			const fnDefault = this.mapCommand.get('*');
-			if (fnDefault && typeof fnDefault === "function")
-			{
-				// Priorité 3 : Map Function par défaut 
-				setTimeout(fnDefault, this.delay, objJSON);
-			}
-		}
-	}
+	const delay = this.delay;
+	this.Dispatch(this.ParseFrame(evt), function(fn, arg) { setTimeout(fn, delay, arg); });
 }
 
 ws.Context.prototype.onmessage_binary = function(evt)

@@ -66,10 +66,7 @@ canoe.GetNbInter = function()
 
 canoe.GetTable = function(tableName)
 {
-	if (typeof canoe.notify_race === "object")
-		return adv.GetTable(canoe.notify_race, tableName);
-	else
-		return undefined;
+	return adv.GetTable(canoe.notify_race, tableName);
 }
 
 canoe.SetFmtChrono = function(defaultFmtChrono)
@@ -111,12 +108,24 @@ canoe.SetRanking = function(objJSON)
 	canoe.notify_ranking = objJSON;	
 }
 
+/**
+ * Retourne toujours une adv.table : vide tant que <epreuve_load> n'est pas
+ * arrive. Voir la note sur adv.GetTable dans adv.js.
+ * Pour savoir si un classement est reellement charge : canoe.HasRanking().
+ */
 canoe.GetTableRanking = function()
 {
-	if (typeof canoe.notify_ranking === 'object')
-		return adv.GetTableUnique(canoe.notify_ranking, 'ranking');
-	else
-		return undefined;
+	return adv.GetTableUnique(canoe.notify_ranking, 'ranking');
+}
+
+canoe.HasRanking = function()
+{
+	return adv.IsTableUnique(canoe.notify_ranking, 'ranking');
+}
+
+canoe.HasRace = function()
+{
+	return !!canoe.notify_race && typeof canoe.notify_race === 'object';
 }
 
 canoe.GetRankingBibIndex = function(tRanking, bib)

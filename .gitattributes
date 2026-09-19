@@ -1,0 +1,10 @@
+# Le code propre au depot est en LF.
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# ws_live est distribue par agil.fr en CRLF. Toute normalisation rend le diff
+# avec l'upstream illisible (des milliers de lignes au lieu de quelques-unes)
+# et rend les correctifs impossibles a remonter. On ne convertit jamais.
+# Cette regle vient en dernier : dans .gitattributes le dernier motif l'emporte.
+ws_live/** -text

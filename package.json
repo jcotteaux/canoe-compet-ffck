@@ -8,7 +8,8 @@
     "descente": "node mock/server.js --fixture descente-sprint",
     "slalom": "node mock/server.js --fixture slalom-finale",
     "international": "node mock/server.js --fixture descente-internationale",
-    "fixtures": "node tools/make-fixtures.js"
+    "fixtures": "node tools/make-fixtures.js",
+    "test": "node tools/smoke.js"
   },
   "dependencies": {
     "ws": "^8.18.0"

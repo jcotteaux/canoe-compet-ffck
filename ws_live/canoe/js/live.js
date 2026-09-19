@@ -83,7 +83,7 @@ function OnFlowOnCourse(objJSON)
 					if (elemTime && typeof elemTime === "object")
 					{
 						elemTime.innerHTML = tRanking.GetCellChrono('Tps'+canoe.GetCodeCoursePhase(), j, 'HHMMSSCC');
-						const stateOnCourse = elemTime.GetAttribute('data-oncourse');
+						const stateOnCourse = elemTime.getAttribute('data-oncourse');
 						if (stateOnCourse == '1')
 							elemTime.setAttribute('data-oncourse', '0');
 					}
@@ -98,8 +98,12 @@ function OnFlowOnCourse(objJSON)
 
 function OnBroadcastModeChrono(objJSON)
 {
-	if (canoe.GetTableRanking() !== 'object')
-		OpenWebSocketCommand();
+	// Il manquait `typeof` : la condition comparait un objet a la chaine
+	// 'object' et etait donc toujours vraie, et OpenWebSocketCommand n'existe
+	// pas (la fonction de la page s'appelle OnOpenWebSocketCommand). Chaque
+	// <mode_chrono> levait donc un ReferenceError.
+	if (!canoe.HasRanking())
+		OnOpenWebSocketCommand();
 }
 
 function OnBroadcastRunErase(objJSON)

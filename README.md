@@ -75,6 +75,52 @@ utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
 `advPage` (classes PHP) et n'est pas rendu — le bouchon le signale sur la sortie
 standard au lieu de produire une page silencieusement cassée.
 
+## Tests de non-régression
+
+```bash
+npm test                    # 20 cas
+node tools/smoke.js --only tv
+```
+
+Chaque cas ouvre une page dans Chrome, y déroule un scénario réaliste (arrivée
+en direct, DNF/DSQ, pénalité à 50, effacement de manche, coupure réseau,
+changement de mode chrono) et **échoue si la console produit la moindre
+erreur**. Le bouchon est démarré automatiquement si besoin.
+
+Mesure de référence : sur le code tel que distribué, la suite donnait **17/20**.
+
+## Blindage
+
+Quatre défauts corrigés, tous reproduits par la suite avant correction.
+
+| où | défaut |
+|---|---|
+| `canoe/js/live.js`, `live_web.js` | `OnBroadcastModeChrono` testait `canoe.GetTableRanking() !== 'object'` — il manquait `typeof`, la condition était donc **toujours** vraie et appelait `OpenWebSocketCommand()`, qui n'existe pas (la fonction de la page s'appelle `OnOpenWebSocketCommand`). `ReferenceError` à chaque `<mode_chrono>`. |
+| `canoe/js/live.js:86` | `elemTime.GetAttribute(...)` au lieu de `getAttribute`. La branche qui restaure une cellule quand un bateau quitte la course ne faisait pas son travail : le temps tournant restait figé au lieu de repasser à `-`. |
+| `adv/adv.js`, `adv/canoe.js` | `GetTable` levait une exception sans `tables`, `GetTableUnique` et `canoe.GetTable*` retournaient `undefined` — alors que la plupart des 72 appelants enchaînent sur `.GetNbRows()`. Toute trame arrivant avant le chargement de la course plantait la page (`monitor_race.html` était inutilisable). Ils retournent désormais **toujours** une table, vide si la donnée n'est pas là. |
+| `adv/ws.js` | Un handler qui levait une exception interrompait le traitement : la page cessait silencieusement de se mettre à jour jusqu'au prochain F5. Chaque appel est maintenant protégé et l'erreur journalisée avec la clé fautive. |
+
+Pour distinguer « pas encore chargé » de « chargé mais vide », utiliser les
+nouveaux `canoe.HasRace()` / `canoe.HasRanking()`, ou `adv.IsTableUnique`.
+
+### Champ `fn` : exécution de code à distance
+
+`ws.js` faisait `window[objJSON.fn](objJSON)` : le serveur choisissait
+n'importe quelle fonction globale de la page. Sur un réseau de course ouvert,
+quiconque se fait passer pour le serveur exécute du code arbitraire.
+
+Le champ `fn` n'est plus honoré que pour les noms explicitement autorisés :
+
+```js
+wsMain.AllowFunction('MaFonction');
+```
+
+Aucune page de `ws_live` n'utilisait ce mécanisme et la suite passe à 20/20 sans
+rien autoriser. Un refus est journalisé bruyamment avec le nom demandé : si
+competFFCK s'en sert réellement en production, cela se verra immédiatement et
+il suffira d'ajouter la fonction concernée. **À vérifier avant de déployer sur
+une compétition.**
+
 ## Reconnexion automatique
 
 `adv/ws.js` se reconnecte désormais seul. Auparavant, `onclose` se contentait de

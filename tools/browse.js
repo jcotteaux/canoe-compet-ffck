@@ -25,7 +25,8 @@ const { spawn } = require('child_process');
 const WebSocket = require('ws');
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const PORT = 9333;
+// port de debug tire au hasard : plusieurs instances peuvent tourner en parallele
+const PORT = Number(process.env.CDP_PORT || 9333 + Math.floor(Math.random() * 400));
 
 function args(argv) {
   const out = { _: [] };
@@ -138,13 +139,22 @@ async function waitForChrome(timeoutMs = 15000) {
   };
 
   if (opts.click) {
+    const clickTimeout = Number(opts.clickTimeout || 10000);
     for (const sel of String(opts.click).split(' >> ')) {
-      const clicked = await evaluate(
-        `(() => { const el = document.querySelector(${JSON.stringify(sel)});
-                  if (!el) return 'introuvable'; el.click(); return 'ok'; })()`
-      );
+      // Le contenu arrive par WebSocket : l'element peut ne pas encore exister.
+      // On sonde jusqu'a clickTimeout plutot que d'echouer au premier essai.
+      const start = Date.now();
+      let clicked = 'introuvable';
+      while (Date.now() - start < clickTimeout) {
+        clicked = await evaluate(
+          `(() => { const el = document.querySelector(${JSON.stringify(sel)});
+                    if (!el) return 'introuvable'; el.click(); return 'ok'; })()`
+        );
+        if (clicked === 'ok') break;
+        await sleep(250);
+      }
       if (clicked !== 'ok') {
-        console.error(`clic impossible sur ${sel} : ${clicked}`);
+        console.error(`clic impossible sur ${sel} apres ${clickTimeout} ms : ${clicked}`);
         process.exit(3);
       }
       await sleep(Number(opts.after || 3000));

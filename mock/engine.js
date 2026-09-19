@@ -219,11 +219,14 @@ class Engine extends EventEmitter {
     if (v === 0) delete b.pena[p];
     else b.pena[p] = v;
 
+    // Noms de champs imposes par le client : live.js:307-309 lit bib / gate /
+    // penalty. `penalty` est une chaine ('0', '2' ou '50'), comparee telle
+    // quelle par SetOnCoursePenalty.
     this.emitFrame({
       key: '<penalty_add>',
       bib: b.bib,
-      porte: p,
-      pena: v,
+      gate: p,
+      penalty: String(v),
       Total_pena: this.sumPena(b),
       Code_competition: this.fixture.competition.Code_competition,
       Code_course: this.fixture.course.Code_course,

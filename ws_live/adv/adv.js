@@ -1295,29 +1295,42 @@ adv.table.prototype.ComputeDiffTime = function(colTime, colDiff)
 	}
 }
 
+/**
+ * Ces deux accesseurs retournent TOUJOURS une adv.table exploitable.
+ *
+ * Auparavant GetTable levait une exception si la trame n'avait pas de `tables`
+ * et GetTableUnique retournait null : comme la grande majorite des appelants
+ * enchainent directement sur .GetNbRows() ou .GetCell(), toute trame arrivant
+ * avant le chargement de la course plantait la page. Une table vide se rend
+ * comme "pas encore de donnees", ce qui est le comportement voulu.
+ *
+ * Pour distinguer reellement "absente" de "vide", utiliser adv.IsTableUnique
+ * ou tester canoe.notify_race / canoe.notify_ranking.
+ */
 adv.GetTable = function(objBase, tName)
 {
-	const t = objBase.tables[tName+'<sqlTable>'];
-	return new adv.table(tName, t);
+	if (objBase && typeof objBase === 'object' && objBase.tables && typeof objBase.tables === 'object')
+		return new adv.table(tName, objBase.tables[tName+'<sqlTable>']);
+
+	return new adv.table(tName);
 }
 
 adv.GetTableUnique = function(objBase, tName)
 {
-	if (typeof objBase == 'object')
-	{
-		const t = objBase[tName+'<sqlTable>'];
-		return new adv.table(tName, t);	
-	}
-	
-	return null;
+	if (objBase && typeof objBase === 'object')
+		return new adv.table(tName, objBase[tName+'<sqlTable>']);
+
+	return new adv.table(tName);
 }
 
 adv.IsTableUnique = function(objBase, tName)
 {
-	if (typeof objBase[tName+'<sqlTable>'] == 'object')
-		return true;
-	else
+	// objBase peut etre undefined tant que rien n'est charge : on repond faux
+	// au lieu de lever une exception.
+	if (!objBase || typeof objBase !== 'object')
 		return false;
+
+	return typeof objBase[tName+'<sqlTable>'] === 'object';
 }
 
 adv.toNumber = function(val)
