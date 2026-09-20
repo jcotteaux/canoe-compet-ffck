@@ -44,6 +44,20 @@
 	--podium-or: #f0c819;
 	--podium-argent: #c8d2dc;
 	--podium-bronze: #c98a3c;
+
+	/*
+	 * Couleur de cle pour l'incrustation en regie (?bg=1).
+	 * Magenta pur : R = B, G = 0, a 80 % du plein.
+	 *   - la charte FFCK n'a aucun magenta (4 pixels sur 578 000 releves
+	 *     dans img/Graphic_FFCK et img/pena) : la cle ne peut pas manger
+	 *     de graphisme ;
+	 *   - teinte a 300 deg, loin des bleus et indigos de la charte
+	 *     (#3680FF, #09006D, #1D1580) et du vert / rouge des penalites ;
+	 *   - 80 % et non 100 % : garde de la marge chromatique pour le
+	 *     sous-echantillonnage 4:2:2 du HDMI puis 4:2:0 de l'encodage.
+	 * Valeur commune aux quatre pages TV : elles doivent rester identiques.
+	 */
+	--chroma-key: #CC00CC;
 }
 
 html, body
@@ -58,7 +72,7 @@ html, body
 
 body.chroma
 {
-	background: #D500FF;
+	background: var(--chroma-key);
 }
 
 #podium
@@ -315,5 +329,52 @@ body.no-anim #podium.entre .step
 	opacity: 1;
 	transform: none;
 }
+
+/*
+ * Variantes d'animation sans opacite, pour l'incrustation par couleur.
+ *
+ * Un fondu par-dessus la couleur de cle melange chaque pixel avec le magenta
+ * pendant toute sa duree : l'incrusteur n'y voit ni la cle ni le graphisme.
+ * Les marches partent donc en visibility plutot qu'en opacite ; visibility
+ * s'interpole en un seul saut, il n'y a aucune image intermediaire.
+ */
+@keyframes podium-titre-chroma
+{
+	from { visibility: hidden;  transform: translateY(-26px); }
+	to   { visibility: visible; transform: translateY(0); }
+}
+
+@keyframes podium-marche-chroma
+{
+	from { visibility: hidden;  transform: translateY(70px); }
+	to   { visibility: visible; transform: translateY(0); }
+}
+
+@keyframes podium-sortie-chroma
+{
+	from { visibility: visible; transform: scale(var(--podium-scale)); }
+	to   { visibility: hidden;  transform: scale(calc(var(--podium-scale) * 0.94)); }
+}
+
+/* L'etat de repos ne peut plus etre une opacite nulle : il devient invisible
+   sans etre transparent, sinon le bloc melangerait la cle pendant l'attente
+   de son animation-delay. */
+body.chroma #podium_categ,
+body.chroma .step
+{
+	opacity: 1;
+	visibility: hidden;
+}
+
+body.chroma #podium.entre #podium_categ { animation-name: podium-titre-chroma; }
+body.chroma #podium.entre .step         { animation-name: podium-marche-chroma; }
+body.chroma #podium.sort  #podium_inner { animation-name: podium-sortie-chroma; }
+
+/*
+ * Le voile assombrit toute l'image, couleur de cle comprise : l'incrusteur ne
+ * retrouve alors plus sa cle nulle part et l'incrustation s'effondre. Il n'a
+ * de sens que sur une alpha reelle, ou il assombrit vraiment la video.
+ */
+body.chroma #podium_scrim { display: none; }
 
 body.no-anim .shine { display: none; }

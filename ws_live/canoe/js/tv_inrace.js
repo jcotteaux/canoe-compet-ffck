@@ -990,6 +990,17 @@ function Init()
 		wsMain.delay = parseInt(urlParams.get('delay'));
 	}
 
+	/*
+	 * Regie : memes parametres que tv_leaders, tv_oncourse et tv_podium.
+	 *   bg=1     fond a la couleur de cle au lieu de transparent, et
+	 *            animations sans fondu (voir tv_inrace.css, body.chroma)
+	 *   anim=0   aucune animation
+	 */
+	if (urlParams.get('bg') === '1')
+		document.body.classList.add('chroma');
+	if (urlParams.get('anim') === '0')
+		document.body.classList.add('no-anim');
+
 	if (urlParams.has('bib_filter'))
 	{
 		wsMain.filter = 'bib'; 

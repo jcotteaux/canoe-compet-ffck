@@ -68,6 +68,20 @@
 	--leaders-pena-top: #770101;
 	--leaders-pena-mid: #c20201;
 	--leaders-pena-bot: #a10101;
+
+	/*
+	 * Couleur de cle pour l'incrustation en regie (?bg=1).
+	 * Magenta pur : R = B, G = 0, a 80 % du plein.
+	 *   - la charte FFCK n'a aucun magenta (4 pixels sur 578 000 releves
+	 *     dans img/Graphic_FFCK et img/pena) : la cle ne peut pas manger
+	 *     de graphisme ;
+	 *   - teinte a 300 deg, loin des bleus et indigos de la charte
+	 *     (#3680FF, #09006D, #1D1580) et du vert / rouge des penalites ;
+	 *   - 80 % et non 100 % : garde de la marge chromatique pour le
+	 *     sous-echantillonnage 4:2:2 du HDMI puis 4:2:0 de l'encodage.
+	 * Valeur commune aux quatre pages TV : elles doivent rester identiques.
+	 */
+	--chroma-key: #CC00CC;
 }
 
 html, body
@@ -83,7 +97,7 @@ html, body
 /* Repli chroma-key : ?bg=1 pour une régie qui incruste par couleur. */
 body.chroma
 {
-	background: #D500FF;
+	background: var(--chroma-key);
 }
 
 #leaders
@@ -316,6 +330,40 @@ body.ancre-bas #leaders
 
 /* Sur un poste qui n'aime pas les animations (vieille machine de régie), on
    coupe tout : ?anim=0 ajoute cette classe sur <body>. */
+/*
+ * Variantes d'animation sans opacite, pour l'incrustation par couleur.
+ *
+ * Un fondu par-dessus la couleur de cle melange chaque pixel du bloc avec le
+ * magenta pendant toute sa duree : l'incrusteur n'y voit ni la cle ni le
+ * graphisme, et laisse un fantome rose a chaque apparition. On garde la
+ * translation, qui ne produit aucun pixel intermediaire. Les sorties, qui ne
+ * peuvent plus s'estomper, basculent en visibility a la derniere image.
+ */
+@keyframes apparitionG-chroma
+{
+	from { transform: translateX(-900px); }
+	to   { transform: translateX(0px); }
+}
+
+@keyframes leader-in-chroma
+{
+	from { transform: translateX(-120px); }
+	to   { transform: translateX(0); }
+}
+
+body.chroma #leaders { animation-name: apparitionG-chroma; }
+body.chroma .leader  { animation-name: leader-in-chroma; }
+
+/*
+ * Le filet de separation du dernier arrive est pose sur le fond de page, donc
+ * sur la couleur de cle : a 75 %% il donne un trait rose que l'incrusteur
+ * n'enleve qu'a moitie. En mode chroma on le rend opaque.
+ */
+body.chroma #leaders_last
+{
+	border-top-color: #ffffff;
+}
+
 body.no-anim #leaders,
 body.no-anim .leader
 {
