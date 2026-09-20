@@ -1,0 +1,779 @@
+/*
+ * Classement plein écran de la dernière épreuve terminée.
+ *
+ * Page opaque, destinée à être envoyée telle quelle (pas d'incrustation) :
+ * c'est l'habillage d'attente entre deux épreuves. Elle prolonge la charte
+ * des PNG FFCK en CSS pur, pour rester modifiable sans repasser par un
+ * fichier image :
+ *   - bandes obliques, biseau à -20 deg          (img/Graphic_FFCK/*.png)
+ *   - indigo #1D1580 -> bleu #097AFF
+ *   - marine très sombre #09006D pour les fonds
+ *
+ * Tout est calé sur 1920x1080. La page se met à l'échelle toute seule si la
+ * fenêtre est plus petite (voir --res-scale posé par le JavaScript), pour
+ * qu'un contrôle sur un écran de bureau montre exactement le même cadrage.
+ */
+
+/*
+ * Les pages livrées par agil.fr écrivent `font-family: Calibri` sans jamais
+ * déclarer la fonte, alors qu'elle est fournie dans ./font. Sur un poste sans
+ * Calibri le rendu diverge silencieusement : on la déclare.
+ */
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	/* Charte FFCK, relevée dans img/Graphic_FFCK/block_rankingstartlist.png */
+	--ffck-navy: #09006D;
+	--ffck-indigo: #1D1580;
+	--ffck-blue: #097AFF;
+	--ffck-blue-light: #3680FF;
+	--ffck-sky: #629BF1;
+
+	/* Fond de page */
+	--fond-haut: #05081F;
+	--fond-bas: #0A1145;
+
+	/* Podium : mêmes teintes que tv_podium.css */
+	--or: #d4af37;
+	--argent: #aab4bf;
+	--bronze: #b5793a;
+
+	--res-scale: 1;
+	--res-ligne-h: 46px;
+
+	/* Biseau commun à toutes les bandes et pavés. */
+	--biseau: -20deg;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	background: var(--fond-bas);
+	color: white;
+	font-family: Calibri, 'Carlito', 'Trebuchet MS', Arial, sans-serif;
+}
+
+/*
+ * Scène de 1920x1080 mise à l'échelle d'un bloc : toutes les tailles sont
+ * écrites en pixels « 1080p », et la page reste identique quelle que soit la
+ * fenêtre. Sans cela, un contrôle en fenêtre réduite donnerait un cadrage
+ * différent de celui envoyé à l'ATEM.
+ */
+#scene
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	width: 1920px;
+	height: 1080px;
+	margin: -540px 0 0 -960px;
+
+	transform: scale(var(--res-scale));
+	transform-origin: center center;
+
+	background:
+		radial-gradient(ellipse 120% 80% at 20% 0%,
+			rgba(9, 122, 255, 0.22) 0%,
+			rgba(9, 122, 255, 0) 60%),
+		linear-gradient(160deg,
+			var(--fond-haut) 0%,
+			var(--fond-bas) 55%,
+			#060B2C 100%);
+
+	overflow: hidden;
+}
+
+/******************** habillage : les bandes obliques ********************/
+
+/*
+ * Quatre bandes qui rejouent la composition des PNG FFCK : deux en haut qui
+ * se chevauchent, deux en bas. Elles sont purement décoratives, donc portées
+ * par des pseudo-éléments plutôt que par du balisage.
+ */
+.bande
+{
+	position: absolute;
+	transform: skewX(var(--biseau));
+}
+
+#bande_haut_sombre
+{
+	left: -60px;
+	top: 84px;
+	width: 1180px;
+	height: 86px;
+	background: linear-gradient(90deg, var(--ffck-navy) 0%, var(--ffck-indigo) 100%);
+}
+
+#bande_haut_vive
+{
+	left: 1010px;
+	top: 108px;
+	width: 980px;
+	height: 72px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+}
+
+#bande_bas_vive
+{
+	left: -60px;
+	top: 1000px;
+	width: 780px;
+	height: 56px;
+	background: linear-gradient(90deg, var(--ffck-indigo) 0%, var(--ffck-blue) 100%);
+}
+
+#bande_bas_sombre
+{
+	left: 1120px;
+	top: 1000px;
+	width: 880px;
+	height: 56px;
+	background: linear-gradient(90deg, var(--ffck-navy) 0%, #140C5E 100%);
+}
+
+/******************** en-tête ********************/
+
+#titre
+{
+	position: absolute;
+	left: 96px;
+	top: 88px;
+
+	/* Jusqu'au bord de la bande vive, qui commence a 1010 : l'epreuve n'est
+	   plus posee ici, le titre peut prendre toute la bande sombre. */
+	width: 900px;
+
+	font-size: 38px;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	line-height: 78px;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Lieu et mention « provisoire » sur une seule ligne : la mention n'est
+   qu'une precision sur le classement affiche, elle ne merite pas sa ligne. */
+#sous_titre
+{
+	position: absolute;
+	left: 98px;
+	top: 182px;
+
+	display: flex;
+	align-items: baseline;
+	gap: 30px;
+}
+
+#lieu
+{
+	font-size: 25px;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+/*
+ * Pavé de l'épreuve, posé SUR la bande vive de droite plutôt qu'en dessous.
+ * C'est la composition des maquettes FFCK — titre à gauche sur la bande
+ * sombre, épreuve à droite sur la bande vive — et elle rend 68 px de hauteur
+ * au tableau, soit deux lignes de résultats de plus.
+ */
+/*
+ * L'épreuve est écrite DANS la bande vive, pas sur un pavé posé dessus : la
+ * bande porte déjà le biseau de la charte, un second pavé biseauté par-dessus
+ * alourdissait l'en-tête pour rien. Le retrait de 130 px garde le texte à
+ * l'intérieur du parallélogramme, dont le bord droit oscille de +-13 px.
+ */
+#epreuve
+{
+	position: absolute;
+	right: 130px;
+	top: 108px;
+	height: 72px;
+
+	display: flex;
+	align-items: center;
+}
+
+#epreuve span
+{
+	font-size: 34px;
+	font-weight: bold;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+/*
+ * Aucune épreuve n'est encore complète : on affiche quand même la dernière
+ * qui a des résultats, mais on le dit, sinon un classement partiel se lit
+ * comme un classement définitif.
+ */
+#provisoire
+{
+	font-size: 19px;
+	font-style: italic;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	color: #ffd24a;
+
+	display: none;
+}
+
+body.provisoire #provisoire
+{
+	display: inline;
+}
+
+/******************** tableau ********************/
+
+/*
+ * Le tableau occupe la bande 226 -> 992, au-dessus des bandes du bas. La
+ * hauteur d'une ligne n'est pas fixe : le JavaScript la calcule depuis le
+ * et la pose dans --res-ligne-h, pour que dix lignes comme quinze tiennent
+ * exactement dans cette zone sans deborder sur l'habillage.
+ */
+#tableau
+{
+	position: absolute;
+	left: 96px;
+	top: 226px;
+	width: 1728px;
+}
+
+/*
+ * Une ligne est une grille : les colonnes restent alignées quelles que soient
+ * les longueurs de nom, ce qu'un enchaînement de blocs flottants ne garantit
+ * pas. Les largeurs sont reprises telles quelles par l'en-tête.
+ */
+.ligne
+{
+	display: grid;
+	grid-template-columns: 104px 118px 1fr 180px 120px 230px 190px;
+	align-items: center;
+
+	height: var(--res-ligne-h);
+	margin-bottom: 4px;
+}
+
+#entete
+{
+	height: 38px;
+	margin-bottom: 8px;
+
+	font-size: 20px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+#entete > div
+{
+	padding: 0 14px;
+}
+
+#entete .c_rang,
+#entete .c_pena
+{
+	text-align: center;
+}
+
+#entete .c_temps,
+#entete .c_ecart
+{
+	text-align: right;
+}
+
+/* Le corps des lignes : marine translucide sur le dégradé de fond. */
+.ligne.res
+{
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.92) 0%,
+		rgba(16, 10, 96, 0.82) 55%,
+		rgba(9, 18, 78, 0.62) 100%);
+
+	font-size: calc(var(--res-ligne-h) * 0.58);
+}
+
+.ligne.res > div
+{
+	padding: 0 14px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* Le pavé du rang, biseauté comme les bandes. */
+.ligne.res .c_rang
+{
+	position: relative;
+	height: 100%;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	padding: 0;
+	font-size: calc(var(--res-ligne-h) * 0.62);
+	font-weight: bold;
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+	color: white;
+}
+
+/*
+ * Les trois premiers sont repérables d'un coup d'œil : c'est l'information
+ * que l'on cherche en premier sur un classement d'arrivée.
+ */
+.ligne.res.p1 .c_rang { background: linear-gradient(180deg, #f7dc63 0%, var(--or) 100%); color: #3a2c00; }
+.ligne.res.p2 .c_rang { background: linear-gradient(180deg, #e6ecf2 0%, var(--argent) 100%); color: #26303a; }
+.ligne.res.p3 .c_rang { background: linear-gradient(180deg, #e0a860 0%, var(--bronze) 100%); color: #33200a; }
+
+.ligne.res .c_dossard
+{
+	text-align: center;
+	font-weight: bold;
+	color: var(--ffck-sky);
+}
+
+.ligne.res .c_nom
+{
+	font-weight: bold;
+	letter-spacing: 0.015em;
+}
+
+.ligne.res .c_nation
+{
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	font-size: calc(var(--res-ligne-h) * 0.46);
+	letter-spacing: 0.08em;
+	color: var(--ffck-sky);
+}
+
+.ligne.res .c_nation img
+{
+	width: calc(var(--res-ligne-h) * 0.72);
+	height: calc(var(--res-ligne-h) * 0.50);
+	object-fit: cover;
+	flex: 0 0 auto;
+}
+
+.ligne.res .c_pena
+{
+	text-align: center;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Une pénalité non nulle doit sauter aux yeux : c'est ce qui explique un
+   classement qui ne suit pas l'ordre des chronos. */
+.ligne.res .c_pena.chargee { color: #ff6b6b; }
+.ligne.res .c_pena.eliminatoire { color: #ff3131; }
+
+.ligne.res .c_temps
+{
+	text-align: right;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	font-size: calc(var(--res-ligne-h) * 0.62);
+}
+
+/* L'écart est secondaire : un ton en dessous du temps, et en italique. */
+.ligne.res .c_ecart
+{
+	text-align: right;
+	font-weight: bold;
+	font-style: italic;
+	font-variant-numeric: tabular-nums;
+	font-size: calc(var(--res-ligne-h) * 0.52);
+	color: #bcd4f2;
+}
+
+/* Non classé (DNF, DNS, DSQ) : pas de rang, pas d'écart. */
+.ligne.res.hc .c_rang
+{
+	background: linear-gradient(180deg, #4a5570 0%, #2f3852 100%);
+	font-size: calc(var(--res-ligne-h) * 0.40);
+}
+
+.ligne.res.hc .c_temps
+{
+	color: #92a4c0;
+	font-size: calc(var(--res-ligne-h) * 0.50);
+}
+
+/*
+ * Ligne de remplissage : la fenêtre qui tourne garde toujours le même nombre
+ * de lignes, y compris quand la dernière est incomplète. Un fond très
+ * discret plutôt que rien du tout, pour que le bloc garde sa silhouette.
+ */
+.ligne.res.place-vide
+{
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.30) 0%,
+		rgba(16, 10, 96, 0.22) 55%,
+		rgba(9, 18, 78, 0.10) 100%);
+	animation: none;
+}
+
+/* Sans cela le pavé du rang reste en bleu plein sur une ligne vide. */
+.ligne.res.place-vide .c_rang
+{
+	background: linear-gradient(180deg,
+		rgba(54, 128, 255, 0.16) 0%,
+		rgba(9, 122, 255, 0.10) 100%);
+}
+
+/******************** pied ********************/
+
+#logo_ffck
+{
+	position: absolute;
+	/* Coin haut-droit : la seule zone vraiment libre de la scène, et la
+	   place habituelle d'un logo sur une incrustation de résultats. */
+	right: 96px;
+	top: 22px;
+
+	width: 220px;
+	height: 84px;
+
+	background-image: url("../img/FFCK_BLANC.png");
+	background-repeat: no-repeat;
+	background-position: right center;
+	background-size: contain;
+}
+
+/*
+ * Pagination : un classement de plus de --res-max lignes défile par pages.
+ * Le compteur dit où l'on en est, sinon on ne sait pas si l'on a vu la fin.
+ */
+#pagination
+{
+	position: absolute;
+	left: 98px;
+	top: 1016px;
+
+	font-size: 23px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #dce8fb;
+
+	display: none;
+}
+
+body.pagine #pagination
+{
+	display: block;
+}
+
+/******************** attente ********************/
+
+#attente
+{
+	position: absolute;
+	left: 96px;
+	top: 450px;
+	width: 1728px;
+
+	font-size: 34px;
+	font-style: italic;
+	letter-spacing: 0.06em;
+	color: #8fa6cc;
+
+	display: none;
+}
+
+body.vide #attente  { display: block; }
+body.vide #tableau  { display: none; }
+body.vide #epreuve  { display: none; }
+
+/******************** animations ********************/
+
+@keyframes res-ligne-entre
+{
+	from { opacity: 0; transform: translateX(-70px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes res-bloc-entre
+{
+	from { opacity: 0; transform: translateX(60px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+.ligne.res
+{
+	animation: res-ligne-entre 0.45s ease-out both;
+}
+
+#epreuve
+{
+	animation: res-bloc-entre 0.6s ease-out both;
+}
+
+/* ?anim=0 : poste de régie qui n'aime pas les animations. */
+body.no-anim .ligne.res,
+body.no-anim #epreuve
+{
+	animation: none;
+}
+
+/*
+ * Colonne nation repliée : sur un championnat de France elle est vide pour
+ * tout le monde, et une colonne de cases vides déséquilibre la ligne. Le
+ * JavaScript pose `sans-nation` quand aucun bateau n'a de code.
+ */
+body.sans-nation .ligne
+{
+	grid-template-columns: 104px 118px 1fr 120px 230px 190px;
+}
+
+body.sans-nation .c_nation
+{
+	display: none;
+}
+
+/******************** bandeau des bateaux en course ********************/
+
+/*
+ * Apparaît en bas dès qu'un bateau est sur l'eau, disparaît quand il n'y en a
+ * plus. Le tableau au-dessus rétrécit d'autant : sa hauteur de ligne est
+ * calculée en JavaScript, qui tient compte de la présence du bandeau — rien ne
+ * se chevauche jamais, quel que soit le nombre de lignes affichées.
+ */
+#encourse
+{
+	position: absolute;
+	left: 96px;
+	top: 862px;
+	width: 1728px;
+	height: 130px;
+
+	display: none;
+	gap: 16px;
+}
+
+body.en-course #encourse
+{
+	display: flex;
+}
+
+/* Le biseau de la charte, avec le contenu redressé à l'intérieur. */
+.coureur
+{
+	flex: 1 1 0;
+	min-width: 0;
+	overflow: hidden;
+
+	transform: skewX(var(--biseau));
+	background: linear-gradient(160deg, #18216F 0%, #0B1050 100%);
+	border-bottom: 5px solid var(--ffck-blue);
+	box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+
+	animation: coureur-entre 0.45s ease-out both;
+}
+
+.coureur.sortant
+{
+	animation: coureur-sort 0.35s ease-in both;
+}
+
+.coureur .c_corps
+{
+	height: 100%;
+	transform: skewX(calc(-1 * var(--biseau)));
+
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: 1fr 1fr;
+	grid-template-areas:
+		"bib nom    nom"
+		"bib chrono pena";
+	align-items: center;
+
+	padding-right: 26px;
+}
+
+.coureur .c_bib
+{
+	grid-area: bib;
+	align-self: stretch;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 92px;
+	margin-right: 22px;
+
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+	font-size: 38px;
+	font-weight: bold;
+}
+
+.coureur .c_nom
+{
+	grid-area: nom;
+	align-self: end;
+
+	font-size: 23px;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	padding-bottom: 4px;
+}
+
+.coureur .c_chrono
+{
+	grid-area: chrono;
+	align-self: start;
+
+	font-size: 44px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+/*
+ * Le cumul de pénalités ne s'affiche que s'il y en a : un « +0 » permanent
+ * attire l'oeil sur une information vide.
+ */
+.coureur .c_pena
+{
+	grid-area: pena;
+	align-self: start;
+	justify-self: end;
+
+	padding: 3px 16px;
+	background: linear-gradient(180deg, #c20201 0%, #770101 100%);
+
+	font-size: 26px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+.coureur .c_pena.vide
+{
+	display: none;
+}
+
+@keyframes coureur-entre
+{
+	from { opacity: 0; transform: skewX(var(--biseau)) translateY(60px); }
+	to   { opacity: 1; transform: skewX(var(--biseau)) translateY(0); }
+}
+
+@keyframes coureur-sort
+{
+	from { opacity: 1; transform: skewX(var(--biseau)) translateY(0); }
+	to   { opacity: 0; transform: skewX(var(--biseau)) translateY(60px); }
+}
+
+body.no-anim .coureur
+{
+	animation: none;
+}
+
+/******************** ligne mise en valeur ********************/
+
+/*
+ * Le bateau qui vient de franchir la ligne. La page saute sur sa page de
+ * classement et l'encadre quelques secondes (?vedette=).
+ *
+ * L'encadrement passe par un ::after absolu plutôt que par une bordure : une
+ * bordure changerait la hauteur de la ligne et décalerait tout le tableau, et
+ * une animation posée sur .ligne remplacerait son animation d'entrée. Un
+ * ::after en position absolue sort du flux de la grille, il n'ajoute donc pas
+ * de colonne.
+ */
+.ligne.res
+{
+	position: relative;
+}
+
+.ligne.res.vedette
+{
+	background: linear-gradient(90deg,
+		rgba(23, 12, 150, 0.98) 0%,
+		rgba(30, 22, 165, 0.92) 55%,
+		rgba(20, 40, 150, 0.72) 100%);
+}
+
+.ligne.res.vedette::after
+{
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+
+	box-shadow: inset 0 0 0 3px var(--ffck-blue-light);
+	animation: res-vedette 1.1s ease-out 3;
+}
+
+@keyframes res-vedette
+{
+	0%   { box-shadow: inset 0 0 0 3px var(--ffck-blue-light), 0 0 0 0 rgba(54, 128, 255, 0.55); }
+	70%  { box-shadow: inset 0 0 0 3px var(--ffck-blue-light), 0 0 26px 6px rgba(54, 128, 255, 0); }
+	100% { box-shadow: inset 0 0 0 3px var(--ffck-blue-light), 0 0 0 0 rgba(54, 128, 255, 0); }
+}
+
+body.no-anim .ligne.res.vedette::after
+{
+	animation: none;
+}
+
+/*
+ * Filet d'ouverture de la partie qui tourne : sans lui, les trois figés et
+ * les cinq tournants se lisent comme un classement continu de 1 à 8, alors
+ * que les cinq du bas changent toutes les quelques secondes.
+ */
+.ligne.res.ouvre-rotation
+{
+	margin-top: 16px;
+}
+
+.ligne.res.ouvre-rotation::before
+{
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: -10px;
+
+	height: 2px;
+	background: linear-gradient(90deg,
+		var(--ffck-blue) 0%,
+		rgba(9, 122, 255, 0.35) 55%,
+		rgba(9, 122, 255, 0) 100%);
+}

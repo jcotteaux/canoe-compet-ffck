@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Results</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_results.css?v1" rel="stylesheet">
+</head>
+<body>
+	<div id="scene">
+		<div class="bande" id="bande_haut_sombre"></div>
+		<div class="bande" id="bande_haut_vive"></div>
+		<div class="bande" id="bande_bas_vive"></div>
+		<div class="bande" id="bande_bas_sombre"></div>
+
+		<div id="titre"></div>
+
+		<div id="sous_titre">
+			<span id="lieu"></span>
+			<span id="provisoire">Classement provisoire</span>
+		</div>
+
+		<div id="epreuve"><span id="epreuve_nom"></span></div>
+
+		<div id="tableau">
+			<div class="ligne" id="entete">
+				<div class="c_rang">Clt</div>
+				<div class="c_dossard">Dos.</div>
+				<div class="c_nom">Nom</div>
+				<div class="c_nation">Nat.</div>
+				<div class="c_pena">Pén.</div>
+				<div class="c_temps">Temps</div>
+				<div class="c_ecart">Écart</div>
+			</div>
+			<div id="corps"></div>
+		</div>
+
+		<div id="attente">En attente des premiers résultats…</div>
+
+		<div id="encourse"></div>
+
+		<div id="pagination"></div>
+		<div id="logo_ffck"></div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v2"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js"></script>
+	<script src="./js/tv_results.js?v1"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>
