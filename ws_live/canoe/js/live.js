@@ -778,7 +778,7 @@ function SetBodyEpreuve(changeScrolling=false)
 		if (tCompetition_Course_Phase.GetNbRows() >= code_phase && code_phase > 0)
 			index_phase = code_phase-1;
 
-		elSubTitle.innerHTML = tCompetition_Course.GetCell('Libelle', 0)+' - '+tCompetition_Course_Phase.GetCell('Libelle', index_phase)+" - "+currentEpreuve;
+		elSubTitle.innerHTML = tCompetition_Course_Phase.GetCell('Libelle', index_phase)+" - "+currentEpreuve;
 	}
 	
 	var html;
@@ -987,7 +987,7 @@ let lg_tab=-1;
 					if (code_nation != '')
 						img_nation = "./img/Flags/"+code_nation+".png";
 					
-					html_cour += '<td class="nation">'+code_nation+'&nbsp;<img src="'+img_nation+'" alt="" height="16" width="16" /></td>';
+					html_cour += '<td class="nation">'+code_nation+'&nbsp;<img src="'+img_nation+'" alt="" height="20" width="25" /></td>';
 				}
 			}
 			else

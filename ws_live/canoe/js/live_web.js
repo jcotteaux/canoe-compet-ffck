@@ -500,7 +500,7 @@ function OnCommandRaceLoad(objJSON)
 {
 //	alert("OnCommandRaceLoad :"+JSON.stringify(objJSON));
 	canoe.SetRace(objJSON);
-
+	
    	document.getElementById("navigation_epreuve").style.display = 'block';
 	document.getElementById("container_message").innerHTML = '';
 
@@ -625,6 +625,11 @@ function NextEpreuve()
 			break;
 		}
 	}
+}
+
+function ShowEpreuves()
+{
+	SetBodyEpreuves();
 }
 
 function ShowPDF()
@@ -805,13 +810,22 @@ function SetBodyEpreuve(changeScrolling=false)
 	{
 		const tCompetition_Course = canoe.GetTable('Competition_Course');
 		const tCompetition_Course_Phase = canoe.GetTable('Competition_Course_Phase');
+
+		const tProgramme_Epreuve_Embarcation = canoe.GetTable('Programme_Epreuve_Embarcation');
+		var labelEpreuve = currentEpreuve;
+		for (let e=0;e<tProgramme_Epreuve_Embarcation.GetNbRows();e++) {
+			if (tProgramme_Epreuve_Embarcation.GetCell('Libelle_court',e) == currentEpreuve) {
+				labelEpreuve = tProgramme_Epreuve_Embarcation.GetCell('Libelle_long',e);
+				break;
+			}
+		}
 		
 		const code_phase = canoe.GetCodePhase();
 		var index_phase = 0;
 		if (tCompetition_Course_Phase.GetNbRows() >= code_phase && code_phase > 0)
 			index_phase = code_phase-1;
 
-		elSubTitle.innerHTML = tCompetition_Course.GetCell('Libelle', 0)+' - '+tCompetition_Course_Phase.GetCell('Libelle', index_phase)+" - "+currentEpreuve;
+		elSubTitle.innerHTML = tCompetition_Course_Phase.GetCell('Libelle', index_phase)+" - "+labelEpreuve;
 	}
 	
 	var html;
@@ -943,7 +957,7 @@ function SetBodyEpreuve(changeScrolling=false)
 					if (code_nation != '')
 						img_nation = "./img/Flags/"+code_nation+".png";
 					
-					html += '<td class="nation">'+code_nation+'&nbsp;<img src="'+img_nation+'" alt="" height="16" width="16" /></td>';
+					html += '<td class="nation">'+code_nation+'&nbsp;<img src="'+img_nation+'" alt="" height="20" width="25" /></td>';
 				}
 				else if (columnContext == "Clt_A_B")
 				{

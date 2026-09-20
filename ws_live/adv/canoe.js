@@ -234,7 +234,7 @@ canoe.GetSecteurNbPorte = function(secteur)
 canoe.SetColumnNameRanking = function(tRanking)
 {
 	const course_phase = canoe.GetCodeCoursePhase();
-	if (canoe.GetCodeActivite() == 'SLA')
+	if (canoe.GetCodeActivite() == 'SLA' || canoe.GetCodeActivite() == 'EXS')
 	{
 		const nbPorte = canoe.GetNbPorte();
 
@@ -247,7 +247,11 @@ canoe.SetColumnNameRanking = function(tRanking)
 		for (let p = 1; p <= nbPorte; p++)
 			tRanking.SetColumnName('@PENA_'+p.toString()+'_1', "Pena_"+p.toString());
 
-		tRanking.SetColumnName('@SUMPENA_'+course_phase+'_1', 'Total_pena'+course_phase);
+		if (tRanking.GetIndexColumn('@SUMPENA_'+course_phase+'_1') >= 0)
+			tRanking.SetColumnName('@SUMPENA_'+course_phase+'_1', 'Total_pena'+course_phase);
+		
+		if (tRanking.GetIndexColumn('@NBPENA_'+course_phase+'_1') >= 0)
+			tRanking.SetColumnName('@NBPENA_'+course_phase+'_1', 'Nb_pena'+course_phase);
 		
 		if (tRanking.GetIndexColumn("@CHRONO_INTER1_"+course_phase+'_1') >= 0)
 		{
@@ -283,6 +287,15 @@ canoe.SetColumnNameRanking = function(tRanking)
 	for (let r = 0; r < tRanking.GetNbRows(); r++)
 	{
 		tRanking.SetCell('Rang'+course_phase, r, r+1);
+	}
+	
+	if (canoe.GetCodeActivite() == 'EXS')
+	{
+		for (let i = 0; i < tRanking.GetNbRows(); i++)
+		{
+			canoe.UpdateExsTotalPena(tRanking, i);
+		}
+		tRanking.SetRanking('Cltc'+course_phase, 'Nb_pena'+course_phase+',Total_pena'+course_phase+', Tps_chrono'+course_phase);
 	}
 }
 
@@ -433,3 +446,48 @@ canoe.UpdateSlalomFinishTime = function(tRanking, row)
 	return newTps;
 }
 
+canoe.UpdateExsTotalPena = function(tRanking, row)
+{
+	const course_phase = canoe.GetCodeCoursePhase();
+	const chrono = tRanking.GetCellInt("Tps_chrono" + course_phase, row);
+	
+	tRanking.SetCell("Tps" + course_phase, row, chrono);
+	tRanking.SetCell('Total_pena'+course_phase, row, Math.pow(2, 30));
+	tRanking.SetCell("Nb_pena" + course_phase, row, 10000);
+
+	if (chrono < adv.chrono.OK)
+		return;
+	
+	const nb_porte = canoe.GetNbPorte();
+	var penaEXS = 0;
+	var nb_pena = 0;
+	for (let p = 1; p <= nb_porte; p++)
+	{
+		var pen = tRanking.GetCell('Pena_'+p.toString(), row);
+		if (pen == '2')
+		{
+			if (nb_pena == 0)
+				penaEXS += Math.pow(2, 15-p);
+			++nb_pena;
+		}
+		else if (pen == '50')
+		{
+			if (nb_pena < 1000)
+				penaEXS += Math.pow(2, 30-p);
+			nb_pena += 1000;
+		}
+		else if (pen != '0')
+			return;
+	}
+
+	tRanking.SetCell('Total_pena'+course_phase, row, penaEXS);
+	tRanking.SetCell("Nb_pena" + course_phase, row, nb_pena);
+}
+
+canoe.UpdateExsFinishTime = function(tRanking, row)
+{
+	canoe.UpdateExsTotalPena(tRanking, row);
+	
+	const course_phase = canoe.GetCodeCoursePhase();
+	tRanking.SetRanking('Cltc'+course_phase, 'Nb_pena'+course_phase+',Total_pena'+course_phase+', Tps_chrono'+course_phase);
+}

@@ -184,6 +184,8 @@ ws.Context.prototype.Dispatch = function(objJSON, schedule)
 	if (!objJSON || typeof objJSON !== 'object')
 		return;
 
+	this.SendAck(objJSON);
+
 	const call = (fn, label) => {
 		const guarded = (arg) => {
 			try
@@ -271,7 +273,7 @@ ws.Context.prototype.OpenWebSocket = function(fnOpen=undefined, fnClose=undefine
 	// mémorisé pour pouvoir rouvrir à l'identique après une coupure
 	this.openArgs = { fnOpen : fnOpen, fnClose : fnClose, fnMessage : fnMessage, mode : mode, binaryType : binaryType };
 
-	this.websocket = new WebSocket(this.url+':'+(this.port).toString());
+	this.websocket = new WebSocket(this.url+':'+(this.port).toString(), 'lws');
 	this.mode = mode;
 	if (mode == 'binary')
 		this.websocket.binaryType = binaryType;
@@ -337,4 +339,17 @@ ws.Context.prototype.OpenWebSocketCommand = function(fnOpen=undefined, fnClose=u
 ws.Context.prototype.OpenWebSocketBinary = function(fnOpen=undefined, fnClose=undefined, fnMessage=undefined)
 {
 	this.OpenWebSocket(fnOpen, fnClose, fnMessage, 'binary', 'arraybuffer');
+}
+
+ws.Context.prototype.Send = function(cmd)
+{
+	this.websocket?.send(JSON.stringify(cmd));
+}
+
+ws.Context.prototype.SendAck = function(objJSON)
+{
+	if (objJSON.ack_ws != null) {
+		this.Send({key:'<ack_ws>', id:objJSON.ack_ws});
+		console.log('Ack WS:'+objJSON.ack_ws);
+	}
 }

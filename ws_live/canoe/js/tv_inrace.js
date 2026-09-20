@@ -334,6 +334,13 @@ function ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart=fal
 	SetName('#block_finish', tRanking, row);
 	SetNation('#block_finish', tRanking, row);
 	SetCateg('#block_finish', tRanking, row);
+	
+	if (parseInt(txtRk) == 1)
+		txtRk = txtRk + '<sup>er</sup>';
+	else if (parseInt(txtRk) > 1)
+		txtRk = txtRk + '<sup>ème</sup>';
+
+	
 
 	document.querySelector('#block_finish .rank').innerHTML = txtRk;
 	document.querySelector('#block_finish .time').innerHTML = txtTime;
@@ -978,6 +985,11 @@ function Init()
 	wsMain.filter_index = 0; 
 	wsMain.filter_modulo = 1; 
 
+	if (urlParams.has('delay'))
+	{
+		wsMain.delay = parseInt(urlParams.get('delay'));
+	}
+
 	if (urlParams.has('bib_filter'))
 	{
 		wsMain.filter = 'bib'; 
@@ -1083,7 +1095,7 @@ function Init()
 	wsMain.leader_before_finish = 7000;
 	ClearLeader();
 	
-	wsMain.timeoutFinishDelay = 20000;
+	wsMain.timeoutFinishDelay = 40000;
 	if (urlParams.has('delay_finish'))
 		wsMain.timeoutFinishDelay = parseInt(urlParams.get('delay_finish'));
 	
@@ -1095,7 +1107,7 @@ function Init()
 	if (urlParams.has('delay_start'))
 		wsMain.timeoutStartDelay = parseInt(urlParams.get('delay_start'));
 	
-	wsMain.lengthIdentity = 20;
+	wsMain.lengthIdentity = 26;
 	if (urlParams.has('length_identity'))
 		wsMain.lengthIdentity = parseInt(urlParams.get('length_identity'));
 

@@ -31,13 +31,37 @@ function OnCommandEpreuveLoad(objJSON)
 
 	const tRanking = canoe.GetTableRanking();
 	canoe.SetColumnNameRanking(tRanking);
-
+	
 	const course_phase = canoe.GetCodeCoursePhase();
 	tRanking.OrderBy('Heure_depart'+course_phase+', Dossard');
 	
 	if (wsMain.epreuve == '')
 		SetCurrentEpreuve(tRanking);
 	
+    // 🔹 Récupération du code activité
+    const codeActivite = canoe.GetCodeActivite();
+
+    // 🔹 Gestion du pictogramme
+    const picto = document.querySelector("#head .picto");
+    picto.classList.remove("sla", "des", "ocr", "mar", "exs");
+
+    if (codeActivite === "SLA") picto.classList.add("sla");
+    if (codeActivite === "DES") picto.classList.add("des");
+    if (codeActivite === "OCR") picto.classList.add("ocr");
+    if (codeActivite === "MAR") picto.classList.add("mar");
+	if (codeActivite === "EXS") picto.classList.add("exs");
+
+
+    // 🔹 Activités sans pénalité
+    const activitesSansPena = ['DES','OCR','MAR'];
+    if (activitesSansPena.includes(codeActivite)) {
+        const pena = document.querySelector('#block_ranking .pena');
+        const labelPena = document.querySelector('#head .label_pena');
+
+        if (pena) pena.innerHTML = '';
+        if (labelPena) labelPena.innerHTML = '';
+    }
+
 	ShowRanking(tRanking);
 }
 
@@ -63,56 +87,109 @@ function SetCurrentEpreuve(tRanking)
 	
 	if (wsMain.epreuve == '' && tRanking.GetNbRows() > 0)
 		wsMain.epreuve = tRanking.GetCell('Code_categorie',0);
+
+	document.querySelector("#head .categ").innerHTML = Categorie_name( wsMain.epreuve);
+ }
+
+// --- GESTION DES CLASSES ET DES RANGS ---
+
+function HideRow(row) {
+    const el = document.querySelector('#block_ranking .row' + row);
+    if (el) {
+        el.classList.remove('visible');
+        el.style.display = 'none'; // Assure que l'élément est retiré du flux
+    }
+}
+
+function ShowRow(row) {
+    const el = document.querySelector('#block_ranking .row' + row);
+    if (el) {
+        el.style.display = 'block';
+        // Petit délai pour laisser le display:block s'appliquer avant l'animation
+		
+        setTimeout(() => {
+
+            el.classList.add('visible');
+        }, 50);
+    }
+}
+
+function HideRows() {
+    for (let i = 1; i <= 10; i++)
+        HideRow(i);				   
+}
+
+function ShowRanking(tRanking) {
+    if (!tRanking || typeof tRanking !== 'object') return;
+
+    // Cache toutes les lignes avant de commencer l'affichage du nouveau bloc
+    for (let j = 1; j <= 10; j++) HideRow(j);
 	
-	document.querySelector("#head .categ").innerHTML = wsMain.epreuve;
+    const course_phase = canoe.GetCodeCoursePhase();
+    let rowsToShow = [];
+    let i = wsMain.scroll_start;
+	
+    // 1️ Préparer le bloc (max 10 lignes valides : heure de départ >0)
+    while (rowsToShow.length < 10 && i < tRanking.GetNbRows()) {
+		
+        const isSameCategory = tRanking.GetCell('Code_categorie', i) === wsMain.epreuve;
+        const hasStart = tRanking.GetCellInt('Heure_depart' + course_phase, i) > 0;
+
+        if (isSameCategory && hasStart) {
+            rowsToShow.push(i);
+        }
+        i++;
+    }
+
+    // 2️ Affichage progressif avec l'animation CSS
+    rowsToShow.forEach((rankingIndex, idx) => {
+        setTimeout(() => {
+            ShowRankingRow(idx + 1, tRanking, rankingIndex, course_phase);
+        }, idx * 200); // Décale l'apparition de chaque ligne en ms
+    });
+
+    // 3️ Calcul du total pour savoir s'il faut arrêter la boucle
+    const totalInCat = GetCountRanking(tRanking, course_phase, 0);
+
+    // 4️ Si moins de 10 lignes classées, on affiche et on stoppe le cycle
+    if (totalInCat <= 10) {
+        wsMain.scroll_start = 0;
+        return; 
+    }
+
+    // 5️ Calcul du prochain index de départ pour le scroll
+    const nextScrollStart = GetCountRanking(tRanking, course_phase, i) > 0 ? i : 0;
+
+	// 6️ Relance le cycle après le délai
+setTimeout(() => {
+    HideRowsProgressively(() => {
+        
+     // On détermine les durée de pause (2s pour redémarrer au début, 0,5s entre 2 pages)
+        let pauseDuration = (nextScrollStart === 0) ? 3000 : 500;
+
+        setTimeout(() => {
+            wsMain.scroll_start = nextScrollStart;
+            const newRanking = canoe.GetTableRanking();
+            ShowRanking(newRanking);
+        }, pauseDuration); 
+
+    });
+}, wsMain.scroll_delay);
 }
 
-function HideRow(row)
+// Mise à jour de GetCountRanking pour éviter l'erreur d'index (i < NbRows)
+function GetCountRanking(tRanking, course_phase, iStart) 
 {
-	document.querySelector('#block_ranking .row'+row).style.display = 'none';
-}
-
-function ShowRow(row)
-{
-	document.querySelector('#block_ranking .row'+row).style.display = 'block';
-}
-
-function HideRows()
-{
-	for (let i=1;i<=10;i++)
-		HideRow(i);
-}
-
-function ShowRanking(tRanking)
-{
-	HideRows();
-	if (tRanking && typeof tRanking === 'object')
+    let count = 0;
+	for (let i = iStart; i < tRanking.GetNbRows(); i++)
 	{
-		const course_phase = canoe.GetCodeCoursePhase();
-
-		var row = 1;
-		var i = wsMain.scroll_start;
-		while (row <= 10 && i < tRanking.GetNbRows())
+        if (tRanking.GetCell('Code_categorie', i) == wsMain.epreuve && 
+            tRanking.GetCellInt('Heure_depart' + course_phase, i) > 0)
 		{
-			if (tRanking.GetCell('Code_categorie', i) == wsMain.epreuve)
-			{
-				ShowRankingRow(row, tRanking, i, course_phase);
-				++row;
-			}
-			++i;
+			count++;
 		}
-		
-		if (GetCountRanking(tRanking, course_phase, i) > 0)
-			wsMain.scroll_start = i;
-		else
-			wsMain.scroll_start = 0;
-		
-		window.setTimeout(function() { 
-				const tRanking = canoe.GetTableRanking();
-				ShowRanking(tRanking);
-			},	wsMain.scroll_delay
-		);
-	}
+    }
+    return count;
 }
 
 function GetCountRanking(tRanking, course_phase, iStart)
@@ -140,7 +217,7 @@ function ShowRankingRow(row, tRanking, i, course_phase)
 
 	if (code_nation.length > 0)
 	{
-		document.querySelector('#block_ranking .row'+row+' .img_nation').innerHTML = "<img src='./img/flags/"+code_nation+".png' height='38' width='56' />";
+		document.querySelector('#block_ranking .row'+row+' .img_nation').innerHTML = "<img src='./img/Flags/"+code_nation+".png' height='32' width='46' />";
 	}
 	else
 	{
@@ -166,6 +243,28 @@ function TruncateName(name)
 ////////// Variables globales et Initialisation  //////////
 const wsMain = new ws.Context(wsParams.url, wsParams.port);
 
+function HideRowsProgressively(callback)
+{
+	let idx = 10;  // dernière ligne a commencer a masquer //
+	const interval = 20; // delais d'affacement des lignes  //
+
+	function hideNext()
+	{
+		if (idx <= 0)
+		{
+			if (callback) callback();
+			return;
+		}
+		
+		HideRow(idx); // ta fonction existante
+		idx--;
+
+		setTimeout(hideNext, interval);
+	}
+
+	hideNext();
+}
+
 function Init()
 {
 	wsMain.lang = 'en';
@@ -177,17 +276,19 @@ function Init()
 	if (urlParams.has('epreuve'))
 	{
 		wsMain.epreuve = urlParams.get('epreuve');
-		document.querySelector("#head .categ").innerHTML = wsMain.epreuve;
+		document.querySelector("#head .categ").innerHTML = Categorie_name( wsMain.epreuve);
 	}
 	
-	wsMain.lengthIdentity = 25;
+ // longueur max de caractère nom prenom//	
+	wsMain.lengthIdentity = 27;
 	if (urlParams.has('length_identity'))
 		wsMain.lengthIdentity = parseInt(urlParams.get('length_identity'));
-	
-	wsMain.scroll_delay = 5000;
-	if (urlParams.has('delay'))
-		wsMain.scroll_delay = parseInt(urlParams.get('delay'));
 
+// delais de scroll entre chaque page affichée  //
+	wsMain.scroll_delay = 7000;
+		if (urlParams.has('delay'))
+		wsMain.scroll_delay = parseInt(urlParams.get('delay'));
+	
 	wsMain.scroll_start = 0;
 
 	// Command Notification

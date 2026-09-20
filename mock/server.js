@@ -37,7 +37,13 @@ if (args.record) {
 
 // ----------------------------------------------------------------- WebSocket
 
-const wss = new WebSocketServer({ port: WS_PORT });
+// competFFCK impose le sous-protocole 'lws' depuis adv/ws.js (juillet 2026) :
+// sans accord explicite du serveur, le navigateur rompt la negociation. On
+// accepte aussi les clients qui n'en demandent aucun (anciennes pages).
+const wss = new WebSocketServer({
+  port: WS_PORT,
+  handleProtocols: (protocols) => (protocols.has('lws') ? 'lws' : false),
+});
 
 wss.on('connection', (socket, req) => {
   clients.add(socket);
@@ -67,6 +73,10 @@ function handleCommand(socket, msg) {
   console.log(`[ws] <- ${key} ${JSON.stringify(omit(msg, 'key'))}`);
 
   switch (key) {
+    // Accuse de reception envoye par ws.Context.SendAck : rien a repondre.
+    case '<ack_ws>':
+      return;
+
     case '<competition_load>':
       return send(socket, engine.competitionLoadFrame());
 

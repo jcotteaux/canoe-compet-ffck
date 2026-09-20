@@ -279,7 +279,7 @@ function ShowRunning(tRanking, i, time_running)
 	
 	const nation = tRanking.GetCell('Code_nation', i);
 	if (nation.length > 0)
-		document.querySelector('#block_running .nation').innerHTML = "<img src='./img/flags/"+nation+".png' height='40' width='64' />";
+		document.querySelector('#block_running .nation').innerHTML = "<img src='./img/flags/"+nation+".png' height='50' width='70' />";
 
 	const course_phase = canoe.GetCodeCoursePhase();
 	for (let p=1;p<=canoe.GetNbPorte();p++)
@@ -564,7 +564,7 @@ function Init()
 	wsMain.bib_select = -1;
 	
 	wsMain.timeoutFinish = null;
-	wsMain.timeoutFinishDelay = 25000;
+	wsMain.timeoutFinishDelay = 60000;
 	
 	wsMain.timeoutInter = null;
 	wsMain.timeoutInterDelay = 5000;

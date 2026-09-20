@@ -39,6 +39,7 @@ define("VERSION_BOOTSTRAP", "5.3.2");
 		<script src="../adv/ws.js"></script>
 		<script src="../adv/ws_params.js"></script>
 		<script src="../adv/adv.js"></script>
+		<script src="../adv/adv_table.js"></script>
 		<script src="../adv/ski.js"></script>
 		
 		<script src="./js/notation_fs.js?v2"></script>

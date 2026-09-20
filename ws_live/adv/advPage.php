@@ -174,6 +174,7 @@ class advPage
 		<script src="../adv/ws.js"></script>
 		<script src="../adv/ws_params.js"></script>
 		<script src="../adv/adv.js"></script>
+		<script src="../adv/adv_table.js"></script>
 		<?php
 	}
 	

@@ -1,73 +1,147 @@
+:root {
+	--font-ffck: 'Calibri','Carlito';
+	--block-opacity: 0.9;  /** règlage de la transparence des logos. /!\ ne fonctionne pas sur l'image de fond  **/
+}
+
+/* Apparition de la gauche */
 @keyframes apparitionG {
-	from{
+	from {
 		opacity: 0;
-		transform: translateX(-900px);
+		transform: translateX(-300px);
 	}
-	to{
+	to {
 		opacity: 1;
-		transform: translateX(0px);
+		transform: translateX(0);
 	}
 }
 
+/* Apparition de la droite */
 @keyframes apparitionD {
-	from{
+	from {
 		opacity: 0;
-		transform: translateX(800px);
+		transform: translateX(300px); 
 	}
-	to{
+	to {
 		opacity: 1;
-		transform: translateX(0px);
+		transform: translateX(0);
 	}
 }
 
-@keyframes appena {
-	0% {
-		transform: translateX(0px);
+/* Apparition fondu */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
 	}
-	20% {
-		transform: translateX(-5px);
+	to {
+		opacity: 1;
 	}
-	40% {
-		transform: translateX(5px);
-	}
-	60% {
-		transform: translateX(-5px);
-	}
-	80% {
-		transform: translateX(5px);
-	}
-	100% {
-		transform: translateX(0px);
-	}
-
 }
 
-/*********************************/
+/**********************************/
 body
 {
-	background-color:#D500FF;
+	overflow-x: hidden;
+	background-color:transparent; 
 	padding:0px;
 	margin:0px;
-
-	background-image: url("../img/block_startlist.png");
+	background-image: url("../img/Graphic_FFCK/block_rankingstartlist.png");
 	background-repeat: no-repeat;
+	
 	animation: apparitionD 0.7s ease-out;
 }
 
-#head .name
+#head .picto {
+    width: 2350px;
+    height: 90px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 833px;
+}
+#head .picto.sla {
+    background-image: url("../img/FFCK_Icon_Slalom.png");
+}
+#head .picto.des {
+    background-image: url("../img/FFCK_Icon_Descente.png");
+}
+#head .picto.ocr {
+    background-image: url("../img/FFCK_Icon_Oceanracing.png");
+}
+#head .picto.mar {
+    background-image: url("../img/FFCK_Icon_Marathon.png");
+}
+#head .picto.exs {
+    background-image: url("../img/FFCK_Icon_Kcross.png");	
+}
+
+#head .logoFFCK
 {
+	width:250px;
+	height: 140px;
+	background-image: url("../img/FFCK_550x400.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 	position: absolute;
-
-	left:830px;
-	width:900px;
-	top:110px;
+	left: 15px;
+	top: 20px;	
 	
-	Font-family:calibri; 
-	font-size:35pt;
-	color:white;
+	background-color: white;
+	opacity: var(--block-opacity);
+	padding: 0.5vw;              /* ✅ un peu d’espace autour du logo */
+    border-radius: 0.5vw;        /* ✅ coins arrondis (optionnel) */
 
-	font-weight:bold;
-	text-align:center;
+}
+
+#head .logo1
+{
+	width: 500px;
+	height: 130px;
+	background-image: url("../img/Partenaires/Logo1.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	position: absolute;
+	left: 10px;
+	top: 930px;
+	
+	background-color: transparent;
+	opacity: var(--block-opacity);
+
+	padding: 0.5vw;              
+    border-radius: 0.5vw;
+	
+}
+
+/*
+#head .logo2
+{
+	width:200px;
+	height: 150px;
+	background-image: url("../img/Partenaires/Image_ICF.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	position: relative;
+	left: 15px;
+	top: 160px;
+	padding: 0.5vw;
+	border-radius: 0.5vw;
+
+}
+*/
+
+#head .name {
+    position: absolute;
+	font-family: var(--font-ffck);
+    left: 335px;
+    width: 665px;
+    top: 148px;
+    font-size: 30pt;
+    color: white;
+    font-weight: bold;
+    text-align: center;
 }
 
 #head .place
@@ -76,30 +150,26 @@ body
 }
 #{
 	position: absolute;
-
+	font-family: var(--font-ffck);
 	left:340px;
 	width:490px;
 	top:190px;
-	
 	font-size:20pt;
 	color:white;
-
 	font-weight:bold;
 	text-align:center;
-	animation: apparitionD 0.7s ease-out;
 }
 
 #head .title
 {
 	position: absolute;
-	font-family: calibri; 
-	left:865px;
-	width:680px;
-	top:178px;
-	
+	font-family: var(--font-ffck);
+	left:1025px;
+	width:520px;
+	top:151px;
+	font-style: italic;
 	font-size:30pt;
 	color:rgb(0,27,90);
-
 	font-weight:bold;
 	text-align:center;
 }
@@ -107,24 +177,31 @@ body
 #head .categ
 {
 	position: absolute;
-	font-family: calibri;
+	font-family: var(--font-ffck);
 	font-style: italic;
-	left:1050px;
-	width:490px;
-	top:910px;
-	
-	font-size:32pt;
+	left:1220px;
+	width:445px;
+	top:850px;
+	font-size:28pt;
 	color:white;
-
 	font-weight:bold;
 	text-align:center;
-	animation: apparitionD 0.7s ease-out;
+}
+
+#head .label_pena
+{
+	display:none;
+}
+
+#head .label_time
+{
+	display:none;
 }
 
 #block_ranking
 {
 	position: absolute;
-	font-family: calibri;
+	font-family: var(--font-ffck);
 	left:0px;
 	top:160px;
 	width:100%;
@@ -150,6 +227,11 @@ body
 	display:none;
 }
 
+#block_ranking .label_pena 
+{
+	display:none;
+}
+
 #block_ranking .label_time
 {
 	display:none;
@@ -160,7 +242,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:111px;
+	top:86px;
 	width:100%;
 	height:60px;
 }
@@ -170,7 +252,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:173px;
+	top:142px;
 	width:100%;
 	height:60px;
 }
@@ -180,7 +262,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:233px;
+	top:198px;
 	width:100%;
 	height:60px;
 }
@@ -190,7 +272,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:295px;
+	top:254px;
 	width:100%;
 	height:60px;
 }
@@ -200,7 +282,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:356px;
+	top:310px;
 	width:100%;
 	height:60px;
 }
@@ -210,7 +292,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:418px;
+	top:366px;
 	width:100%;
 	height:60px;
 }
@@ -220,7 +302,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:480px;
+	top:422px;
 	width:100%;
 	height:60px;
 }
@@ -230,7 +312,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:541px;
+	top:478px;
 	width:100%;
 	height:60px;
 }
@@ -240,7 +322,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:602px;
+	top:534px;
 	width:100%;
 	height:60px;
 }
@@ -250,7 +332,7 @@ body
 	position: absolute;
 
 	left:0px;
-	top:664px;
+	top:590px;
 	width:100%;
 	height:60px;
 }
@@ -259,15 +341,13 @@ body
 {
 	position: absolute;
 
-	left:580px;
+	left:620px;
 	width:60px;
 	height:62px;
 	top:2px;
-	
-	font-family:calibri;
-	font-size:31pt;
+	font-family: var(--font-ffck);
+	font-size:28pt;
 	color:rgb(0,27,90);
-
 	font-weight:bold;
 	text-align:right;
 	padding-top:10px;
@@ -277,29 +357,31 @@ body
 {
 	position: absolute;
 
-	left:665px;
+	left:690px;
 	width:755px;
 	height:62px;
 	top:-4px;
-
-	font-family:calibri;
-	font-size:31pt;
+	font-family: var(--font-ffck);
+	font-size:28pt;
 	font-weight:bold;
-
 	color:rgb(0,27,90);
 	text-align:left;
 	padding-top:16px;
 }
 
+#block_ranking .rank					
+ {
+	display:none;
+}
 
 #block_ranking .img_nation
 {
 	position: absolute;
-
-	left:1465px;
+	
+	left:1340px;
 	width:80px;
 	height:52px;
-	top:5px;
+	top:8px;
 	padding-top:16px;
 }
 
@@ -307,65 +389,74 @@ body
 {
 	position: absolute;
 
-	left:1370px;
+	left:1255px;
 	width:100px;
 	height:52px;
-	top:0px;
-
+	top:5px;
 	color:rgb(0,27,90);
-	font-family:calibri;
-	font-size:25pt;
+	font-family: var(--font-ffck);
+	font-size:20pt;
 	text-align:center;
 	padding-top:18px;
+}
+
+#block_ranking .pena					
+  {
+	display:none;
 }
 
 #block_ranking .time
 {
 	position: absolute;
 
-	left:395px;
+	left:470px;
 	width:120px;
 	height:62px;
 	top:5px;
-	
-	font-family:calibri;
-	font-size:31pt;
+	font-family: var(--font-ffck);
+	font-size:28pt;
 	font-style:italic;
-
 	color:rgb(0,27,90);
-
 	text-align:right;
 	padding-top:7px;
 }
+/* ===== APPARITION LIGNES RANKING ===== */
 
-#block_ranking .yellow
-{
-	color:black;
-	background-image: url("../img/60_140_Y.jpg");
-	background-repeat: repeat-x;
+#block_ranking .row1,
+#block_ranking .row2,
+#block_ranking .row3,
+#block_ranking .row4,
+#block_ranking .row5,
+#block_ranking .row6,
+#block_ranking .row7,
+#block_ranking .row8,
+#block_ranking .row9,
+#block_ranking .row10 {
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.5s ease-in-out;
 }
 
-#block_ranking .red
-{
-	color:white;
-	background-image: url("../img/60_140_R.jpg");
-	background-repeat: repeat-x;
+/* état visible */
+#block_ranking .visible {
+	opacity: 1;
+	visibility: visible;
 }
 
-#block_ranking .green
-{
-	color:white;
-	background-image: url("../img/60_140_G.jpg");
-	background-repeat: repeat-x;
+/* État initial des lignes */
+#block_ranking [class^="row"] {
+    opacity: 0;
+	display: none;
+    visibility: hidden;
+    transform: translateX(90px);  /* droite → gauche */
+    transition:
+        opacity 0.3s ease-out,
+        transform 0.3s ease-out;
 }
 
-#block_ranking .empty
-{
-	color:black;
-	background-image: url("../img/60_10_Gray.jpg");
-	background-repeat: repeat-x;
+/* État quand la ligne devient visible (activé par le JS) */
+#block_ranking [class^="row"].visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0); /* Revient à sa position normale */
 }
-
-
-
-

@@ -1,58 +1,21 @@
 header {
-	min-height: 140px;
+	min-height: 120px;
 
-	background-position: left;
-	background-image: url('../img/header_liveweb.png');
-	background-repeat: no-repeat;	
-	background-size: cover;
+	background-position: center;
+	background-image: url('../img/Header_live.png');
+	background-repeat: no-repeat;
 	
 	width:100%;
 	text-align:center;
-	text-shadow: 2px 2px 2px black;
-	color:white;
+	color:black;
 	font-weight: bold;
-	padding-top:15px;
+	
+	padding-top:12px;
 }
 
 img {
 	display:inline-block;
 	margin: 0 auto;
-}
-
-#row_marquee2 {
-  overflow: hidden;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
-  display: flex;
-}
-
-#label_marquee {
-	padding:0px;
-	background-position: right,center;
-	background-image: url('../img/32x32_megaphone.png');
-	background-repeat: no-repeat;
-}
-
-/* Make it a marquee */
-#marquee {
-    margin: 0 auto;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-#marquee span {
-    display: inline-block;
-    padding-left: 100%;
-    animation: marquee 7s linear infinite;
-	color: rgb(204, 9, 0);
-	font-weight: bold;
-	font-size:24px;
-}
-		
-/* Make it move */
-@keyframes marquee {
-    0%   { transform: translate(0, 0); }
-    100% { transform: translate(-100%, 0); }
 }
 
 th.gate_inv

@@ -1,6 +1,11 @@
+:root {
+	--font-ffck: 'Calibri';
+
+}
+
 body
 {
-	background-color:#D500FF;
+	background-color:#f9b8f5; 
 	padding:0px;
 	margin:0px;
 }
@@ -65,28 +70,26 @@ body
 {
 	position:absolute;
 
-	background-image: url("../img/block_name.png");
+	background-image: url("../img/Graphic_FFCK/block_name.png");
 	background-repeat: no-repeat;	
 	animation: apparitionG 0.7s ease-out;
 	left:0px;
 	top:890px;
 	width:1202px;
 	height:145px;
-	
-}
+	}
 
 #block_start .bib
 {
 	position: absolute;
 
-	left:2px;
+	left:-6px;
 	width:100px;
 	top:0px;
 
-	font-family: Calibri;
-	font-size:48pt;
-	#font-weight:bold;
-	color:white;
+	font-family: var(--font-ffck);
+	font-size:42pt;
+	color:black;
 	text-align:center;
 }
 
@@ -94,12 +97,11 @@ body
 {
 	position: absolute;
 
-	left:125px;
-	top:2px;
+	left:120px;
+	top:-5px;
 
-	font-family: Calibri;
-	font-size:48pt;
-	#font-weight:bold;
+	font-family: var(--font-ffck);
+	font-size:55pt;  /*est gérée dans le Javascript*/
 	color:white;
 }
 
@@ -110,9 +112,8 @@ body
 	left:110px;
 	top:92px;
 
-	font-family: Calibri;
+	font-family: var(--font-ffck);
 	font-size:28pt;
-	#font-weight:bold;
 	color:white;
 }
 
@@ -128,14 +129,129 @@ body
 {
 	position: absolute;
 
-	left:250px;
-	top:88px;
+	left:395px;
+	top:73px;
 
-	font-family: Calibri;
+	font-family: var(--font-ffck);
 	font-style:italic;
 	font-size:33pt;
-	#font-weight:bold;
 	color:white;
+}
+
+
+/******************* block_running ********************/
+#block_running
+{
+	position:absolute;
+	background-image:none;
+	animation: apparitionD 0.7s ease-out;		
+}
+
+/* Toujours masque : le <div class="time_chrono"> de tv_inrace.html n'est pas
+   alimente par le JS, sans cette regle son texte de gabarit "9:59:99" reste
+   affiche. La regle existait dans la version precedente du fichier. */
+#block_running .time_chrono
+{
+	display:none;
+}
+
+#block_running .time
+{
+	position: absolute;
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	color:white;
+	text-align:right;
+	left:1429px;
+	top:890px;
+	width:460px;
+	height:84px;
+	padding-right: 40px; /* Décale le texte vers la gauche */
+
+	background-image: url("../img/Graphic_FFCK/block_running.png");
+	background-repeat: no-repeat;	
+	}
+
+
+/*#block_running .pena
+{
+	position: absolute;
+	left:1800px;
+	top:75px;
+
+	width:var(--block_pena_width);
+	height:848px;
+}
+*/
+
+/******************* block_inter ********************/
+#block_inter
+{
+	position:absolute;
+
+	left:1420px;
+	top:890px;
+	width:500px;
+	height:170px;
+}
+
+#block_inter .pena
+{
+	position: absolute;
+	left:380px;
+	top:75px;
+
+	width:var(--block_pena_width);
+	height:860px;
+	height:860px;
+}
+
+#block_inter.green
+{
+	background-image: url("../img/Graphic_FFCK/block_inter_green.png");
+	background-repeat: no-repeat;	
+	animation: apparitionD 0.7s ease-out;									  
+}
+
+#block_inter.red
+{
+	background-image: url("../img/Graphic_FFCK/block_inter_red.png");
+	background-repeat: no-repeat;	
+	animation: apparitionD 0.7s ease-out;									  
+}
+
+#block_inter .time
+{
+	position: absolute;
+
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	color:white;
+
+	left:250px;
+	width:240px;
+	padding-right:40px;
+	top:2px;
+	
+	text-align:right;
+}
+
+
+
+#block_inter .diff
+{
+	position: absolute;
+
+	font-family: var(--font-ffck);
+	font-style:italic;
+	font-size:40pt;
+	color:white;
+
+	left:65px;
+	width:175px;
+	top:-2px;
+
+	text-align:center;
 }
 
 /******************* block_finish ********************/
@@ -145,20 +261,30 @@ body
 
 	left:0px;
 	top:890px;
-	width:1220px;
+	width:1920px;
 	height:190px;
+}
+
+#block_finish .pena
+{
+	position: absolute;
+	left:1800px;
+	top:75px;
+
+	width:var(--block_pena_width);
+	height:800px;
 }
 
 #block_finish.green
 {
-	background-image: url("../img/block_finish_green.png");
+	background-image: url("../img/Graphic_FFCK/block_finish_green.png");
 	background-repeat: no-repeat;
 	animation: apparitionBas 0.4s ease-out;
 }
 
 #block_finish.red
 {
-	background-image: url("../img/block_finish_red.png");
+	background-image: url("../img/Graphic_FFCK/block_finish_red.png");
 	background-repeat: no-repeat;
 	animation: apparitionBas 0.4s ease-out;
 }
@@ -167,14 +293,13 @@ body
 {
 	position: absolute;
 
-	left:2px;
+	left:-6px;
 	width:100px;
 	top:0px;
 
-	font-family: Calibri;
-	font-size:48pt;
-	#font-weight:bold;
-	color:white;
+	font-family: var(--font-ffck);
+	font-size:42pt;
+	color:black;
 	text-align:center;
 }
 
@@ -183,11 +308,10 @@ body
 	position: absolute;
 
 	left:125px;
-	top:2px;
+	top:-5px;
 
-	font-family: Calibri;
-	font-size:48pt;
-	#font-weight:bold;
+	font-family: var(--font-ffck);
+	font-size:48pt;  /*est gérée dans le Javascript*/
 	color:white;
 }
 
@@ -198,9 +322,8 @@ body
 	left:110px;
 	top:92px;
 
-	font-family: Calibri;
+	font-family: var(--font-ffck);
 	font-size:25pt;
-	#font-weight:bold;
 	color:white;
 }
 
@@ -216,13 +339,12 @@ body
 {
 	position: absolute;
 
-	left:285px;
-	top:92px;
+	left:385px;
+	top:73px;
 
-	font-family: Calibri;
+	font-family: var(--font-ffck);
 	font-style:italic;
-	font-size:25pt;
-	font-weight:bold;
+	font-size:33pt;
 	color:white;
 }
 
@@ -230,13 +352,12 @@ body
 {
 	position: absolute;
 
-	left:460px;
-	top:92px;
-	width:220px;
+	left:1680px;
+	top:05px;
+	width:240px;
 
-	font-family: Calibri;
-	font-size:25pt;
-	font-weight:bold;
+	font-family: var(--font-ffck);
+	font-size:40pt;
 	color:white;
 	text-align:center;
 }
@@ -245,12 +366,12 @@ body
 {
 	position: absolute;
 
-	left:1050px;
-	top:120px;
+	left:1730px;
+	top:67px;
 	width:60px;
 
-	font-family: Calibri;
-	font-size:45pt;
+	font-family: var(--font-ffck);
+	font-size:40pt;
 	font-weight:bold;
 	color:white;
 	text-align:center;
@@ -260,141 +381,145 @@ body
 {
 	position: absolute;
 
-	left:692px;
-	top:92px;
-	width:200px;
+	left:1465px;
+	top:5px;
+	width:175px;
 
-	font-family: Calibri;
-	font-size:25pt;
-	#font-weight:bold;
+	font-family: var(--font-ffck);
+	font-size:40pt;
 	font-style:italic;
 	color:white;
 	text-align:center;
 }
 
-/******************* block_inter ********************/
-#block_inter
+/******************* block_leader ********************/
+#block_leader
 {
 	position:absolute;
 
-	left:1420px;
-	top:890px;
-	width:500px;
-	height:190px;
-}
-
-#block_inter.green
-{
-	background-image: url("../img/block_inter_green.png");
+	background-image: url("../img/Graphic_FFCK/block_leader.png");
 	background-repeat: no-repeat;	
-	animation: apparitionD 0.7s ease-out;									  
+
+	left:1389px;
+	top:964px;
+	width:531px;
+	height:49px;
+	animation: apparitionD 0.8s ease-out;
 }
 
-#block_inter.red
-{
-	background-image: url("../img/block_inter_red.png");
-	background-repeat: no-repeat;	
-	animation: apparitionD 0.7s ease-out;									  
-}
-
-#block_inter .time
+#block_leader .name
 {
 	position: absolute;
 
-	font-family: Calibri;
-	font-style:bold;
-	font-size:40pt;
-	color:rgb(0,27,90);
+	font-family: var(--font-ffck);
+	font-size:24pt;  /* géré dans le JS  */
+	color:yellow;
 
-	left:240px;
-	width:250px;
+	left:36px;
+	width:330px;
 	top:10px;
 
-	text-align:right;
-}
-
-#block_inter .diff
-{
-	position: absolute;
-
-	font-family: Calibri;
-	font-style:italic;
-	font-size:35pt;
-	color:white;
-
-	left:65px;
-	width:175px;
-	top:20px;
-
 	text-align:center;
 }
 
-#block_inter .leader_name
+#block_leader .time
 {
 	position: absolute;
 
-	font-family: Calibri;
+	font-family: var(--font-ffck);
 	font-size:24pt;
-	color:white;
+	color:yellow;
 
-	left:45px;
-	width:260px;
-	top:97px;
-
-	text-align:center;
-}
-
-#block_inter .leader_time
-{
-	position: absolute;
-
-	font-family: Calibri;
-	font-size:24pt;
-	color:rgb(0,27,90);
-
-	left:340px;
+	left:382px;
 	width:150px;
-	top:90px;
-
-	text-align:center;
-}
-
-/******************* block_running ********************/
-#block_running
-{
-	position:absolute;
-
-	background-image: url("../img/block_running.png");
-	background-repeat: no-repeat;	
-
-	left:1420px;
-	top:890px;
-	width:500px;
-	height:84px;
-	animation: apparitionD 0.7s ease-out;									  
-}
-
-#block_running .time
-{
-	position: absolute;
-
-	font-family: Calibri;
-	font-weight:bold;
-	font-size:32pt;
-	color:rgb(0,27,90);
-
-	left:240px;
-	width:250px;
 	top:1px;
 
-	text-align:right;
+	text-align:center;
 }
+/******************* creation block portes/pénalités ********************/
 
-#block_running .time_chrono
+.pena .gate
 {
-	display:none;
+	color:black;
+
+	font-family: var(--font-ffck);
+	font-weight:bold;
+	font-size:16pt;
+	text-align:left;
+
+	padding-left: 28px; /* ← ajuste ici pour plus de précision */
+
+	height:var(--block_pena_height);
 }
 
+.pena .gate[data-pen="0"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_0.png");
+	background-repeat: no-repeat;	
+}
+	
+.pena .gate[data-pen="2"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_2.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="50"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_50.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="-1"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_0_transparent.png");
+/*	opacity: 0.3; /* 0 = totalement transparent, 1 = totalement opaque */
+	background-repeat: no-repeat;	
+	font-weight:normal;
+}
+
+.pena .gate[data-pen="0"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_0.png");
+	background-repeat: no-repeat;	
+}
+	
+.pena .gate[data-pen="2"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_2.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="50"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_50.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="-1"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_0_transparent.png");
+/*	opacity: 0.3; /* 0 = totalement transparent, 1 = totalement opaque */
+	background-repeat: no-repeat;	
+	font-weight:normal;
+}
+
+
+/******************* penalites : repli temporaire ********************
+ * Le nouveau rendu en vignettes (".pena .gate[data-pen=...][data-red=...]"
+ * plus haut) ne s'applique jamais en l'etat :
+ *   - tv_inrace.js ne pose que data-pen et data-col, jamais data-red
+ *     (CreateBlockPena ligne 53, ShowPenalty ligne 584) ;
+ *   - --block_pena_width / --block_pena_height ne sont definies nulle part,
+ *     donc les cellules n'ont ni largeur ni hauteur ;
+ *   - pena_v_0_transparent.png / pena_r_0_transparent.png n'existent pas
+ *     dans img/pena/ (seuls les *_flt.png y sont) ;
+ *   - "#block_running .pena" est commente, la bande du bateau en course n'a
+ *     donc plus aucune position et se poserait en haut a gauche de l'ecran.
+ * En attendant la version finie cote FFCK, on remet exactement le rendu de la
+ * version precedente du fichier, pour ne pas perdre l'affichage des penalites.
+ * Bloc a supprimer d'un seul tenant le jour ou les vignettes fonctionnent.
+ */
 #block_running .pena
 {
 	position: absolute;
@@ -407,87 +532,21 @@ body
 	position: absolute;
 	left:425px;
 	top:152px;
-	/**animation: apparitionD 0.8s ease-out;**/
 }
 
 td.gate {
-	//border: 1px solid rgb(25,75,124);
 	border: 1px solid rgb(0,0,0);
-	padding:0px; 
+	padding:0px;
 	height:25px;
-	font-weight: bold;	
+	font-weight: bold;
 	text-align: center;
 	vertical-align: middle;
 }
 
-#block_finish td.gate {	
-	width:17px;
-}
+#block_finish td.gate { width:17px; }
+#block_running td.gate { width:6px; }
 
-#block_running td.gate {
-	width:6px;
-}
-
-td.gate[data-pen="0"] {
-	background-color: green;
-}
-
-td.gate[data-pen="2"] {
-	background-color: yellow;
-	color:black;
-}
-
-td.gate[data-pen="50"] {
-	background-color: red;
-	color:white;
-}
-
-td.gate[data-pen="-1"] {
-	background-color: white;
-}
-
-/******************* block_leader ********************/
-#block_leader
-{
-	position:absolute;
-
-	background-image: url("../img/block_leader.png");
-	background-repeat: no-repeat;	
-
-	left:1420px;
-	top:974px;
-	width:500px;
-	height:49px;
-	animation: apparitionD 0.8s ease-out;										
-}
-
-#block_leader .name
-{
-	position: absolute;
-
-	font-family: Calibri;
-	font-size:24pt;
-	color:white;
-
-	left:45px;
-	width:260px;
-	top:11px;
-
-	text-align:center;
-}
-
-#block_leader .time
-{
-	position: absolute;
-
-	font-family: Calibri;
-	font-weight:bold;
-	font-size:24pt;
-	color:rgb(0,27,90);
-
-	left:340px;
-	width:150px;
-	top:4px;
-
-	text-align:center;
-}
+td.gate[data-pen="0"]  { background-color: green; }
+td.gate[data-pen="2"]  { background-color: yellow; color:black; }
+td.gate[data-pen="50"] { background-color: red; color:white; }
+td.gate[data-pen="-1"] { background-color: white; }

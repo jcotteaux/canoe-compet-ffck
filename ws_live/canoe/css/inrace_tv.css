@@ -35,7 +35,7 @@
 /*********************************/
 body
 {
-	background-color:white;
+	background-color:#D500FF;
 	padding:0px;
 	margin:0px;
 	animation: apparitionG 0.7s ease-out;
@@ -64,7 +64,7 @@ body
 	justify-content: center;
 	align-items: center;
 
-	font-size:32px;
+	font-size:55px;
 	color:white;
 	font-weight:bold;
 	text-align:center;
@@ -86,7 +86,7 @@ body
 	justify-content: center;
 	align-items: center;
 
-	font-size:32px;
+	font-size:33px;
 	color:white;
 	font-weight:bold;
 	text-align:center;

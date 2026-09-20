@@ -11,10 +11,17 @@
 </head>
 <body> 
 	<div id ="head">
-		<div class='name'>name</div>
-		<div class='place'>place</div>
-		<div class='title'>title</div>
-		<div class='categ'>categ</div>
+		<div class="logo1"></div> <!-- image gérée en CSS -->
+		<div class="logo2"></div> <!-- image gérée en CSS -->
+		<div class="picto"></div> <!-- image gérée en CSS -->
+		<div class="logoFFCK"></div> <!-- image gérée en CSS -->
+		
+		<div class='name'>Name</div>
+		<div class='place'>Place</div>
+		<div class='title'>Title</div>
+		<div class='categ'>Categ</div>
+	    <div class="label_pena">Péna</div>
+		<div class="label_time">Time</div>
 	</div>
 	
 	<div id="block_ranking">
@@ -23,10 +30,7 @@
 			<div class="label_bib">Bib</div>
 			<div class="label_identity">Name</div>
 			<div class="label_nation">Nation</div>
-			<div class="label_pena"></div>
-			<div class="label_time">Time</div>
 		</div>
-
 		<div class="row1" ><div class="rank"></div><div class="bib"></div><div class="identity"></div><div class="img_nation"></div><div class="nation"></div><div class="pena"></div><div class="time"></div></div>
 		<div class="row2" ><div class="rank"></div><div class="bib"></div><div class="identity"></div><div class="img_nation"></div><div class="nation"></div><div class="pena"></div><div class="time"></div></div>
 		<div class="row3" ><div class="rank"></div><div class="bib"></div><div class="identity"></div><div class="img_nation"></div><div class="nation"></div><div class="pena"></div><div class="time"></div></div>
@@ -43,9 +47,11 @@
 	<script src="../adv/ws_params.js"></script>
 	<script src="../adv/ws.js?v2"></script>
 	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
 	<script src="../adv/canoe.js"></script>
 
 	<script src="./js/tv_order.js?v1"></script>
+	<script src="./js/categories.js"></script>  <!--ajout pour gérer nom long -->
 	<script src="./js/tv_ranking.js?v4"></script>
 	
 	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
