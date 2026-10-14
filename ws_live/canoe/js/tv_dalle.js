@@ -15,7 +15,9 @@
  * Deux lignes de 512 x 64, un bateau chacune, sur toute la largeur, dans
  * l'ordre des départs :
  *   - les bateaux sur l'eau, le premier parti en haut : dossard, nom de
- *     famille, pénalités, chrono au dixième (les centièmes clignoteraient) ;
+ *     famille, pénalités, chrono au dixième (les centièmes clignoteraient),
+ *     et dessous la bande de toutes les portes (18 à 25) : vert jugée sans
+ *     touche, jaune 2, rouge 50, gris pas encore jugée ;
  *   - à chaque intermédiaire, pendant `delay_inter` ms (2 s) : le temps de
  *     passage et l'écart au meilleur de l'épreuve, vert ou rouge ;
  *   - un arrivant garde sa ligne `delay_finish` ms (4 s) avec son temps et sa
@@ -29,12 +31,21 @@
  *   avant_depart=5000  passé ce maintien, il ne monte que si un bateau sur l'eau
  *                      a besoin de sa ligne, ou si le prochain départ est dans
  *                      moins de tant de ms ; sinon son résultat reste affiché
- *   delay_inter=2000   affichage d'un intermédiaire en ms
+ *   delay_inter        affichage d'un intermédiaire en ms (2 s en vue « deux »,
+ *                      4 s en vue « dernier », à la place du chrono)
  *   length_identity=16 longueur max du nom
- *   zone=512x128+0+0   la zone des dalles dans la sortie du PC : largeur x
- *                      hauteur + x + y, en pixels (défaut : 4 dalles EVS3 en
- *                      haut à gauche) ; zone=auto : plein écran au format
- *                      `ratio`, pour un aperçu
+ *   zone=512x128+0+0   la zone d'une rangée de dalles dans la sortie du PC :
+ *                      largeur x hauteur + x + y, en pixels (défaut : 4 dalles
+ *                      EVS3 en haut à gauche) ; zone=auto : plein écran au
+ *                      format `ratio`, pour un aperçu
+ *   vue=deux           deux bateaux, une ligne chacun (défaut : un seul bateau
+ *                      sur toute la rangée, celui qui va arriver, avec ses
+ *                      intermédiaires, puis son résultat 15 s)
+ *   resultat=15000     vue « dernier » : le résultat d'un arrivant (place,
+ *                      pénalités, écart au premier) reste tant de ms, même si
+ *                      un autre est parti entre-temps
+ *   copies=2           rangées de dalles qui montrent la même chose, empilées
+ *                      sous la zone (défaut 2 : 512 x 256 en tout)
  *   ratio=4            zone=auto : largeur / hauteur de l'ensemble (défaut 4)
  */
 
@@ -70,6 +81,7 @@ function OnCommandEpreuveLoad(objJSON)
 			f.time = tps;
 		const rank = parseInt(tRanking.GetCellRank('Cltc' + cp, row, 0));
 		f.rank = rank > 0 ? rank : 0;
+		f.ecart = EcartPremier(row, f.time);
 	});
 
 	Render();
@@ -117,13 +129,18 @@ function OnBroadcastBibTime(objJSON)
 		if (diff === null || isNaN(diff))
 			diff = EcartInter(b, k, time);
 		wsMain.inters.set(b, { k : k, time : time, diff : diff, at : Date.now() });
-		window.setTimeout(Render, wsMain.delayInter + 50);
+
+		// Vue « dernier » : tous les intermédiaires du bateau restent affichés.
+		const tous = wsMain.intersTous.get(b) || {};
+		tous[k] = { time : time, diff : diff };
+		wsMain.intersTous.set(b, tous);
+		window.setTimeout(Render, Math.max(wsMain.delayInter, wsMain.delayInterSeul) + 50);
 		Render();
 		return;
 	}
 
 	const bib = String(objJSON.bib);
-	wsMain.finished.set(bib, { at : Date.now(), time : adv.toNumber(objJSON.time_chrono), rank : 0 });
+	wsMain.finished.set(bib, { at : Date.now(), time : adv.toNumber(objJSON.time_chrono), rank : 0, ecart : null });
 	wsMain.onCourse = wsMain.onCourse.filter(function(r) { return r.bib !== bib; });
 	window.setTimeout(Render, wsMain.delayFinish + 50);
 	Render();
@@ -163,11 +180,18 @@ function Bateau(bib)
 		pena = Math.max(total, canoe.GetCurrentSlalomTotalPena(tRanking, row));
 	}
 
+	// Une valeur par porte, dans l'ordre du parcours : '0', '2', '50' ou ''
+	// tant qu'elle n'est pas jugée.
+	const portes = [];
+	for (let p = 1; p <= canoe.GetNbPorte(); p++)
+		portes.push(String(tRanking.GetCell('Pena_' + p, row)));
+
 	return {
 		row : row,
 		name : tRanking.GetCell('Bateau', row),
 		epreuve : tRanking.GetCell('Code_categorie', row),
 		pena : pena,
+		portes : portes,
 	};
 }
 
@@ -227,6 +251,31 @@ function EcartInter(bib, k, time)
 			best = t;
 	}
 	return best > 0 ? time - best : null;
+}
+
+/**
+ * Écart au meilleur des AUTRES classés de l'épreuve pour un temps d'arrivée :
+ * positif derrière le leader, négatif pour un nouveau leader (son avance sur
+ * l'ancien), 0 pour le premier classé, null si le temps n'est pas valide.
+ */
+function EcartPremier(row, time)
+{
+	const tRanking = canoe.GetTableRanking();
+	const cp = canoe.GetCodeCoursePhase();
+	if (!(time >= adv.chrono.OK))
+		return null;
+
+	const epreuve = tRanking.GetCell('Code_categorie', row);
+	let best = 0;
+	for (let r = 0; r < tRanking.GetNbRows(); r++)
+	{
+		if (r === row || tRanking.GetCell('Code_categorie', r) != epreuve)
+			continue;
+		const t = tRanking.GetCellInt('Tps' + cp, r, 0);
+		if (t >= adv.chrono.OK && (best === 0 || t < best))
+			best = t;
+	}
+	return best > 0 ? time - best : 0;
 }
 
 function HeureCompet()
@@ -381,28 +430,233 @@ function Liste()
  */
 function Render()
 {
-	const dalle = document.getElementById('dalle');
-	const liste = Liste();
+	// Une seule liste, peinte dans chaque copie : elles restent synchrones.
+	const liste = wsMain.vue === 'deux' ? Liste() : ListeSeul();
+	wsMain.copies.forEach(function(copie) { Peindre(copie, liste); });
+}
+
+/******************** vue « dernier » : un seul bateau ********************/
+
+/**
+ * Un seul bateau sur toute la rangée, dans cet ordre de priorité :
+ *   1. une arrivée de moins de `resultat` ms (15 s) : place, pénalités,
+ *      écart au premier ;
+ *   2. celui qui va arriver : sur l'eau, parti le plus tôt (chrono,
+ *      intermédiaires, portes) ;
+ *   3. rivière vide : le dernier résultat, jusqu'au départ suivant ;
+ *   4. personne encore parti : le prochain partant et son compte à rebours.
+ * Au changement de bateau, l'ancien monte et le nouveau entre par le bas.
+ */
+function ListeSeul()
+{
+	const now = Date.now();
+	const fmt = canoe.GetFmtChrono ? canoe.GetFmtChrono() : 'XSCC';
+	let meilleur = null;
+
+	// Une arrivée de moins de `resultat` ms (15 s) passe avant tout : place,
+	// pénalités et écart au premier, lisibles de loin.
+	wsMain.finished.forEach(function(f, bib) {
+		if (!Garder(bib) || now - f.at >= wsMain.maintienResultat)
+			return;
+		if (!meilleur || f.at > meilleur.f.at)
+			meilleur = { bib : bib, ordre : OrdreDepart(bib), f : f, prioritaire : true };
+	});
+
+	// Sinon, celui qui va arriver : sur l'eau, parti le plus tôt.
+	if (!meilleur) wsMain.onCourse.forEach(function(r) {
+		if (!Garder(r.bib) || wsMain.finished.has(r.bib))
+			return;
+		const o = OrdreDepart(r.bib);
+		if (!meilleur || o < meilleur.ordre)
+			meilleur = { bib : r.bib, ordre : o, r : r };
+	});
+	// Rivière vide : le dernier résultat reste affiché jusqu'au départ suivant.
+	if (!meilleur) wsMain.finished.forEach(function(f, bib) {
+		if (!Garder(bib))
+			return;
+		const o = OrdreDepart(bib);
+		if (!meilleur || o > meilleur.ordre)
+			meilleur = { bib : bib, ordre : o, f : f };
+	});
+
+	// Les arrivants plus anciens que celui affiché, et hors de leurs 15 s, ne
+	// servent plus.
+	wsMain.finished.forEach(function(f, bib) {
+		if ((!meilleur || bib !== meilleur.bib) && now - f.at >= wsMain.maintienResultat)
+			wsMain.finished.delete(bib);
+	});
+
+	if (meilleur)
+	{
+		const b = Bateau(meilleur.bib);
+		if (b)
+		{
+			const v = { bib : meilleur.bib, nom : b.name, pena : b.pena, portes : b.portes, inters : IntersDe(meilleur.bib, b) };
+			if (meilleur.f)
+			{
+				v.type = 'arrive';
+				v.chrono = adv.GetChrono(meilleur.f.time, fmt);
+				v.rank = meilleur.f.rank;
+				v.ecart = meilleur.f.ecart;
+			}
+			else
+			{
+				v.type = 'course';
+				v.chrono = ChronoDixieme(meilleur.r.time);
+
+				// Intermédiaire tout juste passé : à la place du chrono, quelques
+				// secondes, son temps de passage teinté et l'écart en pastille.
+				const it = wsMain.inters.get(meilleur.bib);
+				if (it && now - it.at < wsMain.delayInterSeul)
+				{
+					v.chrono = adv.GetChrono(it.time, fmt);
+					v.interSens = it.diff < 0 ? 'avance' : it.diff > 0 ? 'retard' : 'neutre';
+					v.interDiff = it.diff !== null && !isNaN(it.diff) && it.diff !== 0
+						? adv.GetChronoDiff(it.diff, 'XSCC') : 'I' + it.k;
+				}
+			}
+			return [v];
+		}
+	}
+
+	const p = Prochain(new Set());
+	if (!p)
+		return [];
+	const b = Bateau(p.bib);
+	const reste = wsMain.clock > 0 ? p.heure - HeureCompet() : 0;
+	let chrono = FormatHeure(p.heure);
+	if (reste > 0 && reste < 600000)
+	{
+		const sec = Math.ceil(reste / 1000);
+		chrono = Math.floor(sec / 60) + ':' + (sec % 60 < 10 ? '0' : '') + (sec % 60);
+	}
+	return [{ type : 'prochain', bib : p.bib, nom : b ? b.name : '', chrono : chrono, pena : 0, portes : [], inters : [] }];
+}
+
+/** Les intermédiaires passés par un bateau : reçus, à défaut lus dans le classement. */
+function IntersDe(bib, b)
+{
+	const tRanking = canoe.GetTableRanking();
+	const cp = canoe.GetCodeCoursePhase();
+	const recus = wsMain.intersTous.get(bib) || {};
+	const out = [];
+
+	for (let k = 1; k <= canoe.GetNbInter(); k++)
+	{
+		let it = recus[k];
+		if (!it)
+		{
+			const col = 'Tps_chrono' + cp + '_inter' + k;
+			const t = tRanking.GetIndexColumn(col) >= 0 ? tRanking.GetCellInt(col, b.row, 0) : 0;
+			if (t >= adv.chrono.OK)
+				it = { time : t, diff : EcartInter(bib, k, t) };
+		}
+		if (it)
+			out.push({ k : k, time : it.time, diff : it.diff });
+	}
+	return out;
+}
+
+/**
+ * Une rangée entière pour un bateau.
+ *   En course :  dossard | nom | pénalités | [écart inter] | chrono
+ *                portes, sur toute la largeur, en grand
+ *   À l'inter :  le chrono laisse place, quelques secondes, au temps de passage
+ *                (teinté vert ou rouge) et à l'écart en grosse pastille
+ *   Arrivé :     dossard | nom                     | pénalités
+ *                dossard | temps | écart (en grand) | place (tout à droite)
+ *                portes, en petits carrés
+ */
+function SyncSeul(el, v)
+{
+	if (!el.firstChild)
+	{
+		el.innerHTML =
+			'<div class="s_bib"></div><div class="s_nom"></div><div class="s_pena"></div>' +
+			'<div class="s_diff"></div><div class="s_chrono"></div>' +
+			'<div class="s_ecart"></div><div class="s_place"></div><div class="s_portes"></div>';
+	}
+
+	const classe = 'ligne seul ' + v.type + (v.interSens ? ' inter-' + v.interSens : '');
+	if (el.className !== classe)
+		el.className = classe;
+
+	Texte(el.querySelector('.s_bib'), v.bib);
+	Texte(el.querySelector('.s_chrono'), v.chrono);
+
+	const elPena = el.querySelector('.s_pena');
+	Texte(elPena, v.type !== 'prochain' && v.pena > 0 ? '+' + v.pena : '');
+	elPena.className = 's_pena' + (v.pena >= 50 ? ' rouge' : ' jaune');
+
+	// Intermédiaire : l'écart au meilleur de l'épreuve, à côté du temps de passage.
+	Texte(el.querySelector('.s_diff'), v.interDiff || '');
+
+	// Arrivée : l'écart au premier en grand, et la place tout à droite.
+	const elEcart = el.querySelector('.s_ecart');
+	let ecart = '';
+	if (v.type === 'arrive' && v.ecart !== null && v.ecart !== undefined)
+		ecart = v.ecart === 0 ? 'Leader' : adv.GetChronoDiff(v.ecart, 'XSCC');
+	Texte(elEcart, ecart);
+	elEcart.className = 's_ecart' + (v.ecart === 0 ? ' leader' : v.ecart < 0 ? ' moins' : v.ecart > 0 ? ' plus' : '');
+
+	const elPlace = el.querySelector('.s_place');
+	Texte(elPlace, v.type === 'arrive' && v.rank > 0 ? v.rank + (v.rank === 1 ? 'er' : 'e') : '');
+	elPlace.className = 's_place' + (v.rank > 0 && v.rank <= 3 ? ' p' + v.rank : '');
+
+	// Les portes : en grand en course, en petits carrés sous le résultat.
+	const bande = el.querySelector('.s_portes');
+	SyncPortes(bande, v.type !== 'prochain' ? (v.portes || []) : []);
+	if (bande.firstChild)
+	{
+		// Le chiffre prend toute la place de la case : on lui donne sa taille.
+		const c = bande.firstChild;
+		bande.style.setProperty('--pw', c.offsetWidth + 'px');
+		bande.style.setProperty('--ph', c.offsetHeight + 'px');
+	}
+
+	// Le nom rétrécit si la ligne est chargée ; un nom composé garde sa
+	// première partie.
+	const elNom = el.querySelector('.s_nom');
+	const charge = v.type + '|' + v.chrono.length + '|' + v.pena + '|' + (v.interDiff || '') + '|' + (v.rank || 0) + '|' + v.nom;
+	if (el.dataset.charge !== charge)
+	{
+		el.dataset.charge = charge;
+		elNom.textContent = NomCourt(v.nom);
+		Ajuster(elNom);
+		if (elNom.scrollWidth > elNom.clientWidth && /[-\s]/.test(elNom.textContent))
+		{
+			elNom.textContent = elNom.textContent.split(/[-\s]/)[0];
+			Ajuster(elNom);
+		}
+	}
+}
+
+/** Peint la liste dans une copie des dalles (son conteneur et ses lignes). */
+function Peindre(copie, liste)
+{
+	const dalle = copie.el;
 	const garder = new Set(liste.map(function(v) { return v.bib; }));
 
-	wsMain.lignes.forEach(function(el, bib) {
+	// Sorties : vers le haut, puis retrait du DOM.
+	copie.lignes.forEach(function(el, bib) {
 		if (garder.has(bib))
 			return;
-		wsMain.lignes.delete(bib);
+		copie.lignes.delete(bib);
 		el.style.transform = 'translateY(-100%)';
 		el.classList.add('sort');
 		window.setTimeout(function() { el.remove(); }, 900);
 	});
 
 	liste.forEach(function(v, i) {
-		let el = wsMain.lignes.get(v.bib);
+		let el = copie.lignes.get(v.bib);
 		if (!el)
 		{
+			// Nouvelle ligne : elle entre par le bas.
 			el = document.createElement('div');
 			el.className = 'ligne';
 			el.style.transform = 'translateY(' + (2 * 100) + '%)';
 			dalle.appendChild(el);
-			wsMain.lignes.set(v.bib, el);
+			copie.lignes.set(v.bib, el);
 			void el.offsetWidth;
 		}
 
@@ -410,36 +664,42 @@ function Render()
 		if (el.style.transform !== pos)
 			el.style.transform = pos;
 
-		SyncMoitie(el, v);
-		el.classList.toggle('bas', i > 0);
+		if (wsMain.vue === 'deux')
+		{
+			SyncMoitie(el, v);
+			el.classList.toggle('bas', i > 0);
+		}
+		else
+		{
+			SyncSeul(el, v);
+		}
 	});
 }
 
+/**
+ * Vue « deux » : une ligne par bateau. Dossard | nom | pénalités |
+ * intermédiaire | chrono | place, et la bande des portes dessous.
+ */
 function SyncMoitie(el, v)
 {
 	if (!el.firstChild)
 	{
 		el.innerHTML =
-			'<div class="l_bib"></div><div class="l_nom"></div><div class="l_pena"></div>' +
-			'<div class="l_inter"></div><div class="l_chrono"></div><div class="l_place"></div>';
+			'<div class="l_bib"></div>' +
+			'<div class="l_droite">' +
+				'<div class="l_info"><div class="l_nom"></div><div class="l_pena"></div>' +
+				'<div class="l_inter"></div><div class="l_chrono"></div><div class="l_place"></div></div>' +
+				'<div class="l_portes"></div>' +
+			'</div>';
 	}
 
-	const classe = 'ligne ' + (v ? v.type : 'vide')
-		+ (v && v.inter ? ' en-inter' + (v.interSens ? ' inter-' + v.interSens : '') : '')
+	const classe = 'ligne ' + v.type
+		+ (v.inter ? ' en-inter' + (v.interSens ? ' inter-' + v.interSens : '') : '')
 		+ (el.classList.contains('bas') ? ' bas' : '');
 	if (el.className !== classe)
 		el.className = classe;
-	if (!v)
-		return;
 
 	Texte(el.querySelector('.l_bib'), v.bib);
-
-	const elNom = el.querySelector('.l_nom');
-	if (elNom.textContent !== NomCourt(v.nom))
-	{
-		elNom.textContent = NomCourt(v.nom);
-		Ajuster(elNom);
-	}
 
 	// Pénalités dès qu'il y en a : jaune pour des touches, rouge pour un 50.
 	const elPena = el.querySelector('.l_pena');
@@ -452,17 +712,21 @@ function SyncMoitie(el, v)
 
 	Texte(el.querySelector('.l_chrono'), v.chrono);
 
+	// Toutes les portes, en bande sous la ligne (pas pour un bateau pas parti).
+	const b = v.type !== 'prochain' ? Bateau(v.bib) : null;
+	SyncPortes(el.querySelector('.l_portes'), b ? b.portes : []);
+
 	const elPlace = el.querySelector('.l_place');
 	Texte(elPlace, v.type === 'arrive' && v.rank > 0 ? v.rank + (v.rank === 1 ? 'er' : 'e') : '');
 	elPlace.className = 'l_place' + (v.rank > 0 && v.rank <= 3 ? ' p' + v.rank : '');
 
-	// Le nom cède la place si la ligne est trop chargée (pénalités + inter +
-	// place) : il rétrécit, et un nom composé qui ne tient toujours pas garde
-	// sa première partie (« DELAUNAY-MERCIER » -> « DELAUNAY »).
-	const longueur = (v.inter || '').length + v.chrono.length + String(v.pena).length + (v.rank || 0);
-	if (elNom.dataset.charge !== String(longueur))
+	// Le nom cède la place si la ligne est trop chargée : il rétrécit, et un
+	// nom composé qui ne tient toujours pas garde sa première partie.
+	const elNom = el.querySelector('.l_nom');
+	const charge = v.type + '|' + (v.inter || '') + '|' + v.chrono.length + '|' + v.pena + '|' + (v.rank || 0) + '|' + v.nom;
+	if (elNom.dataset.charge !== charge)
 	{
-		elNom.dataset.charge = String(longueur);
+		elNom.dataset.charge = charge;
 		elNom.textContent = NomCourt(v.nom);
 		Ajuster(elNom);
 		if (elNom.scrollWidth > elNom.clientWidth && /[-\s]/.test(elNom.textContent))
@@ -471,6 +735,36 @@ function SyncMoitie(el, v)
 			Ajuster(elNom);
 		}
 	}
+}
+
+/**
+ * La bande des portes : une case par porte, vert si elle est jugée sans
+ * touche, jaune « 2 », rouge « 50 », gris tant qu'elle n'est pas jugée.
+ * Les cases ne sont recréées que si le nombre de portes change.
+ */
+function SyncPortes(bande, portes)
+{
+	if (bande.children.length !== portes.length)
+	{
+		bande.innerHTML = '';
+		portes.forEach(function() {
+			const c = document.createElement('div');
+			c.className = 'porte';
+			bande.appendChild(c);
+		});
+	}
+
+	portes.forEach(function(val, i) {
+		const c = bande.children[i];
+		const classe = 'porte' + (val === '0' ? ' ok' : val === '2' ? ' p2' : val === '50' ? ' p50' : '');
+		if (c.className !== classe)
+			c.className = classe;
+		// Le chiffre dans un span : la feuille de style peut le comprimer en
+		// largeur pour qu'il soit le plus haut possible dans une case étroite.
+		const txt = val === '2' || val === '50' ? val : '';
+		if (c.textContent !== txt)
+			c.innerHTML = txt ? '<span>' + txt + '</span>' : '';
+	});
 }
 
 /** Un texte trop long rétrécit jusqu'à tenir dans sa place (jamais sous 45 %). */
@@ -501,26 +795,34 @@ function Texte(el, txt)
  */
 function Redimensionner()
 {
-	const el = document.getElementById('dalle');
-	let w, h;
+	const n = wsMain.copies.length;
+	let w, h, x, y;
 
 	if (wsMain.zone)
 	{
-		// Zone fixe, au pixel près : c'est elle que prélève le contrôleur NovaStar.
+		// Zone fixe, au pixel près : c'est elle que prélève le contrôleur
+		// NovaStar. Les copies s'empilent dessous (2 rangées de dalles).
 		w = wsMain.zone.w;
 		h = wsMain.zone.h;
-		el.style.left = wsMain.zone.x + 'px';
-		el.style.top = wsMain.zone.y + 'px';
-		el.style.transform = 'none';
+		x = wsMain.zone.x;
+		y = wsMain.zone.y;
 	}
 	else
 	{
-		h = Math.min(window.innerHeight, window.innerWidth / wsMain.ratio);
+		// Aperçu : les copies empilées, le tout le plus grand possible.
+		h = Math.min(window.innerHeight / n, window.innerWidth / wsMain.ratio);
 		w = h * wsMain.ratio;
+		x = (window.innerWidth - w) / 2;
+		y = (window.innerHeight - h * n) / 2;
 	}
 
-	el.style.width = w + 'px';
-	el.style.height = h + 'px';
+	wsMain.copies.forEach(function(copie, k) {
+		const el = copie.el;
+		el.style.left = x + 'px';
+		el.style.top = (y + k * h) + 'px';
+		el.style.width = w + 'px';
+		el.style.height = h + 'px';
+	});
 	document.documentElement.style.setProperty('--u', (h / 100) + 'px');
 	document.querySelectorAll('.l_nom').forEach(Ajuster);
 }
@@ -535,9 +837,13 @@ function Init()
 
 	wsMain.epreuve = urlParams.has('epreuve') ? urlParams.get('epreuve') : '';
 	wsMain.delayFinish = num('delay_finish', 4000);
+	wsMain.maintienResultat = num('resultat', 15000);
 	wsMain.avantDepart = num('avant_depart', 5000);
 	wsMain.delayInter = num('delay_inter', 2000);
+	wsMain.delayInterSeul = num('delay_inter', 4000);
 	wsMain.inters = new Map();
+	wsMain.intersTous = new Map();		// dossard -> { k : { time, diff } }
+	wsMain.vue = urlParams.get('vue') === 'deux' ? 'deux' : 'dernier';
 	wsMain.lengthIdentity = num('length_identity', 16);
 	wsMain.ratio = Math.max(1, num('ratio', 4));
 
@@ -547,7 +853,17 @@ function Init()
 	wsMain.zone = m ? { w : +m[1], h : +m[2], x : +(m[3] || 0), y : +(m[4] || 0) } : null;
 	wsMain.onCourse = [];
 	wsMain.finished = new Map();
-	wsMain.lignes = new Map();		// dossard -> ligne de la pile
+	// Copies des dalles, empilées : 2 par défaut (deux rangées de 4 dalles qui
+	// montrent la même chose). Chacune a ses lignes, peintes de la même liste.
+	const nbCopies = Math.max(1, Math.min(4, num('copies', 2)));
+	wsMain.copies = [];
+	for (let k = 0; k < nbCopies; k++)
+	{
+		const el = document.createElement('div');
+		el.className = 'dalle' + (wsMain.vue === 'deux' ? '' : ' seul');
+		document.body.appendChild(el);
+		wsMain.copies.push({ el : el, lignes : new Map() });
+	}
 	wsMain.clock = 0;
 	wsMain.clockRecu = 0;
 	wsMain.reloadTimer = null;
@@ -560,7 +876,7 @@ function Init()
 	wsMain.mapCommand.set('<on_course>', OnFlowOnCourse);
 	wsMain.mapCommand.set('<bib_time>', OnBroadcastBibTime);
 	wsMain.mapCommand.set('<penalty_add>', OnBroadcastPenaltyAdd);
-	wsMain.mapCommand.set('<run_erase>', function() { wsMain.onCourse = []; wsMain.finished.clear(); ReloadEpreuve(); });
+	wsMain.mapCommand.set('<run_erase>', function() { wsMain.onCourse = []; wsMain.finished.clear(); wsMain.intersTous.clear(); ReloadEpreuve(); });
 	wsMain.mapCommand.set('<mode_chrono>', function() { ReloadEpreuve(); });
 
 	// Le compte à rebours du prochain partant avance même sans trame.

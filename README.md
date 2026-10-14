@@ -114,13 +114,23 @@ Codes d'épreuve : `INV`, `K1H`, `K1D`, `C1H`, `C1D` en slalom ; `XK1INV`,
 pixels chacune, carte NovaStar) : fond noir, aplats, gros caractères. Le
 contrôleur NovaStar prélève une zone fixe de la sortie HDMI du PC sans rien
 mettre à l'échelle : la page se dessine donc à **512 × 128 pixels en haut à
-gauche** de l'écran, chaque moitié sur 2 dalles. Autre position ou autre
-nombre de dalles : `&zone=LARGEURxHAUTEUR+X+Y` (3 dalles : `&zone=384x128+0+0`) ;
-`&zone=auto` pour l'aperçu en plein écran.
-Une moitié par bateau sur l'eau : dossard, nom de famille, chrono au dixième,
-pénalités (jaune : touches, rouge : 50). Un arrivant garde sa moitié 8 s avec
-son temps et sa place ; une moitié libre montre le dernier arrivé, sinon le
-prochain partant et son compte à rebours.
+gauche** de l'écran, une ligne par bateau, avec dessous la bande de toutes
+ses portes (vert jugée sans touche, jaune 2, rouge 50, gris pas jugée). Deux
+rangées de dalles montrent la même chose : la page se dessine deux fois,
+l'une sous l'autre (**512 × 256** en tout, `&copies=1` pour une seule
+rangée). Autre position ou autre nombre de dalles :
+`&zone=LARGEURxHAUTEUR+X+Y` (3 dalles : `&zone=384x128+0+0`) ; `&zone=auto`
+pour l'aperçu en plein écran.
+Un seul bateau sur toute la rangée de dalles, copié sur la rangée du dessous :
+celui qui va arriver (sur l'eau, parti le plus tôt). En haut : dossard, nom,
+pénalités (jaune : touches, rouge : 50), chrono au dixième ; à chaque
+intermédiaire, 4 s, le temps de passage teinté vert ou rouge et l'écart en
+grosse pastille à la place du chrono. En bas : toutes ses portes en grand
+(vert jugée sans touche, jaune 2, rouge 50, gris pas jugée). À l'arrivée,
+15 s (`&resultat=`), même si un autre est parti : le temps final, l'écart au
+premier en grand (« Leader » en vert) et la place tout à droite. Rivière
+vide : le dernier résultat ; personne parti : le prochain partant et son
+compte à rebours. `&vue=deux` garde l'ancienne vue à deux bateaux.
 
 ```bash
 open "http://localhost:3000/canoe/tv_results.html?ws=$SERVEUR:8080"

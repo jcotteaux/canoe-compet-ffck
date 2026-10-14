@@ -91,6 +91,7 @@ ws.ChronoLocal.prototype.Observe = function(objJSON)
 {
 	const now = ws.ChronoLocal.now();
 	const tab = ws.ChronoLocal.table(objJSON);
+	const clockServeur = Number(objJSON.clock);
 
 	if (typeof objJSON.clock === 'number' || (typeof objJSON.clock === 'string' && objJSON.clock !== ''))
 	{
@@ -114,7 +115,23 @@ ws.ChronoLocal.prototype.Observe = function(objJSON)
 				continue;	// statut (DNF, DSQ...) ou valeur vide : passe tel quel
 			seen.add(bib);
 
-			const est = now - time;
+			let est = now - time;
+
+			/*
+			 * Départ déduit de l'heure du serveur : clock.ref est le décalage
+			 * le mieux estimé sur toutes les trames passées. Une première trame
+			 * retardée (réseau figé au moment du départ) donne donc tout de
+			 * même le bon départ, au lieu d'un départ trop tardif suivi d'un
+			 * rattrapage brutal à la trame suivante. Écarté au-delà de 5 s :
+			 * l'heure et le chrono ne seraient plus sur la même base.
+			 */
+			if (this.clock !== null && clockServeur > 0)
+			{
+				const parHorloge = this.clock.ref + clockServeur - time;
+				if (parHorloge < est && est - parHorloge < 5000)
+					est = parHorloge;
+			}
+
 			let b = this.bibs.get(bib);
 			if (!b || time < 1000 && est - b.ref > 1000)
 			{
