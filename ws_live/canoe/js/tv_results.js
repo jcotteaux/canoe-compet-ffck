@@ -222,14 +222,19 @@ function OnBroadcastBibTime(objJSON)
 	const bib = String(objJSON.bib);
 
 	// Il devient tout de suite le dernier arrivé, avec le chrono de la trame,
-	// en attendant le classement à jour (pénalités, place).
-	wsMain.arriveRecent = { bib : bib, time : adv.toNumber(objJSON.time_chrono) };
-
-	// Les tuiles ne bougent pas tout de suite : l'arrivant passe en « Arrivée »
-	// sur place, puis tout glisse une seconde après.
-	wsMain.gelTuiles = Date.now() + wsMain.delaiGlisse;
-	window.setTimeout(RenderCourse, wsMain.delaiGlisse + 30);
+	// en attendant le classement à jour (pénalités, place). Une « arrivée »
+	// sans temps valide (abandon, disqualification) sort des tuiles d'emblée.
+	const tempsArrivee = adv.toNumber(objJSON.time_chrono);
 	wsMain.inters.delete(bib);
+	if (tempsArrivee !== null && tempsArrivee >= adv.chrono.OK)
+	{
+		wsMain.arriveRecent = { bib : bib, time : tempsArrivee };
+
+		// Les tuiles ne bougent pas tout de suite : l'arrivant passe en
+		// « Arrivée » sur place, puis tout glisse une seconde après.
+		wsMain.gelTuiles = Date.now() + wsMain.delaiGlisse;
+		window.setTimeout(RenderCourse, wsMain.delaiGlisse + 30);
+	}
 
 	const avant = wsMain.onCourse.length;
 	wsMain.onCourse = wsMain.onCourse.filter(function(r) { return r.bib !== bib; });
@@ -464,6 +469,7 @@ function GetClassement()
 			continue;			// pas encore de résultat : rien à montrer
 
 		const tps = tRanking.GetCellInt('Tps' + course_phase, row, adv.chrono.KO);
+
 		const r = {
 			bib : String(tRanking.GetCell('Dossard', row)),
 			name : tRanking.GetCell('Bateau', row),
@@ -916,6 +922,11 @@ function DernierArrive()
 		if (String(tRanking.GetCell('Tps' + cp, row)) === '')
 			continue;
 
+		// Abandon, non-partant, disqualifié : ce n'est pas une arrivée, il ne
+		// prend pas la tuile du dernier arrivé (il reste dans le classement).
+		if (HorsTuiles(tRanking.GetCellInt('Tps' + cp, row, 0)))
+			continue;
+
 		const fin = tRanking.GetCellInt('Heure_depart' + cp, row, 0) + Math.max(0, tRanking.GetCellInt('Tps_chrono' + cp, row, 0));
 		if (fin > finMax)
 		{
@@ -949,6 +960,25 @@ function DernierArrive()
 	}
 
 	return meilleur;
+}
+
+function StatutHorsTuiles(bib)
+{
+	const tRanking = canoe.GetTableRanking();
+	if (typeof tRanking !== 'object' || tRanking === null)
+		return false;
+	const row = canoe.GetRankingBibIndex(tRanking, parseInt(bib));
+	return row >= 0 && HorsTuiles(tRanking.GetCellInt('Tps' + canoe.GetCodeCoursePhase(), row, 0));
+}
+
+/**
+ * DNF, DNS, DSQ, DES — tout résultat sans temps valide : visible au
+ * classement, jamais dans les tuiles du bas.
+ */
+function HorsTuiles(tps)
+{
+	return tps === adv.chrono.DNF || tps === adv.chrono.DNS || tps === adv.chrono.DSQ
+		|| tps === adv.chrono.DES || tps === adv.chrono.KO;
 }
 
 /**
@@ -1073,7 +1103,11 @@ function RenderCourse()
 	if (wsMain.showCourse)
 	{
 		const arrive = DernierArrive();
-		const enCourse = wsMain.onCourse.slice().sort(function(a, b) { return b.time - a.time; });
+		// Un bateau déclaré DNF, DSQ ou DNS quitte les tuiles tout de suite,
+		// même si le flux le donne encore sur l'eau.
+		const enCourse = wsMain.onCourse
+			.filter(function(r) { return !StatutHorsTuiles(r.bib); })
+			.sort(function(a, b) { return b.time - a.time; });
 
 		if (arrive && !enCourse.some(function(r) { return r.bib === arrive.bib; }))
 			tuiles.push({ type : 'arrive', r : arrive });
