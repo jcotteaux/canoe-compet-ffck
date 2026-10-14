@@ -1,0 +1,419 @@
+/* ==========================================================================
+   KCROSS INCRUSTATION - CONFIGURATION GRAPHIQUE 
+   ========================================================================== */
+
+/* ==========================================================================*/
+/* --- 1. VARIABLES DE THÈME --- 
+/* ==========================================================================
+   Modifiez ces valeurs pour changer l'apparence globale */
+:root {
+    /* Couleurs de la charte */
+    --dark-blue: #1c2b59;       /* Bleu marine (fond principal) */
+    --ffck-blue: #124eb3;       /* Bleu FFCK (titres) */
+    --light-blue: #6fa8dc;      /* Bleu clair (bandeaux info) */
+    --white: #ffffff;
+    
+    /* Paramètres d'animation */
+    --anim-speed: 0.5s;
+    --anim-curve: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --live-row-height: 45px; /* Hauteur de la cellule Live utilisé dans le script pour l'animation */
+}
+
+/* ==========================================================================*/
+/* --- 2. CONFIGURATION DU CANEVAS --- */
+/* ==========================================================================*/
+body {
+    margin: 0;
+    padding: 0;
+    width: 1920px;
+    height: 1080px;
+    background-color: transparent; /* Indispensable pour l'incrustation OBS */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    /* background-color: #4ef500e0; */
+}
+
+/* Classes d'état pour les conteneurs */
+.overlay-base {
+    position: absolute;
+    transition: opacity var(--anim-speed) var(--anim-curve), 
+                transform var(--anim-speed) var(--anim-curve);
+}
+
+.hidden {
+    opacity: 0;
+    transform: translateY(30px);
+    pointer-events: none;
+}
+
+.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==========================================================================*/
+/* --- 3. MODE 1 : RAMPE DE DÉPART (Bottom Center) --- */
+/* ==========================================================================*/
+#ramp-container {
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title-bar {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    padding: 10px 40px;
+    font-size: 28px;
+    font-weight: bold;
+    /* Crée l'effet trapèze */
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    align-self: flex-start;
+    margin-left: 150px;
+    margin-bottom: 5px;
+}
+
+.names-bar {
+    display: flex;
+    width: 100%;
+    height: 60px;
+}
+
+.ramp-slot {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--dark-blue);
+    /* Incline les boites de noms */
+    clip-path: polygon(15px 0, 100% 0, calc(100% - 15px) 100%, 0% 100%);
+    margin-right: -10px;
+    border-bottom: 6px solid transparent; /* Reçoit la couleur du dossard en JS */
+    /* POUR LE TRONQUAGE */
+    padding: 0 10px;        /* Ajoute un petit espace sur les bords */
+    min-width: 0;           /* Crucial pour que le texte ne déborde pas du flex */
+}
+
+.ramp-slot span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;            /* Force le texte à prendre toute la largeur dispo */
+    text-align: center;     /* Centre le texte tronqué */
+}
+
+.ramp-slot:nth-child(odd) { background-color: var(--white); }
+.ramp-slot:nth-child(even) { background-color: #e0f0ff; }
+
+/* ==========================================================================*/
+/* --- 4. MODE 2 : EN COURSE  --- */
+/* ==========================================================================*/
+#live-container {
+    bottom: 50px;
+    left: 50px;
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+}
+
+#live-container {
+    bottom: 50px;
+    left: 50px;
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+    /* Transitions de position pour un glissement fluide entre mode centré et à gauche */
+    transition: opacity var(--anim-speed) var(--anim-curve), 
+                transform var(--anim-speed) var(--anim-curve),
+                left var(--anim-speed) var(--anim-curve),
+                bottom var(--anim-speed) var(--anim-curve);
+}
+
+/* Position centrée quand Prochaine Série */
+#live-container.centered-layout {
+    left: calc(50% - 240px); /* 50% de l'écran moins la moitié de la largeur (480/2) */
+    bottom: calc(50% - 120px); /* Hauteur approximative pour centrer verticalement */
+}
+
+.live-title {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    padding: 8px 20px;
+    font-size: 22px;
+    font-weight: bold;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 100%, 0 100%);
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.live-list {
+    position: relative;
+    width: 100%;
+    height: 200px; /* Espace réservé pour l'animation de translation */
+}
+
+.live-row {
+    position: absolute; /* Crucial pour l'animation translateY */
+    left: 0;
+    width: calc(100% - 30px);
+    height:var(--live-row-height);
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 1);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--dark-blue);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+	padding-left: 30px;
+} 
+
+/* Dégradé selon la couleur du dossard */
+.live-row:has(.live-color-indicator[data-color="R"]) {
+    background: linear-gradient(to right, #ffffff 0%, var(--color-prio-red) 80%, #ffffff 100%) !important;
+}
+.live-row:has(.live-color-indicator[data-color="V"]) {
+    background: linear-gradient(to right, #ffffff 0%, var(--color-prio-green) 80%, #ffffff 100%) !important;
+}
+.live-row:has(.live-color-indicator[data-color="B"]) {
+    background: linear-gradient(to right, #ffffff 0%, var(--color-prio-blue) 80%, #ffffff 100%) !important;
+}
+.live-row:has(.live-color-indicator[data-color="J"]) {
+    background: linear-gradient(to right, #ffffff 0%, var(--color-prio-yellow) 80%, #ffffff 100%) !important;
+}
+
+
+.live-rank {
+        width: 40px; text-align: center; font-size: 20px; color: #666;
+}
+
+/* Non utilise dans ce mode */
+.live-color-indicator {
+    display:none;
+	width: 15px;
+    height: 100%;
+    margin-right: 15px;
+}
+
+.live-name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* text-transform: uppercase; */
+}
+
+
+/* ==========================================================================*/
+/* --- 5. MODE 3 : RÉSULTATS  Version 1--- */
+/* ==========================================================================*/
+#results-container {
+    bottom: 80px;
+    right: 80px;
+    width: 680px;
+    display: flex;
+    flex-direction: column;
+}
+
+.results-header {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 5px;
+    height: 60px;
+}
+
+.results-rank { width: 30px; text-align: right; }
+
+.results-label {
+    background-color: #124eb3;
+    color: white;
+    font-size: 34px;
+    font-weight: 100;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%);
+}
+
+.results-info {
+    background-color: #6fa8dc;
+    color: #1c2b59;
+    padding: 0 20px;
+    font-size: 19px;
+    font-weight: bold;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    clip-path: polygon(20px 0, 100% 0, 100% 100%, 0 100%);
+    margin-left: -20px;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+.results-row {
+    display: flex;
+    align-items: center;
+    height: 55px;
+    background-color: #f2f7ff;  /* ← fallback si pas de couleur */
+    clip-path: polygon(5px 0, 100% 0, calc(100% - 15px) 100%, 0 100%);
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--dark-blue);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+
+
+/* Dégradé sur toute la ligne selon la couleur du dossard */
+/*.results-row:has(.results-color-bar[data-color="R"]) {
+    background: linear-gradient(to left, var(--color-prio-red) 0%, #f2f7ff 90%) !important;
+}
+.results-row:has(.results-color-bar[data-color="V"]) {
+    background: linear-gradient(to left, var(--color-prio-green) 0%, #f2f7ff 90%) !important;
+}
+.results-row:has(.results-color-bar[data-color="B"]) {
+    background: linear-gradient(to left, var(--color-prio-blue) 0%, #f2f7ff 90%) !important;
+}
+.results-row:has(.results-color-bar[data-color="J"]) {
+    background: linear-gradient(to left, var(--color-prio-yellow) 0%, #f2f7ff 90%) !important;
+}*/
+
+.results-row:has(.results-color-bar[data-color="R"]) {
+    background: linear-gradient(to right, #f2f7ff 0%, var(--color-prio-red) 80%, #f2f7ff 100%) !important;
+}
+.results-row:has(.results-color-bar[data-color="V"]) {
+    background: linear-gradient(to right, #f2f7ff 0%, var(--color-prio-green) 80%, #f2f7ff 100%) !important;
+}
+.results-row:has(.results-color-bar[data-color="B"]) {
+    background: linear-gradient(to right, #f2f7ff 0%, var(--color-prio-blue) 80%, #f2f7ff 100%) !important;
+}
+.results-row:has(.results-color-bar[data-color="J"]) {
+    background: linear-gradient(to right, #f2f7ff 0%, var(--color-prio-yellow) 80%, #f2f7ff 100%) !important;
+}
+
+.results-row:nth-child(even) { background-color: #e9f0ff; }
+
+.results-color-bar {
+	display:none;
+    width: 12px;
+    height: 80%;
+    margin-left: 15px;
+    border-radius: 2px;
+}
+
+.results-name {
+    flex-grow: 1;
+    padding-left: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* text-transform: uppercase; */
+
+/* ==========================================================================*/
+/* --- 6. COMPOSANTS DES PÉNALITÉS --- */
+/* ==========================================================================*/
+.penalty-summary-box {
+    display: flex;
+    gap: 5px;
+    margin-right: 25px;
+}
+
+.penalty-tag {
+    display: inline-block;
+    width: 32px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 18px;
+    border: 2px solid #333;
+}
+
+.penalty-tag.clear { display: none; }
+/* .penalty-tag.flt { background-color: var(--color-FLT); color: black; } */
+.penalty-tag.flt { background-color: var(--color-FLT); color: black; }
+.penalty-tag.ral { background-color: var(--color-RAL); color: white; }
+
+
+/* ==========================================================================
+   --- 7. MENTIONS SPÉCIALES (PROCHAINE SÉRIE & QUALIFIÉS) --- 
+==========================================================================*/
+/* Bandeau "Prochaine Série" */
+.live-next-heat {
+    background-color: var(--light-blue);
+    color: var(--dark-blue);
+    padding: 3px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    display: inline-block;
+    margin-bottom: -5px; /* Superpose légèrement avec le bandeau titre pour fluidité */
+    text-transform: uppercase;
+    align-self: flex-start; /* Aligne à gauche */
+    z-index: 10;
+}
+
+.live-next-heat.hidden {
+    display: none;
+}
+
+/* Badge de qualification 'Q' */
+.qualif-tag {
+    width: 32px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 20px;
+    color: rgb(0, 0, 0);
+    /* background-color: #28a745;  */
+    /* border: 2px solid #1e7e34; */
+    margin-right: 25px; /* S'aligne parfaitement sur la droite */
+    margin-left: -15px; /* Rapproche légèrement la pénalité si elle est présente */
+}
+.qualif-tag::before {
+    content: "Q";
+}
+
+/* Badge de non qualifié */
+.no-qualif-tag {
+    width: 32px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 20px;
+    /* color: white; */
+    /* background-color: #28a745; */
+    /* border: 2px solid #1e7e34; */
+    margin-right: 25px; /* S'aligne parfaitement sur la droite */
+    margin-left: -15px; /* Rapproche légèrement la pénalité si elle est présente */
+}
+
+.no-qualif-tag::before {
+    content: "";
+}
+/* ==========================================================================
+ --- 8. UTILITAIRES COULEURS DOSSARDS --- 
+ ==========================================================================*/
+[data-color="R"] { background-color: var(--color-prio-red); border-bottom-color: var(--color-prio-red); color: var(--color-prio-red); }
+[data-color="V"] { background-color: var(--color-prio-green); border-bottom-color: var(--color-prio-green); color: var(--color-prio-green); }
+[data-color="B"] { background-color: var(--color-prio-blue); border-bottom-color: var(--color-prio-blue); color: var(--color-prio-blue); }
+[data-color="J"] { background-color: var(--color-prio-yellow); border-bottom-color: var(--color-prio-yellow); color: var(--color-prio-yellow); }

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulateur kayak cross</title>
+<style>
+  :root {
+    --bg: #11151c; --panel: #1a212b; --line: #2b3542; --text: #e6ecf3;
+    --muted: #8fa0b3; --accent: #3da9fc; --ok: #3ddc97; --warn: #ffb454; --ko: #ff6b6b;
+    --R: #e5484d; --V: #30a46c; --B: #3e63dd; --J: #f5d90a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex;
+           align-items: center; gap: 20px; flex-wrap: wrap; background: var(--panel); }
+  h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  .heat-now { font-size: 20px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .sub { color: var(--muted); font-size: 13px; }
+  main { padding: 20px; display: grid; gap: 20px; grid-template-columns: 1fr; max-width: 1400px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  button, select, input { font: inherit; color: var(--text); background: #232c38;
+      border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #06131f; border-color: var(--accent); font-weight: 600; }
+  button.danger { background: #3a2026; border-color: #5c2f38; color: var(--ko); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  td.num, th.num { text-align: right; }
+  .state { font-size: 11px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+  .s1 { background: #2a3240; color: var(--muted); }
+  .s2 { background: #1d2b3d; color: var(--accent); }
+  .s3 { background: #113a2c; color: var(--ok); }
+  .s4 { background: #3a3020; color: var(--warn); }
+  .s5 { background: #24203a; color: #b4a7ff; }
+  .s6 { background: #3a2026; color: var(--ko); }
+  tr.current td { background: #16202c; }
+  a { color: var(--accent); }
+  .links a { margin-right: 14px; display: inline-block; }
+  .mini { padding: 3px 8px; font-size: 12px; }
+  .lane { display: inline-block; width: 18px; height: 18px; border-radius: 4px; vertical-align: middle; }
+  .lane.R { background: var(--R); } .lane.V { background: var(--V); }
+  .lane.B { background: var(--B); } .lane.J { background: var(--J); }
+  .tag { display: inline-block; min-width: 18px; padding: 0 4px; border-radius: 4px; font-size: 11px;
+         font-weight: 700; text-align: center; margin-right: 2px; }
+  .tag.flt { background: #5c2f38; color: #ffb3b3; }
+  .tag.ral { background: var(--ko); color: #1a0b0e; }
+  .tag.st { background: #3a2026; color: var(--ko); }
+  .zones { display: inline-flex; gap: 2px; }
+  .zones i { width: 8px; height: 8px; border-radius: 2px; background: #2b3542; }
+  .zones i.j { background: var(--ok); } .zones i.f { background: var(--warn); }
+  .entrants { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 4px 12px; }
+  .entrant { font-size: 12px; color: var(--muted); }
+  .entrant b { color: var(--text); font-weight: 600; }
+  .grid2 { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .log { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; max-height: 260px; overflow: auto; }
+  .log div { padding: 2px 0; border-bottom: 1px solid #202834; }
+  .log time { color: var(--muted); margin-right: 8px; }
+  .alert { color: var(--ko); font-weight: 600; }
+  .empty { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulateur kayak cross</h1>
+  <span class="heat-now" id="now">—</span>
+  <span class="sub" id="phase"></span>
+  <span class="alert" id="outage"></span>
+  <span style="flex:1"></span>
+  <span class="sub" id="meta"></span>
+</header>
+
+<main>
+  <section>
+    <h2>Course</h2>
+    <div class="row">
+      <button class="primary" id="toggle">Pause</button>
+      <button id="step" title="Exécute tout de suite le prochain événement (départ, juge, arrivée…)">Étape suivante</button>
+      <label class="sub">Vitesse
+        <select id="speed">
+          <option value="1">×1 (temps réel)</option>
+          <option value="2">×2</option>
+          <option value="4">×4</option>
+          <option value="10">×10</option>
+          <option value="30">×30</option>
+        </select>
+      </label>
+      <label class="sub"><input type="checkbox" id="auto"> validation automatique par le gestionnaire</label>
+      <span style="flex:1"></span>
+      <label class="sub">Compétition <select id="fixture"></select></label>
+      <button id="reset">Réinitialiser</button>
+    </div>
+    <p class="sub" style="margin:10px 0 0">
+      En pause, rien ne bouge seul : les vraies pages (départ, arrivée, juges, gestionnaire) pilotent la même base.
+      Sans validation automatique, chaque série attend le bouton « Valider » ci-dessous ou celui de <code>admin.html</code>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Régie vidéo (incrustation OBS)</h2>
+    <div class="row">
+      <label class="sub"><input type="checkbox" id="regie"> régie automatique : rampe à l'appel, live au départ, résultats à la validation</label>
+      <label class="sub">Style <select id="style"></select></label>
+      <a href="/video/video_incrustation.html?competition=900" target="_blank" id="incr">ouvrir l'incrustation</a>
+    </div>
+    <p class="sub" style="margin:10px 0 0">
+      Tant que la régie automatique est cochée, elle seule écrit l'incrustation : ce qu'envoie <code>video_control.html</code> est ignoré.
+      La décocher pour piloter à la main.
+    </p>
+  </section>
+
+  <section>
+    <h2>Pages</h2>
+    <div class="links" id="links"></div>
+  </section>
+
+  <section>
+    <h2>Série en cours</h2>
+    <div id="lanes"></div>
+  </section>
+
+  <section>
+    <h2>Scénarios</h2>
+    <div class="row">
+      <button class="danger" data-outage="15">Coupure réseau 15 s</button>
+      <button class="danger" data-outage="60">Coupure réseau 60 s</button>
+      <button id="blank" title="Base vide : la compétition se configure depuis admin.html">Repartir sans configuration</button>
+    </div>
+    <p class="sub" style="margin:10px 0 0">
+      La coupure ferme les connexions HTTP des API (comme un Wi-Fi perdu) : les postes doivent passer hors-ligne,
+      mettre leurs saisies en file et les rejouer au retour du réseau.
+    </p>
+  </section>
+
+  <section>
+    <h2>Programme</h2>
+    <table>
+      <thead>
+        <tr><th class="num">N°</th><th>Heure</th><th>Série</th><th>État</th><th>Zones</th><th>Bateaux</th><th></th></tr>
+      </thead>
+      <tbody id="heats"></tbody>
+    </table>
+  </section>
+
+  <div class="grid2">
+    <section>
+      <h2>Classements</h2>
+      <div id="rankings"></div>
+    </section>
+    <section>
+      <h2>Journal</h2>
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const LANES = ['R', 'V', 'B', 'J'];
+const ETATS = { 1: 'en attente', 2: 'prête', 3: 'en course', 4: 'à valider', 5: 'officielle', 6: 'en modif.' };
+const PHASES = {
+  idle: 'au repos', waiting: 'attend la validation des séries sources', call: 'appel en pré-départ',
+  race: 'en course', validation: 'arrivée saisie, validation', gap: 'entre deux séries', done: 'compétition terminée',
+};
+let state = null;
+
+async function api(action, body) {
+  const r = await fetch('/mock/api/' + action, {
+    method: body === undefined ? 'GET' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  return r.json();
+}
+
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function penaltyTags(pena, zones) {
+  if (!pena) return '';
+  return [...pena].map((c, i) => {
+    if (c === '0') return '';
+    const z = zones[i] || '';
+    const label = z === 'Start' ? 'S' : z === 'ROLL' ? 'R' : z.replace('Porte ', '');
+    return `<span class="tag ${c === '5' ? 'ral' : 'flt'}" title="${c === '5' ? 'RAL' : 'FLT'} ${esc(z)}">${esc(label)}</span>`;
+  }).join('');
+}
+
+function zonesDots(zj) {
+  if (!zj) return '';
+  return `<span class="zones" title="zones jugées : ${esc(zj)}">${[...zj].map((c) => `<i class="${c === '1' ? 'j' : c === '2' ? 'f' : ''}"></i>`).join('')}</span>`;
+}
+
+function render() {
+  const s = state, d = s.director;
+  $('now').textContent = d.heatLabel || '—';
+  const next = d.next ? ` · ${d.next.label} dans ${(d.next.in / 1000).toFixed(1)} s` : '';
+  $('phase').textContent = (d.running ? '' : 'EN PAUSE · ') + (PHASES[d.phase] || d.phase) + next;
+  $('outage').textContent = s.outage ? `réseau coupé (${s.outage} s)` : '';
+  $('meta').textContent = `compétition ${s.code} · ${s.fixture.format}`;
+  $('toggle').textContent = d.running ? 'Pause' : 'Démarrer';
+  $('toggle').className = d.running ? '' : 'primary';
+  if (document.activeElement !== $('speed')) $('speed').value = String(d.speed);
+  $('auto').checked = d.autoValidate;
+  $('regie').checked = d.regie.auto;
+  if (document.activeElement !== $('style') && $('style').options.length) $('style').value = d.regie.style;
+  $('incr').href = `/video/video_incrustation.html?competition=${s.code}`;
+
+  const c = s.code;
+  $('links').innerHTML = [
+    ['live.html', `live.html?competition=${c}`],
+    ['speaker.html', `speaker.html?competition=${c}`],
+    ['gestionnaire (admin.html)', `admin.html?competition=${c}`],
+    ['régie vidéo', `video/video_control.html?competition=${c}`],
+    ['incrustation OBS', `video/video_incrustation.html?competition=${c}`],
+    ['écran TV du site', `video/ecran_tv.html?competition=${c}`],
+    ['tableau (répétition)', `video/video_tableau.html?competition=${c}&force=1`],
+    ['classement time trial', `classement-time-trial.html?competition=${c}`],
+    ['départ', `depart.html?competition=${c}`],
+    ['arrivée', `arrivee.html?competition=${c}`],
+    ['juge zone 1', `penalite.html?competition=${c}&zone=1&nom_zone=Porte%201`],
+    ['accueil', `index.html`],
+  ].map(([t, href]) => `<a href="/${href}" target="_blank">${t}</a>`).join('');
+
+  // Série en cours : un couloir par bateau, avec les incidents.
+  const cur = s.heats.find((h) => h.id === d.heatId);
+  if (!cur || !cur.slots.length) {
+    $('lanes').innerHTML = `<p class="empty">${d.phase === 'done' ? 'Toutes les séries sont officielles.' : 'Aucune série sur l\'eau.'}</p>`;
+  } else {
+    const racing = d.phase === 'race';
+    $('lanes').innerHTML = `<table><thead><tr><th>Couloir</th><th class="num">Dos.</th><th>Nom</th><th>Club</th><th class="num">Place</th><th>Pénalités</th><th class="num">Clt</th><th>Incident</th></tr></thead><tbody>${
+      cur.slots.map((sl) => {
+        const p = sl.participant, lane = LANES[(sl.prioDepart - 1) % 4];
+        const st = p.specialStatus ? `<span class="tag st">${esc(p.specialStatus)}</span>` : '';
+        const actions = racing && !p.specialStatus && !p.ordre_arrivee
+          ? ['DNF', 'DSQ', 'FLT', 'RAL'].map((k) => `<button class="mini" data-incident="${k}" data-slot="${sl.prioDepart}">${k}</button>`).join(' ')
+          : '';
+        return `<tr><td><span class="lane ${lane}"></span> ${lane}</td><td class="num">${esc(p.bib)}</td><td>${esc(p.name)}</td>
+          <td class="sub">${esc(p.club)}</td><td class="num">${esc(p.ordre_arrivee ?? '')}</td>
+          <td>${st}${penaltyTags(p.penalite, s.zones)}</td><td class="num">${esc(p.finalRank)}</td><td>${actions}</td></tr>`;
+      }).join('')}</tbody></table>`;
+  }
+
+  $('heats').innerHTML = s.heats.map((h) => {
+    const entrants = h.slots.length
+      ? `<div class="entrants">${h.slots.map((sl) => {
+          const p = sl.participant;
+          const res = p.specialStatus || (p.finalRank !== '-' ? p.finalRank + 'e' : p.ordre_arrivee ? '#' + p.ordre_arrivee : '');
+          return `<span class="entrant"><span class="lane ${LANES[(sl.prioDepart - 1) % 4]}" style="width:8px;height:8px"></span> <b>${esc(p.bib)}</b> ${esc(p.name)} ${res ? '· ' + esc(res) : ''} ${penaltyTags(p.penalite, s.zones)}</span>`;
+        }).join('')}</div>`
+      : '<span class="empty">qualifiés à venir</span>';
+    const btn = h.etat === 4 ? `<button class="mini primary" data-validate="${h.id}">Valider</button>` : '';
+    return `<tr class="${h.id === d.heatId ? 'current' : ''}"><td class="num">${esc(h.globalHeatNumber)}</td><td>${esc((h.startTime || '').slice(0, 5))}</td>
+      <td><b>${esc(h.categoryKey)}</b> ${esc(h.roundKey)} ${esc(h.name)}</td>
+      <td><span class="state s${h.etat}">${ETATS[h.etat] || h.etat}</span></td><td>${zonesDots(h.zonesJugees)}</td><td>${entrants}</td><td>${btn}</td></tr>`;
+  }).join('');
+
+  $('rankings').innerHTML = Object.entries(s.rankings).map(([cat, list]) => `
+    <h3 style="margin:8px 0 4px;font-size:14px">${esc(cat)}</h3>
+    <table><tbody>${list.slice(0, 8).map((r) => `<tr><td class="num">${r.rank}</td><td class="num">${esc(r.bib)}</td><td>${esc(r.name)}</td><td class="sub">${esc(r.source)}</td></tr>`).join('')}
+    ${list.length > 8 ? `<tr><td colspan="4" class="sub">… ${list.length - 8} autres</td></tr>` : ''}</tbody></table>`).join('')
+    || '<p class="empty">Aucun classement.</p>';
+
+  $('log').innerHTML = d.log.map((l) => `<div><time>${new Date(l.at).toLocaleTimeString('fr-FR')}</time>${esc(l.msg)}</div>`).join('');
+}
+
+async function refresh() {
+  try {
+    state = await api('state');
+    render();
+  } catch (e) {
+    $('phase').textContent = 'simulateur injoignable';
+  }
+}
+
+async function loadStyles() {
+  const list = await api('styles');
+  $('style').innerHTML = list.map((f) => `<option value="${esc(f.file)}">${esc(f.label)}</option>`).join('');
+  if (state) $('style').value = state.director.regie.style;
+}
+
+async function loadFixtures() {
+  const list = await api('fixtures');
+  $('fixture').innerHTML = list.map((f) => `<option value="${esc(f.id)}">${esc(f.label)}</option>`).join('');
+  if (state) $('fixture').value = state.fixture.id;
+}
+
+$('toggle').onclick = () => api(state.director.running ? 'pause' : 'start', {}).then(refresh);
+$('step').onclick = () => api('step', {}).then(refresh);
+$('speed').onchange = (e) => api('speed', { speed: Number(e.target.value) }).then(refresh);
+$('auto').onchange = (e) => api('auto', { on: e.target.checked }).then(refresh);
+$('reset').onclick = () => api('reset', { id: $('fixture').value }).then(refresh);
+$('fixture').onchange = (e) => api('fixture', { id: e.target.value }).then(refresh);
+$('regie').onchange = (e) => api('regie', { auto: e.target.checked }).then(refresh);
+$('style').onchange = (e) => api('regie', { style: e.target.value }).then(refresh);
+$('blank').onclick = () => api('reset', { id: $('fixture').value, configure: false }).then(refresh);
+document.body.addEventListener('click', (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.incident) api('incident', { slot: Number(t.dataset.slot), kind: t.dataset.incident }).then(refresh);
+  if (t.dataset.validate) api('validate', { heatId: Number(t.dataset.validate) }).then(refresh);
+  if (t.dataset.outage) api('outage', { seconds: Number(t.dataset.outage) }).then(refresh);
+});
+
+refresh().then(loadFixtures).then(loadStyles);
+setInterval(refresh, 500);
+</script>
+</body>
+</html>

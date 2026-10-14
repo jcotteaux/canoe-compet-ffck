@@ -164,6 +164,16 @@ const CASES = [
     setup: [['bib-start', { bib: 1 }]],
     events: [[6000, 'bib-finish', { bib: 1 }]], settle: 10000 },
 
+  // Liaison morte sans fermeture : la page doit s'en apercevoir, rouvrir la
+  // socket et recharger le classement, pénalité manquée comprise.
+  { name: 'tv_inrace / liaison morte', url: '/canoe/tv_inrace.html', fixture: 'slalom-finale',
+    setup: [['bib-start', { bib: 1 }]],
+    events: [[4000, 'mute-clients', {}], [6000, 'penalty', { bib: 1, porte: 5, value: 2 }]],
+    settle: 18000,
+    expect: (r) => (r.wsState === 1 && r.eval && r.eval.pena === '5:2' && r.eval.running ? null
+      : `pas de reprise : ${JSON.stringify(r.eval)} ws=${r.wsState}`),
+    evalExpr: "JSON.stringify({pena: [...document.querySelectorAll('#block_pena .gate')].map(g => g.dataset.gate+':'+g.dataset.pen).join(','), running: document.getElementById('block_running').style.display == 'block'})" },
+
   { name: 'tv_oncourse / plusieurs en course', url: '/canoe/tv_oncourse.html',
     setup: [['bib-start', { bib: 1 }], ['bib-start', { bib: 2 }], ['bib-start', { bib: 3 }]],
     settle: 8000,
@@ -561,6 +571,8 @@ const FIXTURE_PAR_DEFAUT = 'descente-sprint';
 
 async function runCase(c) {
   await api('fixture', { name: c.fixture || FIXTURE_PAR_DEFAUT });
+  // Les cas imposent leurs pénalités et vérifient des totaux exacts.
+  await api('pena-plan', { on: false });
   await api('speed', { speed: 2 });
   await api('start', {});
   for (const [action, body] of c.setup || []) await api(action, body);

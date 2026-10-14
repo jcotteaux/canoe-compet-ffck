@@ -131,10 +131,22 @@ body.ancre-bas #leaders
 	display: none;
 }
 
-/* En-tête : le code de l'épreuve en cours de chronométrage. */
-#leaders_categ
+/*
+ * En-tête : l'épreuve, et à sa droite la mention « provisoire ». Sur une
+ * seule ligne : la mention n'est qu'une précision sur le classement, elle ne
+ * mérite pas de repousser tout le bloc d'un cran.
+ */
+#leaders_head
 {
 	align-self: flex-start;
+
+	display: flex;
+	align-items: stretch;
+}
+
+/* Le code de l'épreuve en cours de chronométrage. */
+#leaders_categ
+{
 
 	background: linear-gradient(90deg, var(--leaders-row-dark) 0%, var(--leaders-row-blue) 100%);
 	color: white;
@@ -143,6 +155,33 @@ body.ancre-bas #leaders
 	font-size: 20pt;
 	font-weight: bold;
 	letter-spacing: 0.05em;
+}
+
+/*
+ * Des bateaux de l'épreuve n'ont pas encore couru : l'ordre peut bouger.
+ * Même jaune et même italique que sur tv_results, sur un pavé sombre pour
+ * rester lisible par-dessus la vidéo.
+ */
+#leaders_provisoire
+{
+	display: none;
+	align-items: center;
+
+	background: var(--leaders-row-dark);
+	color: #ffd24a;
+
+	padding: 0 16px;
+	font-size: 14pt;
+	font-weight: bold;
+	font-style: italic;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+#leaders.provisoire #leaders_provisoire
+{
+	display: flex;
 }
 
 #leaders_list,

@@ -18,9 +18,10 @@ const wsMain = new ws.Context(wsParams.url, wsParams.port);  // canoe/js/live.js
 wsMain.OpenWebSocketCommand(OnOpenWebSocketCommand);         // canoe/js/live.js:1298
 ```
 
-L'adresse vient de `adv/ws_params.js`. Le port par défaut des déploiements
-réels est **20000** (`canoe_pau/js/ws_params.js`) ; l'exemple livré dans
-`canoe_national/` utilise 8080.
+L'adresse vient de `adv/ws_params.js`. Le port par défaut est **8080** : c'est
+celui du serveur de course (192.168.1.52) et de l'exemple livré dans
+`canoe_national/`. `canoe_pau/js/ws_params.js` utilise 20000 : le port se règle
+dans competFFCK, d'où le paramètre `?ws=hote:port`.
 
 > competFFCK expose aussi un serveur **TCP brut** (port 7000 par défaut) qui
 > parle le même JSON, avec un octet `\0` comme fin de trame, destiné aux modules

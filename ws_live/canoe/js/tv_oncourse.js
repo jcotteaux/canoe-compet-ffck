@@ -21,6 +21,8 @@
  *   width=560         largeur du bandeau en pixels
  *   delay_finish=6000 durée d'affichage après l'arrivée en ms (défaut : 10000)
  *   no_pena           masque le cumul de pénalités
+ *   titre=...         texte de l'en-tête (défaut : « En course »)
+ *   no_titre          masque l'en-tête
  *   time_pena=0       slalom : temps tournant sans les pénalités (défaut : avec)
  *                     alias du time_running_pena de tv_inrace
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
@@ -335,6 +337,14 @@ function Init()
 	}
 	root.setProperty('--oncourse-width', num('width', 560) + 'px');
 	root.setProperty('--oncourse-scale', num('scale', 1));
+
+	// En-tête du bloc. textContent : le texte vient de l'URL, on ne
+	// l'interprète pas comme du HTML.
+	const elTitre = document.getElementById('oncourse_titre');
+	if (urlParams.has('no_titre'))
+		elTitre.style.display = 'none';
+	else if (urlParams.has('titre'))
+		elTitre.textContent = urlParams.get('titre');
 
 	if (urlParams.get('bg') === '1')
 		document.body.classList.add('chroma');

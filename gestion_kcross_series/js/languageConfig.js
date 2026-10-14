@@ -1,0 +1,1 @@
+export const AVAILABLE_LANGUAGES={'de':{name:'Deutsch',flag:'./img/flags/de.png'},'en':{name:'English',flag:'./img/flags/en.png'},'es':{name:'Español',flag:'./img/flags/es.png'},'fr':{name:'Français',flag:'./img/flags/fr.png',default:true},'it':{name:'Italiano',flag:'./img/flags/it.png'},};

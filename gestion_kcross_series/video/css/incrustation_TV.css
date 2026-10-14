@@ -1,0 +1,575 @@
+/* ==========================================================================
+   KCROSS INCRUSTATION — STYLE « TV »
+
+   Habillage aligné sur les pages TV de ws_live (tv_oncourse, tv_leaders) :
+   la même régie peut enchaîner slalom et kayak cross sans changer de charte.
+     - Calibri gras blanc                          (tv_inrace.css)
+     - dégradé de ligne #030910 -> #256eb5         (img/block_name.png)
+     - pavé pâle, texte rgb(0,27,90)               (img/block_running.png)
+     - entrée par translation 0,7 s ease-out       (tv_ranking.css)
+   La couleur du couloir (R, V, B, J) est un pavé plein détaché du dégradé :
+   c'est le repère que le spectateur cherche sur l'eau.
+
+   Sélection : « Style incrustation » de la régie vidéo -> TV.
+   ========================================================================== */
+
+@font-face {
+    font-family: 'Calibri';
+    src: url('../fonts/calibri-regular.ttf') format('truetype');
+    font-weight: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: 'Calibri';
+    src: url('../fonts/calibri-bold.ttf') format('truetype');
+    font-weight: bold;
+    font-display: block;
+}
+
+:root {
+    --tv-dark: #030910;
+    --tv-mid: #123558;
+    --tv-blue: #256eb5;
+    --tv-pale: #c4dbef;
+    --tv-pale2: #d0e0f1;
+    --tv-pale-text: rgb(0, 27, 90);
+    --tv-gold: #f2c200;
+    --tv-qualif: #338d31;
+
+    /* Couloirs : les couleurs pures de dossards.css bavent à l'écran. On
+       garde les teintes, désaturées juste ce qu'il faut pour la vidéo. */
+    --color-prio-red: #d7262b;
+    --color-prio-green: #1e9a3c;
+    --color-prio-blue: #1f5fd6;
+    --color-prio-yellow: #f5cf00;
+
+    --anim-speed: 0.7s;
+    --anim-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* Lu par le script de la page : pas vertical des lignes du mode Live
+       (cette valeur + 4 px). */
+    --live-row-height: 40px;
+}
+
+/* --------------------------------------------------------------- canevas */
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 1920px;
+    height: 1080px;
+    background: transparent;
+    font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
+    font-weight: bold;
+    color: #fff;
+    overflow: hidden;
+}
+
+.overlay-base {
+    position: absolute;
+    transition: opacity var(--anim-speed) var(--anim-curve),
+                transform var(--anim-speed) var(--anim-curve);
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.visible {
+    opacity: 1;
+}
+
+/* Entrées par translation, comme les pages TV : le bloc caché attend hors
+   champ, à gauche pour les blocs ancrés à gauche, à droite sinon. */
+#live-container.hidden { transform: translateX(-140px); }
+#live-container.visible { transform: translateX(0); }
+#results-container.hidden { transform: translateX(140px); }
+#results-container.visible { transform: translateX(0); }
+#ramp-container.hidden { transform: translate(-50%, 60px); }
+#ramp-container.visible { transform: translate(-50%, 0); }
+
+/* Couloir : pavé plein, lettre centrée. La lettre vient de l'attribut. */
+[data-color="R"] { background-color: var(--color-prio-red); }
+[data-color="V"] { background-color: var(--color-prio-green); }
+[data-color="B"] { background-color: var(--color-prio-blue); }
+[data-color="J"] { background-color: var(--color-prio-yellow); }
+
+/* Bandeau titre commun : catégorie | tour | série. */
+.title-bar,
+.live-title,
+.results-info {
+    background: linear-gradient(90deg, var(--tv-dark) 0%, var(--tv-mid) 55%, var(--tv-blue) 100%);
+    color: #fff;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+/* ===================================================== 1. RAMPE DE DÉPART */
+
+#ramp-container {
+    left: 50%;
+    bottom: 60px;
+    width: 1500px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.title-bar {
+    align-self: flex-start;
+    padding: 6px 22px;
+    font-size: 22pt;
+    text-transform: uppercase;
+}
+
+.names-bar {
+    display: flex;
+    gap: 6px;
+    height: 74px;
+}
+
+/* Une case par place sur la rampe : nom sur le dégradé, couloir en bandeau
+   bas épais (la couleur est posée en ligne par la page). */
+.ramp-slot {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    background: linear-gradient(180deg, var(--tv-mid) 0%, var(--tv-dark) 100%);
+    border-bottom: 10px solid transparent;
+    font-size: 22pt;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.ramp-slot span {
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Place vide sur la rampe : on ne montre pas une case sans nom. */
+.ramp-slot:has(span:empty) {
+    visibility: hidden;
+}
+
+/* ============================================================ 2. EN COURSE */
+
+#live-container {
+    left: 40px;
+    bottom: 60px;
+    width: 620px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: opacity var(--anim-speed) var(--anim-curve),
+                transform var(--anim-speed) var(--anim-curve),
+                left var(--anim-speed) var(--anim-curve),
+                bottom var(--anim-speed) var(--anim-curve);
+}
+
+#live-container.centered-layout {
+    left: calc(50% - 310px);
+    bottom: calc(50% - 130px);
+}
+
+.live-title {
+    align-self: flex-start;
+    padding: 6px 18px;
+    font-size: 18pt;
+    text-transform: uppercase;
+}
+
+.live-next-heat {
+    align-self: flex-start;
+    padding: 3px 14px;
+    background: var(--tv-gold);
+    color: var(--tv-dark);
+    font-size: 13pt;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.live-next-heat.hidden {
+    display: none;
+}
+
+/* Quatre lignes au plus, positionnées en translateY par la page. */
+.live-list {
+    position: relative;
+    width: 100%;
+    height: calc(4 * (var(--live-row-height) + 4px));
+}
+
+.live-row {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: var(--live-row-height);
+    display: flex;
+    align-items: stretch;
+    background: linear-gradient(90deg, var(--tv-dark) 0%, var(--tv-mid) 45%, var(--tv-blue) 100%);
+    color: #fff;
+    font-size: 20pt;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: tv-row-in 350ms ease-out;
+}
+
+.live-color-indicator {
+    flex: 0 0 auto;
+    width: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22pt;
+}
+
+.live-color-indicator::after {
+    content: attr(data-color);
+    color: #fff;
+}
+
+.live-color-indicator[data-color="J"]::after {
+    color: var(--tv-dark);
+}
+
+.live-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================ 3. RÉSULTATS */
+
+#results-container {
+    right: 40px;
+    bottom: 60px;
+    width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.results-header {
+    display: flex;
+    align-items: stretch;
+    height: 50px;
+}
+
+.results-label {
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    background: linear-gradient(180deg, var(--tv-pale) 0%, var(--tv-pale2) 100%);
+    color: var(--tv-pale-text);
+    font-size: 20pt;
+    letter-spacing: 0.08em;
+}
+
+.results-info {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 18px;
+    font-size: 17pt;
+    text-transform: uppercase;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.results-row {
+    display: flex;
+    align-items: stretch;
+    height: 58px;
+    background: linear-gradient(90deg, var(--tv-dark) 0%, var(--tv-mid) 45%, var(--tv-blue) 100%);
+    color: #fff;
+    font-size: 21pt;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    animation: tv-row-in-right 350ms ease-out backwards;
+}
+
+/* Les lignes entrent l'une après l'autre, du premier au dernier. */
+.results-row:nth-child(2) { animation-delay: 80ms; }
+.results-row:nth-child(3) { animation-delay: 160ms; }
+.results-row:nth-child(4) { animation-delay: 240ms; }
+
+/* Place : pavé sombre détaché, comme sur tv_leaders. */
+.results-rank {
+    flex: 0 0 auto;
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tv-dark);
+    font-size: 25pt;
+}
+
+/* Série qualificative (« Afficher les qualifiés ») : les deux premiers passent
+   au tour suivant. Ils forment un groupe, on ne distingue pas le 1er du 2e. */
+.results-row:has(.qualif-tag) .results-rank {
+    background: var(--tv-qualif);
+}
+
+/* Trait d'élimination : un espace entre le dernier qualifié et le premier
+   éliminé, pour qu'on lise la coupure sans la chercher. */
+.results-row:has(.qualif-tag) + .results-row:has(.no-qualif-tag) {
+    margin-top: 10px;
+}
+
+/* Les éliminés restent lisibles mais passent au second plan. */
+.results-row:has(.no-qualif-tag) {
+    background: linear-gradient(90deg, var(--tv-dark) 0%, #0d2238 50%, #183f66 100%);
+}
+
+.results-row:has(.no-qualif-tag) .results-name {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+/* Finale, ou qualifiés non affichés : seul le vainqueur a sa place en or. */
+.results-list:not(:has(.qualif-tag)) .results-row:first-child .results-rank:not(:empty) {
+    background: var(--tv-gold);
+    color: var(--tv-dark);
+}
+
+.results-color-bar {
+    flex: 0 0 auto;
+    width: 14px;
+}
+
+.results-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ================================================== DAMES / HOMMES */
+
+/* Les tours Dames et Hommes s'intercalent : chaque bandeau titre porte la
+   catégorie en clair, sur sa couleur. Même code couleur que le tableau. */
+body[data-genre="dames"] { --genre: #e8467c; --genre-label: "DAMES"; }
+body[data-genre="hommes"] { --genre: #2f8cff; --genre-label: "HOMMES"; }
+
+body[data-genre] .title-bar::before,
+body[data-genre] .live-title::before,
+body[data-genre] .results-info::before {
+    content: var(--genre-label);
+    display: inline-block;
+    margin: -6px 16px -6px -22px;
+    padding: 6px 14px;
+    background: var(--genre);
+    color: #fff;
+    letter-spacing: 0.1em;
+}
+
+body[data-genre] .live-title::before { margin: -6px 14px -6px -18px; }
+
+body[data-genre] .results-info {
+    justify-content: space-between;
+}
+
+body[data-genre] .results-info::before {
+    margin: 0 16px 0 -18px;
+    padding: 0 14px;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    font-size: 15pt;
+}
+
+/* ================================================================= CLUB */
+
+/* Masqué par défaut par la page ; ce style l'affiche sous le nom, plus petit
+   et plus pâle : on lit d'abord qui, ensuite d'où. */
+.kx-club {
+    display: block;
+    font-size: 13pt;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ramp-slot {
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ramp-slot .ramp-club {
+    width: 100%;
+    text-align: center;
+    font-size: 14pt;
+}
+
+.names-bar { height: 86px; }
+
+.live-name,
+.results-name {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    line-height: 1.05;
+}
+
+.live-name .kx-club,
+.results-name .kx-club {
+    max-width: 100%;
+    font-size: 12pt;
+}
+
+/* ============================================================ PÉNALITÉS */
+
+.penalty-summary-box {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 10px;
+}
+
+.penalty-tag {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16pt;
+    line-height: 1;
+}
+
+.penalty-tag.clear { display: none; }
+
+/* FLT : faute de porte. Jaune de la feuille de pénalités, texte sombre. */
+.penalty-tag.flt {
+    background: #ffd400;
+    color: var(--tv-dark);
+}
+
+/* RAL et statuts (DNF, DSQ…) : rouge des pavés de pénalité de la charte. */
+.penalty-tag.ral {
+    background: linear-gradient(180deg, #770101 0%, #c20201 50%, #a10101 100%);
+    color: #fff;
+}
+
+/* ============================================================ QUALIFIÉS */
+
+.qualif-tag,
+.no-qualif-tag {
+    flex: 0 0 auto;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20pt;
+}
+
+.qualif-tag {
+    background: var(--tv-qualif);
+    color: #fff;
+}
+
+.qualif-tag::before { content: "Q"; }
+.no-qualif-tag::before { content: ""; }
+
+/* ============================================================ ANIMATIONS */
+
+@keyframes tv-row-in {
+    from { opacity: 0; transform: translateX(-120px); }
+}
+
+@keyframes tv-row-in-right {
+    from { opacity: 0; transform: translateX(120px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ==========================================================================
+   MODE EN COURSE
+   Même design que la rampe, les résultats et l'écran TV (dégradé bleu nuit,
+   pavé de couloir, titre sur dégradé), en plus compact : le bandeau reste à
+   l'écran toute la course. Une ligne par bateau, nom puis club.
+   (Regroupé ici : ces règles priment sur celles des sections 2 et CLUB.)
+   ========================================================================== */
+
+#live-container {
+    width: 480px;
+    gap: 2px;
+}
+
+#live-container.centered-layout {
+    left: calc(50% - 240px);
+}
+
+.live-title {
+    padding: 3px 12px;
+    font-size: 14pt;
+}
+
+body[data-genre] .live-title::before {
+    margin: -3px 10px -3px -12px;
+    padding: 3px 9px;
+}
+
+.live-next-heat {
+    font-size: 10pt;
+    padding: 2px 10px;
+}
+
+.live-row {
+    font-size: 17pt;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+.live-color-indicator {
+    width: 34px;
+    font-size: 15pt;
+}
+
+/* Nom et club sur la même ligne, le club en retrait. */
+.live-name {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+}
+
+.live-name .kx-club {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 12pt;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.live-row .penalty-summary-box {
+    gap: 3px;
+    padding: 0 6px;
+}
+
+.live-row .penalty-tag {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 4px;
+    font-size: 14pt;
+}

@@ -148,6 +148,32 @@ body.ancre-droite #oncourse
 	display: none;
 }
 
+/*
+ * En-tête « En course » : même pavé que l'en-tête d'épreuve de tv_leaders,
+ * pour que les deux blocs se lisent comme une même famille à l'antenne. Il
+ * disparaît avec le bloc quand la rivière est vide (#oncourse.empty).
+ */
+#oncourse_titre
+{
+	align-self: flex-start;
+
+	background: linear-gradient(90deg, var(--oncourse-row-dark) 0%, var(--oncourse-row-blue) 100%);
+	color: white;
+
+	padding: 6px 18px;
+	font-size: 20pt;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+/* Bloc ancré à droite : l'en-tête suit le bord. */
+body.ancre-droite #oncourse_titre
+{
+	align-self: flex-end;
+	background: linear-gradient(270deg, var(--oncourse-row-dark) 0%, var(--oncourse-row-blue) 100%);
+}
+
 #oncourse_list
 {
 	display: flex;

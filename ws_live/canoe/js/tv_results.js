@@ -1,11 +1,20 @@
 /*
- * Classement plein écran de la dernière épreuve TERMINÉE.
+ * Classement plein écran de la dernière épreuve courue.
  *
  * Page d'attente entre deux épreuves : opaque, pas d'incrustation. Elle ne
  * demande aucun réglage, elle trouve seule l'épreuve à montrer et se remet à
  * jour toute seule.
  *
  * Choix de l'épreuve
+ *   Par défaut : la DERNIÈRE épreuve qui a au moins un classé, c'est-à-dire
+ *   celle du dernier bateau arrivé (le plus tard parti parmi ceux qui ont un
+ *   résultat). Tant qu'elle n'est pas finie, elle est marquée « classement
+ *   provisoire ». Avant le premier classé d'une nouvelle épreuve, on reste
+ *   sur la précédente : l'écran ne se vide jamais entre deux épreuves.
+ *
+ *   ?terminee=1 rétablit la règle d'origine, décrite ci-dessous : la
+ *   dernière épreuve TERMINÉE d'abord.
+ *
  *   Une épreuve est terminée quand TOUS ses bateaux ont une valeur dans Tps.
  *   competFFCK laisse cette colonne vide tant qu'un bateau n'a pas de
  *   résultat, et y met une valeur négative pour DNF / DNS / DSQ
@@ -70,6 +79,7 @@
  *   delay=8000        durée d'affichage d'une page en ms (défaut : 8000)
  *   epreuve=K1H       fige l'épreuve au lieu de suivre la dernière terminée
  *   encours=1         suit l'épreuve en cours de chronométrage
+ *   terminee=1        dernière épreuve TERMINÉE plutôt que dernière courue
  *   vedette=10000     durée de mise en valeur d'une arrivée en ms (0 = jamais)
  *   titre=...         remplace le nom de compétition venu de competFFCK
  *   lieu=...          remplace le lieu
@@ -79,6 +89,8 @@
  *   no_course         supprime le bandeau des bateaux en course
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
  *   anim=0            désactive les animations
+ *   style=classique   habillage d'origine, fond uni (défaut : photo)
+ *   fond=mewen        photo de fond, prise dans img/fonds/<nom>.jpg
  */
 
 const wsMain = new ws.Context(wsParams.url, wsParams.port);
@@ -216,7 +228,7 @@ function ReleverCategories()
 		let e = cats.get(categ);
 		if (e === undefined)
 		{
-			e = { total : 0, traites : 0, classes : 0, dernierDepart : 0 };
+			e = { total : 0, traites : 0, classes : 0, dernierDepart : 0, dernierTraite : -1 };
 			cats.set(categ, e);
 		}
 
@@ -234,14 +246,20 @@ function ReleverCategories()
 		const heure = tRanking.GetCellInt('Heure_depart' + course_phase, row, 0);
 		if (heure > e.dernierDepart)
 			e.dernierDepart = heure;
+
+		// Départ du dernier bateau qui a un résultat : c'est lui qui dit quelle
+		// épreuve vient d'être courue.
+		if (String(tRanking.GetCell('Tps' + course_phase, row)) !== '' && heure > e.dernierTraite)
+			e.dernierTraite = heure;
 	}
 
 	return cats;
 }
 
 /**
- * La dernière épreuve terminée, ou à défaut la dernière qui a des résultats.
- * Pose la classe `provisoire` dans le second cas.
+ * L'épreuve à afficher : la dernière courue (défaut), ou avec ?terminee=1 la
+ * dernière terminée, à défaut la dernière qui a des résultats. Pose la classe
+ * `provisoire` quand l'épreuve affichée n'est pas finie.
  */
 function ChoisirEpreuve()
 {
@@ -260,6 +278,24 @@ function ChoisirEpreuve()
 			document.body.classList.toggle('provisoire', e.traites < e.total);
 			return wsMain.epreuveChrono;
 		}
+	}
+
+	if (!wsMain.preferTerminee)
+	{
+		let derniere = '';
+		let derniere_h = -1;
+
+		cats.forEach(function(e, categ) {
+			if (e.classes > 0 && e.dernierTraite > derniere_h)
+			{
+				derniere_h = e.dernierTraite;
+				derniere = categ;
+			}
+		});
+
+		const e = cats.get(derniere);
+		document.body.classList.toggle('provisoire', e !== undefined && e.traites < e.total);
+		return derniere;
 	}
 
 	let terminee = '';
@@ -546,13 +582,14 @@ function Render(remonter)
 	const queue = tout.slice(nbFixes);
 
 	/*
-	 * Le nombre de bateaux par fenêtre reste équilibré — 11 en queue donnent
-	 * trois fenêtres de 4, 4 et 3 plutôt que 5, 5 et 1 — pour que le vide se
-	 * réparte au lieu de se concentrer sur la dernière.
+	 * Chaque fenêtre est pleine : les `max - fixes` suivants (4 à 8, puis 9 à
+	 * 13…), seule la dernière est complétée par des lignes vides. Répartir la
+	 * queue en fenêtres égales donnait 4-5-6 puis 7-8-9 pour six bateaux :
+	 * l'écran montrait moins de monde qu'il ne pouvait.
 	 */
 	const fenetre = Math.max(1, wsMain.max - nbFixes);
 	const nbPages = Math.max(1, Math.ceil(queue.length / fenetre));
-	const parPage = queue.length > 0 ? Math.ceil(queue.length / nbPages) : 0;
+	const parPage = queue.length > 0 ? fenetre : 0;
 
 	if (wsMain.page >= nbPages)
 		wsMain.page = 0;
@@ -792,6 +829,7 @@ function Init()
 	wsMain.lieu = urlParams.has('lieu') ? urlParams.get('lieu') : '';
 	wsMain.noNation = urlParams.has('no_nation');
 	wsMain.suivreEnCours = urlParams.get('encours') === '1';
+	wsMain.preferTerminee = urlParams.get('terminee') === '1';
 	wsMain.epreuveChrono = '';
 	wsMain.vedetteDuree = num('vedette', 10000);
 	wsMain.bibArrive = null;
@@ -809,6 +847,12 @@ function Init()
 	if (urlParams.get('anim') === '0')
 		document.body.classList.add('no-anim');
 
+	ChoisirHabillage(urlParams);
+
+	// Écran d'attente dès l'ouverture : tant que competFFCK n'a rien envoyé,
+	// on montre le kayakiste plutôt qu'un tableau vide sans en-tête.
+	document.body.classList.add('vide');
+
 	CalerHauteurLignes();
 	Redimensionner();
 	window.addEventListener('resize', Redimensionner);
@@ -822,6 +866,26 @@ function Init()
 	wsMain.mapCommand.set('<run_erase>', OnBroadcastRunErase);
 
 	wsMain.OpenWebSocketCommand(OnOpenWebSocketCommand);
+}
+
+/**
+ * Habillage photo (défaut) ou classique (?style=classique, la première
+ * version, fond uni).
+ *
+ * La photo n'est déclarée qu'en mode photo : en classique, le navigateur ne
+ * la télécharge pas du tout. ?fond= ne prend qu'un nom simple, jamais un
+ * chemin ou une URL : la page ne va chercher que dans img/fonds/.
+ */
+function ChoisirHabillage(urlParams)
+{
+	if (urlParams.get('style') === 'classique')
+		return;
+
+	document.body.classList.add('theme-photo');
+
+	const fond = urlParams.get('fond');
+	if (fond !== null && /^[A-Za-z0-9_-]+$/.test(fond))
+		document.getElementById('fond').style.backgroundImage = 'url("./img/fonds/' + fond + '.jpg")';
 }
 
 /**
@@ -839,8 +903,11 @@ function Init()
  */
 function CalerHauteurLignes()
 {
-	const HAUT = 226;				// haut du tableau (tv_results.css)
-	const BAS = 846;				// bas du tableau quand le bandeau est là
+	// Habillage photo : en-tête remonté et pied descendu (tv_results.css,
+	// « mise en page resserrée »), le tableau gagne 70 px.
+	const photo = document.body.classList.contains('theme-photo');
+	const HAUT = photo ? 186 : 226;	// haut du tableau (tv_results.css)
+	const BAS = photo ? 876 : 846;	// bas du tableau quand le bandeau est là
 	const ENTETE = 46;				// en-tête de colonnes + sa marge
 	const MARGE = 4;				// espace entre deux lignes
 	const FILET = 16;				// marge du filet de la partie tournante

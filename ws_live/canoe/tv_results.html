@@ -7,9 +7,14 @@
 	<link rel="shortcut icon" href="./16x16_ffck.png" />
 	<link rel="icon" href="./16x16_ffck.png" />
 
-	<link href="./css/tv_results.css?v1" rel="stylesheet">
+	<link href="./css/tv_results.css?v11" rel="stylesheet">
 </head>
 <body>
+	<!-- Hors de la scène : en mode photo, le fond couvre toute la fenêtre,
+	     même quand elle n'est pas en 16:9. -->
+	<div id="fond"></div>
+	<div id="voile"></div>
+
 	<div id="scene">
 		<div class="bande" id="bande_haut_sombre"></div>
 		<div class="bande" id="bande_haut_vive"></div>
@@ -38,7 +43,158 @@
 			<div id="corps"></div>
 		</div>
 
-		<div id="attente">En attente des premiers résultats…</div>
+		<!-- Écran d'attente : aucun classement à montrer. Le kayakiste est
+		     dessiné en SVG, animé en CSS (tv_results.css, « attente »). -->
+		<div id="attente">
+			<svg id="attente_dessin" viewBox="0 0 640 230" aria-hidden="true">
+				<defs>
+					<linearGradient id="att_pont" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="0" stop-color="#5b9bff" />
+						<stop offset="1" stop-color="#097aff" />
+					</linearGradient>
+					<linearGradient id="att_carene" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="0" stop-color="#ffffff" />
+						<stop offset="1" stop-color="#c9d6ea" />
+					</linearGradient>
+					<linearGradient id="att_gilet" x1="0" y1="0" x2="1" y2="0">
+						<stop offset="0" stop-color="#ff9a2e" />
+						<stop offset="1" stop-color="#e85d0c" />
+					</linearGradient>
+					<linearGradient id="att_pale" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="0" stop-color="#ffe27a" />
+						<stop offset="1" stop-color="#f2b705" />
+					</linearGradient>
+				</defs>
+
+				<!-- câble et portes de slalom -->
+				<line class="cable" x1="0" y1="18" x2="640" y2="18" />
+				<g class="porte porte_verte">
+					<line class="perche" x1="96" y1="18" x2="96" y2="132" />
+					<line class="perche" x1="150" y1="18" x2="150" y2="132" />
+				</g>
+				<g class="porte porte_rouge">
+					<line class="perche" x1="490" y1="18" x2="490" y2="132" />
+					<line class="perche" x1="544" y1="18" x2="544" y2="132" />
+				</g>
+
+				<!-- vague du fond -->
+				<g class="vagues vagues_fond">
+					<path d="M0 150 Q 40 136 80 150 T 160 150 T 240 150 T 320 150 T 400 150 T 480 150 T 560 150 T 640 150 T 720 150 T 800 150 T 880 150 T 960 150 T 1040 150 T 1120 150 T 1200 150 T 1280 150 V 230 H 0 Z" />
+				</g>
+
+				<!--
+					Le scénario, une boucle de 18 s (tv_results.css, « attente ») :
+					il pagaie, chavire, nage en poussant son bateau hors de l'écran,
+					revient en trombe par la gauche, puis s'offre un esquimautage
+					dans l'autre sens.
+				-->
+				<g class="trajet">
+					<!-- traits de vitesse, pendant l'arrivée en trombe -->
+					<g class="sillage">
+						<line x1="120" y1="130" x2="176" y2="130" />
+						<line x1="96" y1="142" x2="170" y2="142" />
+						<line x1="136" y1="118" x2="180" y2="118" />
+					</g>
+
+					<g class="bateau">
+						<!--
+						Volume pendant les rotations : vu de côté, un kayak qui tourne
+						sur son axe montre aussi son pont (ou sa carène), de plus en
+						plus large à mesure que le profil s'écrase.
+					-->
+						<g class="dessus dessus_pont">
+							<path class="pont_vu" d="M188 152 C 250 136, 390 136, 454 152 C 390 168, 250 168, 188 152 Z" />
+							<path class="arete" d="M200 152 L 442 152" />
+							<ellipse class="hiloire" cx="316" cy="152" rx="25" ry="10" />
+							<ellipse class="gilet_vu" cx="316" cy="152" rx="10" ry="8" />
+							<circle class="casque_vu" cx="322" cy="152" r="6.5" />
+						</g>
+						<g class="dessus dessus_carene">
+							<path class="carene_vue" d="M188 152 C 250 136, 390 136, 454 152 C 390 168, 250 168, 188 152 Z" />
+							<path class="quille" d="M196 152 L 446 152" />
+						</g>
+
+						<g class="chavire">
+							<!-- kayak de slalom : carène blanche, pont bleu, pointes effilées -->
+							<path class="coque" d="M188 150 C 240 164, 400 166, 454 148 C 420 151, 260 153, 188 150 Z" />
+							<path class="pont" d="M188 150 C 250 136, 390 134, 454 148 C 400 151, 250 152, 188 150 Z" />
+							<path class="liseret" d="M200 151 C 260 157, 390 158, 444 149" />
+							<path class="reflet" d="M232 144 C 270 139, 300 138, 318 138" />
+							<g class="pilote">
+								<!-- buste : veste de pagaie sombre et gilet orange -->
+								<path class="veste" d="M305 144 C 302 130, 304 118, 309 110 L 323 110 C 327 118, 328 132, 326 144 Z" />
+								<path class="gilet" d="M306 142 C 304 131, 305 121, 309 114 L 323 114 C 326 121, 327 132, 325 142 Z" />
+								<path class="sangle" d="M306 128 L 326 128 M 306 135 L 326 135" />
+								<rect class="cou" x="312" y="104" width="8" height="8" rx="3" />
+								<!-- jupe néoprène sur l'hiloire, par-dessus le bas du buste -->
+								<ellipse class="jupe" cx="316" cy="143" rx="26" ry="5" />
+								<!-- tête et casque à visière, tourné vers l'avant (la droite) -->
+								<circle class="tete" cx="316" cy="96" r="10" />
+								<circle class="oeil" cx="322" cy="96" r="1.6" />
+								<path class="casque" d="M305 96 C 305 84, 327 82, 328 93 L 334 93 C 334 95, 330 96, 326 95 L 305 97 Z" />
+								<path class="aeration" d="M310 88 L 322 87" />
+								<g class="pagaie">
+									<!-- bras : ils tiennent la pagaie, ils tournent donc avec elle -->
+									<path class="bras_pilote" d="M309 116 L 286 122" />
+									<path class="bras_pilote" d="M323 116 L 346 122" />
+									<line class="manche" x1="232" y1="122" x2="398" y2="122" />
+									<circle class="main" cx="286" cy="122" r="4" />
+									<circle class="main" cx="346" cy="122" r="4" />
+									<!-- pales asymétriques, comme une vraie pagaie de slalom -->
+									<path class="pale" d="M234 122 C 230 114, 214 113, 206 117 C 204 121, 204 124, 206 127 C 214 130, 230 129, 234 122 Z" />
+									<path class="pale" d="M396 122 C 400 114, 416 113, 424 117 C 426 121, 426 124, 424 127 C 416 130, 400 129, 396 122 Z" />
+								</g>
+								<circle class="goutte g1" cx="226" cy="146" r="3" />
+								<circle class="goutte g2" cx="404" cy="146" r="3" />
+							</g>
+						</g>
+					</g>
+
+					<!-- un petit requin qui suit le nageur… -->
+					<g transform="translate(96 156)">
+						<g class="requin">
+							<path class="aileron" d="M0 0 L 12 -30 Q 20 -15 34 0 Z" />
+							<path class="remous" d="M-26 2 Q -14 -3 -2 2" />
+						</g>
+					</g>
+
+					<!-- le nageur, qui pousse le bateau retourné par l'arrière -->
+					<g transform="translate(176 150)">
+						<g class="nageur">
+							<line class="bras b1" x1="0" y1="-2" x2="24" y2="-2" />
+							<line class="bras b2" x1="0" y1="-2" x2="24" y2="-2" />
+							<circle class="tete" cx="0" cy="-8" r="10" />
+							<circle class="oeil" cx="6" cy="-8" r="1.6" />
+							<path class="casque" d="M-11 -8 C -11 -20, 11 -22, 12 -11 L 18 -11 C 18 -9, 14 -8, 10 -9 L -11 -7 Z" />
+						</g>
+					</g>
+				</g>
+
+				<!-- bulles sous le bateau, juste avant l'esquimautage -->
+				<g class="bulles">
+					<circle cx="300" cy="200" r="4" />
+					<circle cx="322" cy="210" r="3" />
+					<circle cx="340" cy="196" r="5" />
+					<circle cx="312" cy="186" r="2.5" />
+				</g>
+
+				<!-- vague de devant, par-dessus la coque -->
+				<g class="vagues vagues_devant">
+					<path d="M0 164 Q 32 154 64 164 T 128 164 T 192 164 T 256 164 T 320 164 T 384 164 T 448 164 T 512 164 T 576 164 T 640 164 T 704 164 T 768 164 T 832 164 T 896 164 T 960 164 T 1024 164 T 1088 164 T 1152 164 T 1216 164 T 1280 164 V 230 H 0 Z" />
+				</g>
+
+				<!-- la gerbe quand il remonte -->
+				<g class="gerbe">
+					<circle cx="250" cy="140" r="5" />
+					<circle cx="280" cy="124" r="4" />
+					<circle cx="320" cy="116" r="6" />
+					<circle cx="360" cy="124" r="4" />
+					<circle cx="390" cy="140" r="5" />
+				</g>
+			</svg>
+
+			<div id="attente_titre">En attente des premiers résultats</div>
+		</div>
 
 		<div id="encourse"></div>
 
@@ -47,13 +203,13 @@
 	</div>
 
 	<script src="../adv/ws_params.js"></script>
-	<script src="../adv/ws.js?v2"></script>
+	<script src="../adv/ws.js?v3"></script>
 	<script src="../adv/adv.js"></script>
 	<script src="../adv/adv_table.js"></script>
 	<script src="../adv/canoe.js"></script>
 
 	<script src="./js/categories.js"></script>
-	<script src="./js/tv_results.js?v1"></script>
+	<script src="./js/tv_results.js?v6"></script>
 
 	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
 </body>

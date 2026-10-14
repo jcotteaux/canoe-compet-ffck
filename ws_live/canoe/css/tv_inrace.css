@@ -1,612 +1,534 @@
-:root {
-	--font-ffck: 'Calibri';
+/*
+ * Incrustation du bateau suivi (tv_inrace.html), 1920 x 1080.
+ *
+ * Même charte que tv_oncourse, tv_leaders et tv_podium : Calibri gras blanc,
+ * dégradé de ligne #030910 -> #256eb5, pavé de temps bleu pâle à texte
+ * rgb(0,27,90), pavés détachés pour les repères (dossard, place). Rien
+ * n'est dessiné par des images de fond : le texte décide de la taille des
+ * blocs, il ne peut plus déborder d'un gabarit.
+ *
+ *   bas gauche  identité : dossard, nom, club, catégorie
+ *   bas droite  chrono tournant / temps intermédiaire / leader
+ *   bord droit  pénalités, porte par porte, au fil du jugement
+ */
+
+/* Les autres pages écrivent `Calibri` sans le déclarer : sur un poste sans
+   la fonte (macOS, Linux) le rendu passe en Times. On la déclare ici. */
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--row-dark: #030910;
+	--row-mid: #123558;
+	--row-blue: #256eb5;
+	--time-bg: #c4dbef;
+	--time-bg2: #d0e0f1;
+	--time-text: rgb(0, 27, 90);
+	--green: #338d31;
+	--red: #c20201;
+	--gold: #f2c200;
+	--silver: #d5dce3;
+	--bronze: #c47a3a;
+	/* Libellés d'état (Inter, Arrivée) : bleu de la charte, plus clair que le dégradé. */
+	--status: #1b4f86;
+	--flt: #ffd400;
+
+	/* Marges de l'incrustation (zone de sécurité titre). */
+	--side: 60px;
+	--bottom: 64px;
+	/* Hauteur commune des blocs du bas : identité, chrono, résultat. */
+	--block-h: 112px;
+	--leader-h: 48px;
 
 	/*
 	 * Couleur de cle pour l'incrustation en regie (?bg=1).
-	 * Magenta pur : R = B, G = 0, a 80 % du plein.
-	 *   - la charte FFCK n'a aucun magenta (4 pixels sur 578 000 releves
-	 *     dans img/Graphic_FFCK et img/pena) : la cle ne peut pas manger
-	 *     de graphisme ;
-	 *   - teinte a 300 deg, loin des bleus et indigos de la charte
-	 *     (#3680FF, #09006D, #1D1580) et du vert / rouge des penalites ;
-	 *   - 80 % et non 100 % : garde de la marge chromatique pour le
-	 *     sous-echantillonnage 4:2:2 du HDMI puis 4:2:0 de l'encodage.
-	 * Valeur commune a tv_inrace.css, tv_leaders.css, tv_oncourse.css et
-	 * tv_podium.css : les quatre doivent rester identiques.
+	 * Magenta pur : R = B, G = 0, a 80 % du plein. Valeur commune a
+	 * tv_inrace.css, tv_leaders.css, tv_oncourse.css et tv_podium.css.
 	 */
 	--chroma-key: #CC00CC;
 }
 
-body
+html, body
 {
-	/* Transparent par defaut : la video passe au travers (alpha OBS).
-	   ?bg=1 pose la classe chroma et remplit avec la couleur de cle. */
-	background-color:transparent;
-	padding:0px;
-	margin:0px;
+	margin: 0;
+	padding: 0;
+	width: 1920px;
+	height: 1080px;
+	overflow: hidden;
+	/* Transparent par défaut : la vidéo passe au travers (alpha OBS). */
+	background: transparent;
+	font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
+	font-weight: bold;
+	color: #fff;
 }
 
-body.chroma
+body.chroma { background: var(--chroma-key); }
+
+/* ------------------------------------------------------------ identité */
+
+#block_start,
+#block_finish .ident
 {
-	background-color: var(--chroma-key);
+	position: absolute;
+	left: var(--side);
+	bottom: var(--bottom);
 }
 
-@keyframes apparitionG {
-	from{
-		opacity: 0;
-		transform: translateX(-900px);
-	}
-	to{
-		opacity: 1;
-		transform: translateX(0px);
-	}
+#block_start { animation: apparitionG 0.6s ease-out; }
+
+.ident
+{
+	display: flex;
+	align-items: stretch;
+	height: var(--block-h);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
-@keyframes apparitionBas {
-	from{
-		opacity: 0;
-		transform: translateY(200px);
-	}
-	to{
-		opacity: 1;
-		transform: translateY(0px);
-	}
+/* Dossard : pavé détaché, c'est le premier repère du spectateur. */
+.ident .bib
+{
+	flex: 0 0 auto;
+	min-width: 110px;
+	padding: 0 14px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(180deg, var(--time-bg) 0%, var(--time-bg2) 100%);
+	color: var(--time-text);
+	font-size: 56px;
+	font-variant-numeric: tabular-nums;
 }
 
-@keyframes apparitionD {
-	from{
-		opacity: 0;
-		transform: translateX(400px);
-	}
-	to{
-		opacity: 1;
-		transform: translateX(0px);
-	}
+.ident .who
+{
+	min-width: 620px;
+	max-width: 1080px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	background: linear-gradient(90deg, var(--row-dark) 0%, var(--row-mid) 45%, var(--row-blue) 100%);
+}
+
+.ident .name
+{
+	padding: 0 28px;
+	font-size: 46px;
+	line-height: 58px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Équipage (C2) : deux noms l'un sous l'autre. */
+.ident .name.crew
+{
+	font-size: 30px;
+	line-height: 34px;
+}
+
+.ident .sub
+{
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 2px 28px 0;
+	font-size: 26px;
+	line-height: 34px;
+}
+
+.ident .club
+{
+	min-width: 0;
+	font-weight: normal;
+	color: rgba(255, 255, 255, 0.82);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ident .club:empty { display: none; }
+
+.ident .categ
+{
+	flex: 0 0 auto;
+	padding: 0 12px;
+	background: rgba(255, 255, 255, 0.16);
+	font-size: 22px;
+	letter-spacing: 0.06em;
+}
+
+.ident .categ:empty { display: none; }
+
+/* ------------------------------------------------------------ chrono */
+
+#block_running
+{
+	position: absolute;
+	right: var(--side);
+	bottom: var(--bottom);
+	animation: apparitionD 0.6s ease-out;
+}
+
+/* Pavé de temps : le chrono tournant, en gros. */
+#block_running .time,
+#block_inter .time,
+#block_finish .time
+{
+	min-width: 300px;
+	height: var(--block-h);
+	padding: 0 28px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	background: linear-gradient(180deg, var(--time-bg) 0%, var(--time-bg2) 100%);
+	color: var(--time-text);
+	font-size: 66px;
+	font-variant-numeric: tabular-nums;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 /*
- * Variantes sans opacite, pour l'incrustation par couleur.
- *
- * Un fondu par-dessus la couleur de cle melange chaque pixel du bloc avec le
- * magenta pendant toute sa duree : l'incrusteur n'y voit ni la cle ni le
- * graphisme, et laisse un fantome rose a chaque apparition. On garde la
- * translation, qui ne produit aucun pixel intermediaire.
+ * Le script affiche et masque les blocs par style.display ('block' / 'none') :
+ * la mise en page vit donc dans un élément intérieur, que ce réglage ne touche pas.
  */
-@keyframes apparitionG-chroma {
-	from { transform: translateX(-900px); }
-	to   { transform: translateX(0px); }
-}
-@keyframes apparitionBas-chroma {
-	from { transform: translateY(200px); }
-	to   { transform: translateY(0px); }
-}
-@keyframes apparitionD-chroma {
-	from { transform: translateX(400px); }
-	to   { transform: translateX(0px); }
-}
 
-body.chroma #block_start        { animation-name: apparitionG-chroma; }
-body.chroma #block_running,
-body.chroma #block_inter.green,
-body.chroma #block_inter.red,
-body.chroma #block_leader       { animation-name: apparitionD-chroma; }
-body.chroma #block_finish.green,
-body.chroma #block_finish.red   { animation-name: apparitionBas-chroma; }
-
-/* ?anim=0 : plus aucune animation, comme sur les autres pages TV. */
-body.no-anim #block_start,
-body.no-anim #block_running,
-body.no-anim #block_inter,
-body.no-anim #block_finish,
-body.no-anim #block_leader
-{
-	animation: none;
-}
-
-@keyframes appena {
-	0% {
-		transform: translateX(0px);
-	}
-	20% {
-		transform: translateX(-5px);
-	}
-	40% {
-		transform: translateX(5px);
-	}
-	60% {
-		transform: translateX(-5px);
-	}
-	80% {
-		transform: translateX(5px);
-	}
-	100% {
-		transform: translateX(0px);
-	}
-
-}
-
-/******************* block_start ********************/
-#block_start
-{
-	position:absolute;
-
-	background-image: url("../img/Graphic_FFCK/block_name.png");
-	background-repeat: no-repeat;	
-	animation: apparitionG 0.7s ease-out;
-	left:0px;
-	top:890px;
-	width:1202px;
-	height:145px;
-	}
-
-#block_start .bib
-{
-	position: absolute;
-
-	left:-6px;
-	width:100px;
-	top:0px;
-
-	font-family: var(--font-ffck);
-	font-size:42pt;
-	color:black;
-	text-align:center;
-}
-
-#block_start .name
-{
-	position: absolute;
-
-	left:120px;
-	top:-5px;
-
-	font-family: var(--font-ffck);
-	font-size:55pt;  /*est gérée dans le Javascript*/
-	color:white;
-}
-
-#block_start .nation
-{
-	position: absolute;
-
-	left:110px;
-	top:92px;
-
-	font-family: var(--font-ffck);
-	font-size:28pt;
-	color:white;
-}
-
-#block_start .img_nation
-{
-	position: absolute;
-
-	left:185px;
-	top:98px;
-}
-
-#block_start .categ
-{
-	position: absolute;
-
-	left:395px;
-	top:73px;
-
-	font-family: var(--font-ffck);
-	font-style:italic;
-	font-size:33pt;
-	color:white;
-}
-
-
-/******************* block_running ********************/
-#block_running
-{
-	position:absolute;
-	background-image:none;
-	animation: apparitionD 0.7s ease-out;		
-}
-
-/* Toujours masque : le <div class="time_chrono"> de tv_inrace.html n'est pas
-   alimente par le JS, sans cette regle son texte de gabarit "9:59:99" reste
-   affiche. La regle existait dans la version precedente du fichier. */
-#block_running .time_chrono
-{
-	display:none;
-}
-
-#block_running .time
-{
-	position: absolute;
-	font-family: var(--font-ffck);
-	font-size:40pt;
-	color:white;
-	text-align:right;
-	left:1429px;
-	top:890px;
-	width:460px;
-	height:84px;
-	padding-right: 40px; /* Décale le texte vers la gauche */
-
-	background-image: url("../img/Graphic_FFCK/block_running.png");
-	background-repeat: no-repeat;	
-	}
-
-
-/*#block_running .pena
-{
-	position: absolute;
-	left:1800px;
-	top:75px;
-
-	width:var(--block_pena_width);
-	height:848px;
-}
-*/
-
-/******************* block_inter ********************/
-#block_inter
-{
-	position:absolute;
-
-	left:1420px;
-	top:890px;
-	width:500px;
-	height:170px;
-}
-
-#block_inter .pena
-{
-	position: absolute;
-	left:380px;
-	top:75px;
-
-	width:var(--block_pena_width);
-	height:860px;
-	height:860px;
-}
-
-#block_inter.green
-{
-	background-image: url("../img/Graphic_FFCK/block_inter_green.png");
-	background-repeat: no-repeat;	
-	animation: apparitionD 0.7s ease-out;									  
-}
-
-#block_inter.red
-{
-	background-image: url("../img/Graphic_FFCK/block_inter_red.png");
-	background-repeat: no-repeat;	
-	animation: apparitionD 0.7s ease-out;									  
-}
-
-#block_inter .time
-{
-	position: absolute;
-
-	font-family: var(--font-ffck);
-	font-size:40pt;
-	color:white;
-
-	left:250px;
-	width:240px;
-	padding-right:40px;
-	top:2px;
-	
-	text-align:right;
-}
-
-
-
-#block_inter .diff
-{
-	position: absolute;
-
-	font-family: var(--font-ffck);
-	font-style:italic;
-	font-size:40pt;
-	color:white;
-
-	left:65px;
-	width:175px;
-	top:-2px;
-
-	text-align:center;
-}
-
-/******************* block_finish ********************/
-#block_finish
-{
-	position:absolute;
-
-	left:0px;
-	top:890px;
-	width:1920px;
-	height:190px;
-}
-
-#block_finish .pena
-{
-	position: absolute;
-	left:1800px;
-	top:75px;
-
-	width:var(--block_pena_width);
-	height:800px;
-}
-
-#block_finish.green
-{
-	background-image: url("../img/Graphic_FFCK/block_finish_green.png");
-	background-repeat: no-repeat;
-	animation: apparitionBas 0.4s ease-out;
-}
-
-#block_finish.red
-{
-	background-image: url("../img/Graphic_FFCK/block_finish_red.png");
-	background-repeat: no-repeat;
-	animation: apparitionBas 0.4s ease-out;
-}
-
-#block_finish .bib
-{
-	position: absolute;
-
-	left:-6px;
-	width:100px;
-	top:0px;
-
-	font-family: var(--font-ffck);
-	font-size:42pt;
-	color:black;
-	text-align:center;
-}
-
-#block_finish .name
-{
-	position: absolute;
-
-	left:125px;
-	top:-5px;
-
-	font-family: var(--font-ffck);
-	font-size:48pt;  /*est gérée dans le Javascript*/
-	color:white;
-}
-
-#block_finish .nation
-{
-	position: absolute;
-
-	left:110px;
-	top:92px;
-
-	font-family: var(--font-ffck);
-	font-size:25pt;
-	color:white;
-}
-
-#block_finish .img_nation
-{
-	position: absolute;
-
-	left:185px;
-	top:98px;
-}
-
-#block_finish .categ
-{
-	position: absolute;
-
-	left:385px;
-	top:73px;
-
-	font-family: var(--font-ffck);
-	font-style:italic;
-	font-size:33pt;
-	color:white;
-}
-
-#block_finish .time
-{
-	position: absolute;
-
-	left:1680px;
-	top:05px;
-	width:240px;
-
-	font-family: var(--font-ffck);
-	font-size:40pt;
-	color:white;
-	text-align:center;
-}
-
-#block_finish .rank
-{
-	position: absolute;
-
-	left:1730px;
-	top:67px;
-	width:60px;
-
-	font-family: var(--font-ffck);
-	font-size:40pt;
-	font-weight:bold;
-	color:white;
-	text-align:center;
-}
-
-#block_finish .diff
-{
-	position: absolute;
-
-	left:1465px;
-	top:5px;
-	width:175px;
-
-	font-family: var(--font-ffck);
-	font-size:40pt;
-	font-style:italic;
-	color:white;
-	text-align:center;
-}
-
-/******************* block_leader ********************/
+/* Leader : la référence à battre, juste au-dessus du chrono. */
 #block_leader
 {
-	position:absolute;
-
-	background-image: url("../img/Graphic_FFCK/block_leader.png");
-	background-repeat: no-repeat;	
-
-	left:1389px;
-	top:964px;
-	width:531px;
-	height:49px;
-	animation: apparitionD 0.8s ease-out;
+	position: absolute;
+	right: var(--side);
+	bottom: calc(var(--bottom) + var(--block-h) + 8px);
+	animation: apparitionD 0.6s ease-out;
 }
 
-#block_leader .name
+#block_leader .bar
+{
+	display: flex;
+	align-items: stretch;
+	height: var(--leader-h);
+	background: var(--row-dark);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+#block_leader .label,
+#block_inter .leader .label
+{
+	display: flex;
+	align-items: center;
+	padding: 0 12px;
+	background: var(--gold);
+	color: var(--row-dark);
+	font-size: 18px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+#block_leader .name,
+#block_inter .leader_name
+{
+	display: flex;
+	align-items: center;
+	max-width: 420px;
+	padding: 0 14px;
+	font-size: 24px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#block_leader .time,
+#block_inter .leader_time
+{
+	display: flex;
+	align-items: center;
+	padding: 0 14px;
+	background: rgba(255, 255, 255, 0.12);
+	font-size: 26px;
+	font-variant-numeric: tabular-nums;
+}
+
+#block_leader .name:empty,
+#block_inter .leader_name:empty { display: none; }
+
+/* ------------------------------------------------------------ intermédiaire */
+
+#block_inter
 {
 	position: absolute;
-
-	font-family: var(--font-ffck);
-	font-size:24pt;  /* géré dans le JS  */
-	color:yellow;
-
-	left:36px;
-	width:330px;
-	top:10px;
-
-	text-align:center;
+	right: var(--side);
+	bottom: var(--bottom);
+	animation: apparitionD 0.6s ease-out;
 }
 
-#block_leader .time
+#block_inter .row
+{
+	display: flex;
+	justify-content: flex-end;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+#block_inter .row .time { box-shadow: none; }
+
+/* Devant le leader à cet intermédiaire : badge doré qui pulse. */
+#block_inter .row .badge
+{
+	display: none;
+	align-items: center;
+	padding: 0 20px;
+	background: var(--gold);
+	color: var(--row-dark);
+	font-size: 28px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	animation: new-leader 0.9s ease-in-out infinite alternate;
+}
+
+#block_inter.new-leader .row .badge { display: flex; }
+
+@keyframes new-leader
+{
+	from { filter: brightness(1); }
+	to   { filter: brightness(1.35); }
+}
+
+/* Le temps est figé au passage : on dit lequel. */
+#block_inter .row .label
+{
+	display: flex;
+	align-items: center;
+	padding: 0 18px;
+	background: var(--status);
+	font-size: 26px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+/* Écart au leader : vert si devant, rouge si derrière. */
+#block_inter .diff,
+#block_finish .diff
+{
+	min-width: 190px;
+	padding: 0 22px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 44px;
+	font-variant-numeric: tabular-nums;
+}
+
+#block_inter .diff:empty,
+#block_finish .diff:empty { display: none; }
+
+#block_inter.green .diff,
+#block_finish.green .diff { background: var(--green); }
+
+#block_inter.red .diff,
+#block_finish.red .diff { background: var(--red); }
+
+/* Leader au-dessus du temps : le temps reste aligné sur l'identité. */
+#block_inter .leader
+{
+	display: flex;
+	align-items: stretch;
+	width: fit-content;
+	margin: 0 0 8px auto;
+	height: var(--leader-h);
+	background: var(--row-dark);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+#block_inter .leader:has(.leader_time:empty) { display: none; }
+
+/* ------------------------------------------------------------ arrivée */
+
+#block_finish .ident { animation: apparitionG 0.5s ease-out; }
+
+#block_finish .result
 {
 	position: absolute;
-
-	font-family: var(--font-ffck);
-	font-size:24pt;
-	color:yellow;
-
-	left:382px;
-	width:150px;
-	top:1px;
-
-	text-align:center;
+	right: var(--side);
+	bottom: var(--bottom);
+	display: flex;
+	align-items: stretch;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+	animation: apparitionD 0.5s ease-out;
 }
-/******************* creation block portes/pénalités ********************/
 
-.pena .gate
+#block_finish .time { box-shadow: none; }
+
+/* Arrivée, ou temps provisoire tant qu'une porte attend son juge. */
+#block_finish .result .label
 {
-	color:black;
-
-	font-family: var(--font-ffck);
-	font-weight:bold;
-	font-size:16pt;
-	text-align:left;
-
-	padding-left: 28px; /* ← ajuste ici pour plus de précision */
-
-	height:var(--block_pena_height);
+	display: flex;
+	align-items: center;
+	padding: 0 18px;
+	background: var(--status);
+	font-size: 26px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 }
 
-.pena .gate[data-pen="0"][data-red="0"]
+#block_finish.provisional .result .label
 {
-	background-image: url("../img/pena/pena_v_0.png");
-	background-repeat: no-repeat;	
-}
-	
-.pena .gate[data-pen="2"][data-red="0"]
-{
-	background-image: url("../img/pena/pena_v_2.png");
-	background-repeat: no-repeat;	
+	background: #b86e00;
 }
 
-.pena .gate[data-pen="50"][data-red="0"]
+/* Place : couleurs du podium pour les trois premiers, bleu de la charte ensuite. */
+#block_finish .rank
 {
-	background-image: url("../img/pena/pena_v_50.png");
-	background-repeat: no-repeat;	
+	min-width: 110px;
+	padding: 0 16px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--row-blue);
+	color: #fff;
+	font-size: 52px;
 }
 
-.pena .gate[data-pen="-1"][data-red="0"]
+#block_finish .rank:empty { display: none; }
+#block_finish .rank sup { font-size: 0.45em; margin-left: 2px; align-self: flex-start; margin-top: 18px; }
+
+#block_finish.first .rank
 {
-	background-image: url("../img/pena/pena_v_0_transparent.png");
-/*	opacity: 0.3; /* 0 = totalement transparent, 1 = totalement opaque */
-	background-repeat: no-repeat;	
-	font-weight:normal;
+	background: var(--gold);
+	color: var(--row-dark);
 }
 
-.pena .gate[data-pen="0"][data-red="1"]
+#block_finish.second .rank
 {
-	background-image: url("../img/pena/pena_r_0.png");
-	background-repeat: no-repeat;	
-}
-	
-.pena .gate[data-pen="2"][data-red="1"]
-{
-	background-image: url("../img/pena/pena_r_2.png");
-	background-repeat: no-repeat;	
+	background: var(--silver);
+	color: var(--row-dark);
 }
 
-.pena .gate[data-pen="50"][data-red="1"]
-{
-	background-image: url("../img/pena/pena_r_50.png");
-	background-repeat: no-repeat;	
-}
+#block_finish.third .rank { background: var(--bronze); }
 
-.pena .gate[data-pen="-1"][data-red="1"]
-{
-	background-image: url("../img/pena/pena_r_0_transparent.png");
-/*	opacity: 0.3; /* 0 = totalement transparent, 1 = totalement opaque */
-	background-repeat: no-repeat;	
-	font-weight:normal;
-}
+/* ------------------------------------------------------------ pénalités */
 
-
-/******************* penalites : repli temporaire ********************
- * Le nouveau rendu en vignettes (".pena .gate[data-pen=...][data-red=...]"
- * plus haut) ne s'applique jamais en l'etat :
- *   - tv_inrace.js ne pose que data-pen et data-col, jamais data-red
- *     (CreateBlockPena ligne 53, ShowPenalty ligne 584) ;
- *   - --block_pena_width / --block_pena_height ne sont definies nulle part,
- *     donc les cellules n'ont ni largeur ni hauteur ;
- *   - pena_v_0_transparent.png / pena_r_0_transparent.png n'existent pas
- *     dans img/pena/ (seuls les *_flt.png y sont) ;
- *   - "#block_running .pena" est commente, la bande du bateau en course n'a
- *     donc plus aucune position et se poserait en haut a gauche de l'ecran.
- * En attendant la version finie cote FFCK, on remet exactement le rendu de la
- * version precedente du fichier, pour ne pas perdre l'affichage des penalites.
- * Bloc a supprimer d'un seul tenant le jour ou les vignettes fonctionnent.
+/*
+ * Colonne du bord droit : une ligne par porte pénalisée, dans l'ordre des
+ * portes, qui apparaît dès que le juge la saisit.
  */
-#block_running .pena
+#block_pena
 {
 	position: absolute;
-	left:255px;
-	top:48px;
+	right: var(--side);
+	bottom: calc(var(--bottom) + var(--block-h) + 8px + var(--leader-h) + 16px);
+	width: 200px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	animation: apparitionD 0.5s ease-out;
 }
 
-#block_finish .pena
+#block_pena .pena-list
 {
-	position: absolute;
-	left:425px;
-	top:152px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
 
-td.gate {
-	border: 1px solid rgb(0,0,0);
-	padding:0px;
-	height:25px;
-	font-weight: bold;
-	text-align: center;
-	vertical-align: middle;
+#block_pena .gate
+{
+	display: flex;
+	align-items: stretch;
+	height: 46px;
+	background: linear-gradient(90deg, var(--row-dark) 0%, var(--row-mid) 100%);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	animation: pena-in 0.45s ease-out;
 }
 
-#block_finish td.gate { width:17px; }
-#block_running td.gate { width:6px; }
+#block_pena .gate .num
+{
+	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
+	padding: 0 12px;
+	font-size: 24px;
+}
 
-td.gate[data-pen="0"]  { background-color: green; }
-td.gate[data-pen="2"]  { background-color: yellow; color:black; }
-td.gate[data-pen="50"] { background-color: red; color:white; }
-td.gate[data-pen="-1"] { background-color: white; }
+#block_pena .gate .num small
+{
+	margin-right: 6px;
+	font-size: 16px;
+	font-weight: normal;
+	color: rgba(255, 255, 255, 0.7);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+#block_pena .gate .val
+{
+	flex: 0 0 auto;
+	min-width: 70px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 28px;
+}
+
+/* 2 s : touche (jaune) ; 50 s : porte manquée (rouge). */
+#block_pena .gate[data-pen="2"] .val { background: var(--flt); color: var(--row-dark); }
+#block_pena .gate[data-pen="50"] .val { background: var(--red); color: #fff; }
+
+/* ------------------------------------------------------------ animations */
+
+@keyframes apparitionG
+{
+	from { opacity: 0; transform: translateX(-200px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes apparitionD
+{
+	from { opacity: 0; transform: translateX(200px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Nouvelle pénalité : entre par la droite et s'éclaire un instant. */
+@keyframes pena-in
+{
+	0%   { opacity: 0; transform: translateX(60px); filter: brightness(1.8); }
+	60%  { opacity: 1; transform: translateX(0); filter: brightness(1.8); }
+	100% { filter: brightness(1); }
+}
+
+/*
+ * Incrustation par couleur (?bg=1) : pas de fondu, qui mélangerait chaque
+ * pixel au magenta et laisserait un fantôme rose. On garde la translation.
+ */
+@keyframes apparitionG-chroma { from { transform: translateX(-200px); } to { transform: translateX(0); } }
+@keyframes apparitionD-chroma { from { transform: translateX(200px); } to { transform: translateX(0); } }
+@keyframes pena-in-chroma { from { transform: translateX(60px); } to { transform: translateX(0); } }
+
+body.chroma #block_start,
+body.chroma #block_finish .ident { animation-name: apparitionG-chroma; }
+body.chroma #block_running,
+body.chroma #block_leader,
+body.chroma #block_inter,
+body.chroma #block_finish .result,
+body.chroma #block_pena { animation-name: apparitionD-chroma; }
+body.chroma #block_pena .gate { animation-name: pena-in-chroma; }
+
+/* ?anim=0 : plus aucune animation, comme sur les autres pages TV. */
+body.no-anim *,
+body.no-anim *::before,
+body.no-anim *::after { animation: none !important; }

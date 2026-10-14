@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=1920, initial-scale=1.0">
+<title>KCross - Écran TV</title>
+<link rel="icon" type="image/png" sizes="64x64" href="../favicons/favicon-64x64.png">
+<link rel="stylesheet" href="../css/dossards.css?v=2.2.0">
+<link rel="stylesheet" href="css/tableau.css?v=2.2.0">
+<link rel="stylesheet" href="css/ecran_tv.css?v=2.2.0">
+</head>
+<body>
+<!--
+  Écran TV du site, pour le public sur place. Page autonome : aucune régie,
+  elle suit la course d'après l'état des séries (api_get_next_heats).
+
+    - en haut : où en est la journée (programme par blocs, course n° x sur y) ;
+    - à gauche : la branche du tableau de la série en cours ;
+    - à droite : la série en cours (au départ, en course, arrivée, résultats)
+      et la série suivante.
+
+  Après la validation d'une série, son tableau et ses résultats restent
+  affichés ?maintien=20 secondes, puis l'écran passe à la série suivante.
+  Composé pour 1920 x 1080, réduit d'un bloc sur un écran plus petit.
+-->
+<div id="screen">
+  <header class="tv-head">
+    <div class="tv-title">
+      <span class="tv-comp" id="tv-comp"></span>
+      <span class="tv-count" id="tv-count"></span>
+    </div>
+    <div class="tv-program" id="tv-program"></div>
+    <div class="tv-clock" id="tv-clock"></div>
+  </header>
+  <main class="tv-main">
+    <section class="tv-tree">
+      <div id="board" class="visible">
+        <div class="tb-bg" aria-hidden="true"></div>
+        <header class="tb-head">
+          <div class="tb-title">
+            <span class="tb-genre" id="tb-genre"></span>
+            <span class="tb-cat" id="tb-cat"></span>
+            <span class="tb-catname" id="tb-catname"></span>
+          </div>
+        </header>
+        <div class="tb-stage">
+          <svg class="tb-links"></svg>
+          <div class="tb-grid"></div>
+        </div>
+        <p class="tv-notree" id="tv-notree" hidden>Pas de tableau pour ce format : les bateaux sont redistribués à chaque tour.</p>
+      </div>
+    </section>
+    <aside class="tv-side">
+      <section class="tv-current" id="tv-current"></section>
+      <section class="tv-next" id="tv-next"></section>
+    </aside>
+  </main>
+</div>
+<script type="module" src="js/ecran_tv.js?v=2.2.0"></script>
+</body>
+</html>

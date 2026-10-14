@@ -1,0 +1,400 @@
+/* ==========================================================================
+   KCROSS — ÉCRAN TV DU SITE
+   Charte des pages TV (Calibri gras, bleus #030910 -> #256eb5). L'arbre
+   reprend tableau.css ; les bateaux de la série en cours reprennent le
+   bandeau de l'incrustation TV (pavé de couloir, dégradé, pénalités).
+   Écran vu de loin : rien sous 16 px.
+   ========================================================================== */
+
+:root {
+    --tv-dark: #030910;
+    --tv-mid: #123558;
+    --tv-blue: #256eb5;
+    --tv-pale: #c4dbef;
+    --tv-gold: #f2c200;
+    --tv-qualif: #3fae3c;
+    --tv-live: #e0342f;
+    --dames: #e8467c;
+    --hommes: #2f8cff;
+}
+
+html, body { background: #000; }
+
+#screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
+    box-sizing: border-box;
+    padding: 24px 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: #000;
+    font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
+    color: #fff;
+    overflow: hidden;
+}
+
+/* ------------------------------------------------------------- en-tête */
+
+.tv-head {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.tv-title {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    max-width: 460px;
+    font-weight: bold;
+}
+
+.tv-comp {
+    font-size: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tv-count {
+    font-size: 20px;
+    color: var(--tv-gold);
+    letter-spacing: 0.04em;
+}
+
+/* Le programme par blocs : on voit d'un coup d'œil ce qui est fait, ce qui se
+   court et ce qui vient. */
+.tv-program {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tv-block {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-left: 5px solid rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.tv-block.dames { border-left-color: var(--dames); }
+.tv-block.hommes { border-left-color: var(--hommes); }
+.tv-block b { font-size: 20px; }
+.tv-block i { font-style: normal; font-weight: bold; color: var(--tv-gold); margin-left: 4px; }
+.tv-block em { font-style: normal; color: var(--tv-qualif); font-weight: bold; }
+.tv-block.done { opacity: 0.45; }
+
+.tv-block.current {
+    background: rgba(242, 194, 0, 0.16);
+    outline: 2px solid var(--tv-gold);
+    font-size: 20px;
+}
+
+.tv-clock {
+    flex: 0 0 auto;
+    font-weight: bold;
+    font-size: 52px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------- corps */
+
+.tv-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1160px 1fr;
+    gap: 28px;
+}
+
+/* ------------------------------------------------------------- arbre */
+
+.tv-tree { position: relative; min-width: 0; }
+
+/* Le plateau du tableau, logé dans sa colonne au lieu de couvrir l'écran. */
+.tv-tree #board {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    padding: 22px 24px 20px;
+    background: #04070b;
+    --row-h: 48px;
+    --name-size: 22px;
+    --club-size: 15px;
+}
+
+.tv-tree #board.focus { --row-h: 48px; --name-size: 22px; --club-size: 16px; }
+.tv-tree #board.focus .tb-grid { gap: 56px; }
+.tv-tree #board.focus .tb-heat.big .tb-row { height: 56px; }
+.tv-tree #board.focus .tb-heat.big { --name-size: 25px; --club-size: 17px; }
+.tv-tree #board.focus .tb-col-head { font-size: 20px; }
+.tv-tree #board.focus .tb-col-head.final { font-size: 24px; }
+.tv-tree #board.focus .tb-heat-label { font-size: 18px; }
+.tv-tree #board.focus .tb-placeholder { font-size: 19px; }
+.tv-tree .tb-cat { font-size: 44px; }
+.tv-tree .tb-catname { font-size: 26px; }
+.tv-tree .tb-genre { font-size: 24px; }
+.tv-tree #board.focus .tb-champion-name { font-size: 34px; }
+.tv-tree #board.focus .tb-podium { font-size: 19px; }
+
+.tv-notree {
+    position: relative;
+    z-index: 1;
+    margin: 120px 40px 0;
+    font-size: 26px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ------------------------------------------------- série en cours, à suivre */
+
+.tv-side {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.tv-current,
+.tv-next {
+    background: rgba(10, 30, 52, 0.6);
+    border-top: 6px solid rgba(255, 255, 255, 0.25);
+    padding: 16px 18px 18px;
+}
+
+.tv-current { flex: 1 1 auto; }
+.tv-current.waiting { border-top-color: var(--tv-gold); }
+.tv-current.racing { border-top-color: var(--tv-live); }
+.tv-current.arrival { border-top-color: #e58a00; }
+.tv-current.results { border-top-color: var(--tv-qualif); }
+
+.tv-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.tv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px;
+    font-weight: bold;
+    font-size: 26px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.tv-badge.waiting { background: var(--tv-gold); color: var(--tv-dark); }
+.tv-badge.racing { background: var(--tv-live); }
+.tv-badge.arrival { background: #e58a00; }
+.tv-badge.results { background: var(--tv-qualif); }
+
+/* En course : le point qui clignote, comme un direct. */
+.tv-badge.racing::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    animation: tv-blink 1s steps(2, start) infinite;
+}
+
+.tv-when {
+    font-weight: bold;
+    font-size: 26px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.tv-heat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 14px;
+    font-size: 30px;
+}
+
+.tv-heat.small { font-size: 23px; margin-bottom: 10px; }
+
+.tv-genre {
+    padding: 2px 10px;
+    font-size: 0.7em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.tv-genre.dames { background: var(--dames); }
+.tv-genre.hommes { background: var(--hommes); }
+
+.tv-rows { display: flex; flex-direction: column; gap: 6px; }
+
+/* Bandeau d'un bateau : celui de l'incrustation TV, en grand. */
+.tv-row {
+    display: flex;
+    align-items: stretch;
+    height: 70px;
+    background: linear-gradient(90deg, var(--tv-dark) 0%, var(--tv-mid) 45%, var(--tv-blue) 100%);
+    font-weight: bold;
+}
+
+.tv-row.small { height: 50px; }
+
+.tv-lane {
+    flex: 0 0 auto;
+    width: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: #fff;
+}
+
+.tv-row.small .tv-lane { width: 44px; font-size: 22px; }
+.tv-lane.lane-R { background: #d7262b; }
+.tv-lane.lane-V { background: #1e9a3c; }
+.tv-lane.lane-B { background: #1f5fd6; }
+.tv-lane.lane-J { background: #f5cf00; color: var(--tv-dark); }
+
+.tv-who {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 16px;
+    line-height: 1.1;
+}
+
+.tv-name {
+    font-size: 30px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tv-club {
+    font-size: 18px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tv-row.small .tv-name { font-size: 22px; }
+.tv-row.small .tv-club { font-size: 16px; }
+
+.tv-placeholder {
+    font-size: 24px;
+    font-style: italic;
+    font-weight: normal;
+    color: rgba(196, 219, 239, 0.6);
+}
+
+.tv-row.small .tv-placeholder { font-size: 20px; }
+.tv-row.empty { background: rgba(255, 255, 255, 0.05); }
+
+/* Qualifié connu, couloir pas encore fixé. */
+.tv-lane.unsure { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.5); }
+
+.tv-from {
+    align-self: center;
+    margin-right: 12px;
+    padding: 2px 8px;
+    font-size: 17px;
+    color: var(--tv-qualif);
+    border: 1px solid rgba(63, 174, 60, 0.6);
+    white-space: nowrap;
+}
+.tv-row.empty .tv-lane { opacity: 0.4; }
+
+.tv-row .penalty-summary-box {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 10px;
+}
+
+.tv-row .penalty-tag {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.tv-row .penalty-tag.clear { display: none; }
+.tv-row .penalty-tag.flt { background: #ffd400; color: var(--tv-dark); }
+.tv-row .penalty-tag.ral { background: linear-gradient(180deg, #770101 0%, #c20201 50%, #a10101 100%); color: #fff; }
+
+.tv-q {
+    flex: 0 0 auto;
+    width: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tv-qualif);
+    font-size: 26px;
+}
+
+.tv-place {
+    flex: 0 0 auto;
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tv-dark);
+    font-size: 34px;
+}
+
+.tv-place:empty { background: transparent; }
+.tv-row.qualified .tv-place { background: var(--tv-qualif); }
+.tv-row.eliminated { opacity: 0.45; }
+.tv-row.medal-1 .tv-place { background: var(--tv-gold); color: var(--tv-dark); }
+.tv-row.medal-2 .tv-place { background: #d5dce3; color: var(--tv-dark); }
+.tv-row.medal-3 .tv-place { background: #d08a4a; }
+
+.tv-rule {
+    margin: 12px 0 0;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.tv-next-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-weight: bold;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tv-gold);
+}
+
+.tv-next-label .tv-when { font-size: 22px; letter-spacing: 0; text-transform: none; }
+
+.tv-empty {
+    margin: 8px 0;
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes tv-blink { to { visibility: hidden; } }

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=1920, initial-scale=1.0">
+<title>KCross - Tableau des phases finales</title>
+<link rel="icon" type="image/png" sizes="64x64" href="../favicons/favicon-64x64.png">
+<link rel="stylesheet" href="css/tableau.css?v=2.2.0">
+</head>
+<body>
+<!--
+  Tableau des phases finales pour le public, en deux branches qui convergent
+  vers la finale. Page d'incrustation OBS (fond transparent), 1920 x 1080.
+
+  Affichage :
+    - piloté par la régie : visible quand l'état d'incrustation est en mode
+      BRACKET (categoryKey, heatId = prochaine série) ;
+    - ?force=1 : toujours visible (répétition, cadrage) ;
+    - ?categorie=K1H : fige la catégorie.
+-->
+<div id="board" class="hidden">
+  <div class="tb-bg" aria-hidden="true"></div>
+  <header class="tb-head">
+    <div class="tb-title">
+      <span class="tb-genre" id="tb-genre"></span>
+      <span class="tb-cat" id="tb-cat"></span>
+      <span class="tb-catname" id="tb-catname"></span>
+      <span class="tb-kind">Phases finales</span>
+    </div>
+    <div class="tb-next" id="tb-next"></div>
+  </header>
+  <div class="tb-stage" id="tb-stage">
+    <svg class="tb-links" id="tb-links"></svg>
+    <div class="tb-grid" id="tb-grid"></div>
+  </div>
+</div>
+<script type="module" src="js/tableau.js?v=2.2.0"></script>
+</body>
+</html>

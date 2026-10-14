@@ -55,7 +55,10 @@
       "nom": "CHEVALIER Arthur",
       "club": "ASCPA Tours",
       "nation": "FRA",
-      "ref_time_ms": 103502
+      "ref_time_ms": 103502,
+      "pena_plan": {
+        "3": 2
+      }
     },
     {
       "bib": 2,
@@ -63,7 +66,11 @@
       "nom": "RIVIERE Hugo",
       "club": "Annecy CK",
       "nation": "FRA",
-      "ref_time_ms": 116725
+      "ref_time_ms": 116725,
+      "pena_plan": {
+        "5": 2,
+        "12": 2
+      }
     },
     {
       "bib": 3,
@@ -71,7 +78,10 @@
       "nom": "VASSEUR Quentin",
       "club": "CKC Argentat",
       "nation": "FRA",
-      "ref_time_ms": 120343
+      "ref_time_ms": 120343,
+      "pena_plan": {
+        "7": 50
+      }
     },
     {
       "bib": 4,
@@ -87,7 +97,12 @@
       "nom": "LEMOINE Antoine",
       "club": "CK Saint-Pierre",
       "nation": "FRA",
-      "ref_time_ms": 121364
+      "ref_time_ms": 121364,
+      "pena_plan": {
+        "2": 2,
+        "9": 2,
+        "15": 50
+      }
     },
     {
       "bib": 6,
@@ -95,7 +110,10 @@
       "nom": "ROYER Gabin",
       "club": "ACA Aviron Canoë",
       "nation": "FRA",
-      "ref_time_ms": 105613
+      "ref_time_ms": 105613,
+      "pena_plan": {
+        "11": 2
+      }
     },
     {
       "bib": 7,

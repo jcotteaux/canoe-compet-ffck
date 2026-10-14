@@ -1,0 +1,1 @@
+const appInfo={name:"competCrossFFCK",version:"2.2.0",fullName:`competCrossFFCK v2.2.0`,autor:`Verdier Stéphane`,date:`28/06/2026`};export{appInfo}

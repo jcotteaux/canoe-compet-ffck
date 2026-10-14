@@ -1,0 +1,56 @@
+{
+  "label": "Kayak cross — élimination directe ICF, Dames et Hommes (K1D 12, K1H 16)",
+  "competition": {
+    "Code": 900,
+    "Codex": "KX-2026-900",
+    "Nom": "Kayak Cross simulé — Coupe de France",
+    "Ville": "Pau",
+    "Date_debut": "2026-10-17",
+    "Date_fin": "2026-10-18",
+    "Etat": 4
+  },
+  "format": "ICF_ELIMINATION_DIRECTE",
+  "gates": 6,
+  "roll_after_gate": 4,
+  "gate_profil": "000000",
+  "first_start": "14:00:00",
+  "ecart_series": 120,
+  "ecart_categories": 240,
+  "ecart_phases": 900,
+  "seed": 7,
+  "speed": 4,
+  "categories": [
+    {
+      "code": "K1D",
+      "nom": "Kayak Cross Dame",
+      "sexe": "F",
+      "nb": 12,
+      "inscrits": 14,
+      "tt_base_s": 68,
+      "tt_spread_s": 12
+    },
+    {
+      "code": "K1H",
+      "nom": "Kayak Cross Homme",
+      "sexe": "H",
+      "nb": 16,
+      "inscrits": 19,
+      "tt_base_s": 61,
+      "tt_spread_s": 11
+    }
+  ],
+  "sim": {
+    "call_s": 25,
+    "race_s": 52,
+    "race_spread_s": 6,
+    "validate_s": 12,
+    "gap_s": 20,
+    "p_dns": 0.02,
+    "p_dnf": 0.03,
+    "p_dsq": 0.01,
+    "p_start": 0.02,
+    "p_gate": 0.04,
+    "p_roll": 0.08,
+    "p_ral": 0.015
+  }
+}

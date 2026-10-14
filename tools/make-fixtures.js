@@ -99,6 +99,20 @@ const slalomEpreuves = [
   { code: 'C1D', libelle: 'Canoë monoplace dames', etat: '1', offsetMs: 18000 },
 ];
 
+/**
+ * Pénalités prévues sur les premiers K1H : elles tombent pendant la course,
+ * au passage de la porte (voir mock/engine.js), pour voir l'incrustation se
+ * remplir sans rien saisir. Porte -> 2 (touchée) ou 50 (manquée). Le dossard 4
+ * reste propre : il faut aussi un parcours sans faute.
+ */
+const SLALOM_PENA_PLAN = {
+  1: { 3: 2 },
+  2: { 5: 2, 12: 2 },
+  3: { 7: 50 },
+  5: { 2: 2, 9: 2, 15: 50 },
+  6: { 11: 2 },
+};
+
 const slalom = {
   id: 'slalom-finale',
   label: 'Coupe de France Slalom — Finale (18 portes)',
@@ -165,6 +179,10 @@ const international = {
 };
 
 fs.mkdirSync(OUT, { recursive: true });
+for (const b of slalom.boats) {
+  if (SLALOM_PENA_PLAN[b.bib]) b.pena_plan = SLALOM_PENA_PLAN[b.bib];
+}
+
 for (const f of [descente, slalom, international]) {
   const file = path.join(OUT, `${f.id}.json`);
   fs.writeFileSync(file, JSON.stringify(f, null, 2) + '\n');

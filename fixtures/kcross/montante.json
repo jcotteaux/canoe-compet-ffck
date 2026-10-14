@@ -1,0 +1,56 @@
+{
+  "label": "Kayak cross — montante-descendante 2 tours, Dames et Hommes (K1D 16, K1H 24)",
+  "competition": {
+    "Code": 900,
+    "Codex": "KX-2026-901",
+    "Nom": "Kayak Cross simulé — Montante-descendante",
+    "Ville": "Bourg-Saint-Maurice",
+    "Date_debut": "2026-10-24",
+    "Date_fin": "2026-10-24",
+    "Etat": 4
+  },
+  "format": "MONTANTE_DESCENDANTE_2_TOURS",
+  "gates": 8,
+  "roll_after_gate": 2,
+  "gate_profil": "00000000",
+  "first_start": "10:30:00",
+  "ecart_series": 150,
+  "ecart_categories": 300,
+  "ecart_phases": 1200,
+  "seed": 21,
+  "speed": 4,
+  "categories": [
+    {
+      "code": "K1D",
+      "nom": "Kayak Cross Dame",
+      "sexe": "F",
+      "nb": 16,
+      "inscrits": 17,
+      "tt_base_s": 71,
+      "tt_spread_s": 12
+    },
+    {
+      "code": "K1H",
+      "nom": "Kayak Cross Homme",
+      "sexe": "H",
+      "nb": 24,
+      "inscrits": 26,
+      "tt_base_s": 64,
+      "tt_spread_s": 12
+    }
+  ],
+  "sim": {
+    "call_s": 25,
+    "race_s": 58,
+    "race_spread_s": 7,
+    "validate_s": 12,
+    "gap_s": 20,
+    "p_dns": 0.02,
+    "p_dnf": 0.03,
+    "p_dsq": 0.01,
+    "p_start": 0.02,
+    "p_gate": 0.04,
+    "p_roll": 0.08,
+    "p_ral": 0.015
+  }
+}

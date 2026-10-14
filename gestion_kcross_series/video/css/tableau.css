@@ -1,0 +1,674 @@
+/* ==========================================================================
+   KCROSS — TABLEAU DES PHASES FINALES (incrustation plein écran)
+
+   Version allégée : une ligne par bateau, pas de pastilles ni de légende. Le
+   vert dit « qualifié », le reste s'efface ; l'or désigne la prochaine course.
+   Charte des pages TV ws_live : Calibri gras, bleus #030910 -> #256eb5.
+   ========================================================================== */
+
+@font-face {
+    font-family: 'Calibri';
+    src: url('../fonts/calibri-regular.ttf') format('truetype');
+    font-weight: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: 'Calibri';
+    src: url('../fonts/calibri-bold.ttf') format('truetype');
+    font-weight: bold;
+    font-display: block;
+}
+
+:root {
+    --tv-dark: #030910;
+    --tv-mid: #123558;
+    --tv-pale: #c4dbef;
+    --tv-pale-text: rgb(0, 27, 90);
+    --tv-gold: #f2c200;
+    --tv-qualif: #3fae3c;
+    --tv-live: #e0342f;
+
+    --lane-R: #d7262b;
+    --lane-V: #1e9a3c;
+    --lane-B: #1f5fd6;
+    --lane-J: #f5cf00;
+
+    --row-h: 44px;
+    --name-size: 20px;
+    --club-size: 15px;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: Calibri, 'Trebuchet MS', Arial, sans-serif;
+    color: #fff;
+}
+
+/* ------------------------------------------------------------- plateau */
+
+/* Fenêtre plus large ou plus haute que 16/9 : bandes noires plutôt que
+   blanches, mais seulement quand le tableau est affiché (sinon la page doit
+   rester transparente au-dessus de la vidéo). */
+body:has(#board.visible) { background: #000; }
+
+/* Composé pour 1920 x 1080 ; réduit pour tenir dans la fenêtre (tableau.js). */
+#board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 40px 56px 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #000;
+    transition: opacity 0.6s ease;
+}
+
+#board.hidden { opacity: 0; pointer-events: none; }
+#board.visible { opacity: 1; }
+
+/* Vue antenne : une branche, 2 séries au plus par colonne. Caractères taillés
+   pour une diffusion YouTube, lisibles même en 720p. Colonnes plafonnées et
+   centrées : une branche courte ne s'étire pas sur toute la largeur. */
+#board.focus {
+    --row-h: 60px;
+    --name-size: 29px;
+    --club-size: 20px;
+}
+
+#board.focus .tb-grid { justify-content: center; gap: 90px; }
+#board.focus.ltr .tb-col,
+#board.focus.ltr .tb-col.center { flex: 0 1 560px; }
+#board.focus .tb-heat-label { font-size: 21px; margin-bottom: 6px; }
+#board.focus .tb-cat { font-size: 54px; }
+#board.focus .tb-catname { font-size: 30px; }
+#board.focus .tb-genre { font-size: 30px; }
+#board.focus .tb-kind { font-size: 22px; }
+#board.focus .tb-next-label { font-size: 22px; }
+#board.focus .tb-next-what { font-size: 32px; }
+#board.focus .tb-champion-label { font-size: 19px; }
+#board.focus .tb-champion-name { font-size: 42px; }
+#board.focus .tb-champion-club { font-size: 22px; }
+#board.focus .tb-podium { font-size: 22px; }
+#board.focus .tb-podium-place b { width: 30px; height: 30px; font-size: 19px; }
+#board.focus .tb-trophy { width: 76px; height: 76px; }
+#board.focus .tb-col-head { font-size: 24px; margin-bottom: 12px; }
+#board.focus .tb-col-head.final { font-size: 28px; }
+#board.focus /* Qualifié connu, couloir pas encore fixé : filet neutre et provenance. */
+.tb-row.provisional { border-left-color: rgba(255, 255, 255, 0.25); }
+
+.tb-from {
+    flex: 0 0 auto;
+    padding: 1px 6px;
+    font-size: calc(var(--club-size) - 1px);
+    font-weight: bold;
+    color: var(--tv-qualif);
+    border: 1px solid rgba(63, 174, 60, 0.6);
+}
+
+.tb-placeholder { font-size: 24px; }
+#board.focus .tb-heat.big .tb-row { height: 70px; }
+#board.focus .tb-heat.big { --name-size: 32px; --club-size: 21px; }
+
+/* Photo de fond : à droite, côté finale, assombrie et fondue vers le noir à
+   gauche pour que le tableau reste lisible. Lent zoom continu. Remplacer
+   img/fond_tableau.jpg pour changer de photo ; sans fichier, fond noir. */
+.tb-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.tb-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 0 30%;
+    background: url('../img/fond_tableau.jpg') center 35% / cover no-repeat;
+    filter: saturate(0.85) brightness(0.55);
+    animation: tb-kenburns 40s ease-in-out infinite alternate;
+}
+
+.tb-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, #000 30%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.45) 75%, rgba(0, 0, 0, 0.35) 100%),
+        linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 35%);
+}
+
+/* Le contenu passe au-dessus de la photo. */
+.tb-head,
+.tb-stage { position: relative; z-index: 1; }
+
+/* Une série par colonne (8 ou 12 bateaux) : plus grand. */
+#board.roomy {
+    --row-h: 54px;
+    --name-size: 24px;
+    --club-size: 17px;
+}
+
+/* 32 bateaux : 4 séries par colonne, on resserre. */
+#board.compact {
+    --row-h: 32px;
+    --name-size: 16px;
+    --club-size: 12px;
+}
+
+/* De gauche à droite, 4 séries dans la première colonne (16 bateaux). */
+#board.dense {
+    --row-h: 38px;
+    --name-size: 19px;
+    --club-size: 14px;
+}
+
+#board.dense .tb-col-body { gap: 10px; }
+
+/* Les tours se lisent de gauche à droite : la finale n'a plus besoin d'être
+   plus large que les autres colonnes, elle est seulement la dernière. */
+#board.ltr .tb-col.center { flex: 1 1 0; }
+#board.ltr .tb-grid { gap: 70px; }
+
+/* De gauche à droite à 32 bateaux : 8 huitièmes dans la première colonne.
+   Les colonnes restent larges, seule la hauteur des lignes se resserre. */
+#board.ltr.compact {
+    --row-h: 20px;
+    --name-size: 14px;
+    --club-size: 11px;
+}
+
+#board.ltr.compact .tb-col-body { gap: 8px; }
+#board.ltr.compact .tb-heat-label { font-size: 11px; margin-bottom: 1px; }
+#board.ltr.compact .tb-heat.big .tb-row { height: 34px; }
+#board.ltr.compact .tb-heat.big { --name-size: 18px; --club-size: 13px; }
+
+/* Deux branches à 32 bateaux : 7 colonnes, on gagne de la largeur sur les
+   espaces plutôt que sur les noms. */
+#board.compact:not(.ltr) { padding-left: 36px; padding-right: 36px; }
+#board.compact:not(.ltr) .tb-grid { gap: 30px; }
+#board.compact:not(.ltr) .tb-col.center { flex: 1 1 0; }
+
+/* Dames / Hommes : une couleur par catégorie, sur le filet du haut, le
+   libellé et les titres de tours. L'or reste réservé à la prochaine course. */
+#board[data-genre="dames"] { --genre: #e8467c; }
+#board[data-genre="hommes"] { --genre: #2f8cff; }
+
+.tb-genre {
+    align-self: center;
+    padding: 6px 16px;
+    background: var(--genre);
+    font-size: 26px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.tb-genre:empty { display: none; }
+
+#board[data-genre] .tb-col-head:not(.final) { color: var(--genre); }
+
+/* ------------------------------------------------------------- en-tête */
+
+.tb-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.tb-title {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    font-weight: bold;
+}
+
+.tb-cat {
+    font-size: 44px;
+    letter-spacing: 0.03em;
+}
+
+.tb-catname {
+    font-size: 26px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.tb-catname:empty { display: none; }
+
+.tb-kind {
+    font-size: 18px;
+    color: var(--tv-gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.tb-next {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-weight: bold;
+}
+
+.tb-next:empty { display: none; }
+
+.tb-next-label {
+    font-size: 16px;
+    color: var(--tv-gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.tb-next-what { font-size: 24px; }
+
+/* -------------------------------------------------------------- grille */
+
+.tb-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 6px;
+}
+
+.tb-links {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.tb-links path {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 2;
+}
+
+.tb-links path.done { stroke: rgba(63, 174, 60, 0.75); }
+
+/* Lumière qui circule vers la finale sur les traits des séries jouées. */
+.tb-links path.flow {
+    stroke: #b9ffb2;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 0.035 0.3;
+    filter: drop-shadow(0 0 4px rgba(120, 255, 110, 0.9));
+    animation: tb-flow 2.6s linear infinite;
+}
+
+.tb-grid {
+    position: relative;
+    height: 100%;
+    display: flex;
+    gap: 52px;
+}
+
+.tb-col {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.tb-col.center { flex: 1.2 1 0; }
+
+.tb-col-head {
+    text-align: center;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 17px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(196, 219, 239, 0.7);
+}
+
+.tb-col-head.final { color: var(--tv-gold); font-size: 20px; }
+
+/* Colonnes de même hauteur, cases en space-around : chaque case tombe à
+   mi-hauteur des deux cases qui l'alimentent. */
+.tb-col-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 16px;
+}
+
+/* --------------------------------------------------------------- série */
+
+.tb-heat { position: relative; }
+
+.tb-heat-label {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    margin: 0 0 4px 2px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+}
+
+.tb-live {
+    font-weight: bold;
+    color: var(--tv-live);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.tb-heat-box {
+    background: rgba(10, 30, 52, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Prochaine course : seul élément appuyé du tableau. */
+.tb-heat.next .tb-heat-box {
+    border: 2px solid var(--tv-gold);
+    box-shadow: 0 0 24px rgba(242, 194, 0, 0.35);
+}
+
+.tb-heat.next .tb-heat-label { color: var(--tv-gold); font-weight: bold; }
+.tb-heat.live .tb-heat-box { border-color: var(--tv-live); }
+
+/* ------------------------------------------------------------- bateaux */
+
+.tb-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--row-h);
+    padding: 0 12px;
+    border-left: 5px solid transparent;
+}
+
+.tb-row + .tb-row { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+
+/* Couleur du couloir : un simple filet. */
+.tb-row.lane-R { border-left-color: var(--lane-R); }
+.tb-row.lane-V { border-left-color: var(--lane-V); }
+.tb-row.lane-B { border-left-color: var(--lane-B); }
+.tb-row.lane-J { border-left-color: var(--lane-J); }
+.tb-row.empty { border-left-color: rgba(255, 255, 255, 0.08); }
+
+.tb-who {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Le nom passe en premier : c'est le club qui cède la place, puis disparaît. */
+.tb-name {
+    flex: 0 0 auto;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: var(--name-size);
+}
+
+.tb-club {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--club-size);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.tb-tt {
+    flex: 0 0 auto;
+    font-size: calc(var(--club-size) - 1px);
+    font-weight: bold;
+    color: var(--tv-pale);
+}
+
+.tb-placeholder {
+    font-size: calc(var(--name-size) - 3px);
+    font-style: italic;
+    color: rgba(196, 219, 239, 0.45);
+}
+
+.tb-rank {
+    flex: 0 0 auto;
+    min-width: 22px;
+    text-align: right;
+    font-weight: bold;
+    font-size: var(--name-size);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Qualifié : le vert, et rien d'autre. */
+.tb-row.qualified {
+    border-left-color: var(--tv-qualif);
+    background: rgba(63, 174, 60, 0.16);
+}
+
+.tb-row.qualified .tb-rank { color: var(--tv-qualif); }
+.tb-row.eliminated { opacity: 0.38; }
+
+/* --------------------------------------------------------------- finale */
+
+.tb-heat.big .tb-row { height: calc(var(--row-h) + 10px); }
+.tb-heat.big .tb-heat-box { border-color: rgba(242, 194, 0, 0.45); }
+.tb-heat.big.next .tb-heat-box { border-color: var(--tv-gold); }
+.tb-row.medal-1 { background: rgba(242, 194, 0, 0.16); }
+.tb-row.medal-1 .tb-rank { color: var(--tv-gold); }
+.tb-row.medal-2 .tb-rank { color: #d5dce3; }
+.tb-row.medal-3 .tb-rank { color: #d08a4a; }
+
+/* Vainqueur de la catégorie : carte dorée sous la finale, avec le podium. */
+.tb-champion {
+    position: relative;
+    overflow: hidden;
+    margin-top: 6px;
+    padding: 16px 18px 14px;
+    background: linear-gradient(160deg, #2a2000 0%, #0b0900 70%);
+    border: 2px solid var(--tv-gold);
+    box-shadow: 0 0 40px rgba(242, 194, 0, 0.35);
+    animation: tb-glow 3s ease-in-out infinite;
+}
+
+/* Reflet doré qui balaie la carte. */
+.tb-champion::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(100deg, transparent, rgba(255, 230, 140, 0.28), transparent);
+    animation: tb-shine 4s ease-in-out 3s infinite;
+}
+
+.tb-champion-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tb-trophy {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    fill: var(--tv-gold);
+    filter: drop-shadow(0 0 10px rgba(242, 194, 0, 0.6));
+}
+
+.tb-champion-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.tb-champion-label {
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--tv-gold);
+}
+
+.tb-champion-name {
+    font-weight: bold;
+    font-size: 36px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tb-champion-club {
+    font-size: 19px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tb-podium {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(242, 194, 0, 0.3);
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.tb-podium:empty { display: none; }
+
+.tb-podium-place {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.tb-podium-place b {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 15px;
+    color: var(--tv-dark);
+}
+
+.tb-podium-place.m2 b { background: #d5dce3; }
+.tb-podium-place.m3 b { background: #d08a4a; }
+
+/* 32 bateaux : la colonne de la finale est étroite. La carte déborde sur les
+   espaces entre colonnes et se lit centrée, le nom pouvant passer à la ligne. */
+#board.compact:not(.ltr) .tb-champion {
+    margin-left: -80px;
+    margin-right: -80px;
+    text-align: center;
+}
+
+#board.compact:not(.ltr) .tb-champion-top { flex-direction: column; gap: 6px; }
+#board.compact:not(.ltr) .tb-champion-text { align-items: center; }
+#board.compact:not(.ltr) .tb-champion-name { font-size: 30px; white-space: normal; }
+#board.compact:not(.ltr) .tb-podium { justify-content: center; }
+
+/* Finale jouée : les tours précédents passent au second plan. */
+#board.has-champion .tb-col:not(.center),
+#board.has-champion .tb-links { opacity: 0.45; transition: opacity 0.8s ease; }
+
+/* ------------------------------------------------------------- animations */
+
+/* Entrée en cascade, jouée à chaque apparition (classe .intro posée 5 s) :
+   le filet de catégorie se déroule, les tours arrivent un par un, chaque
+   série avec un léger décalage, les traits se dessinent derrière elles, les
+   qualifiés se surlignent, le vainqueur arrive en dernier. Sans fondu sur
+   l'ensemble : l'image reste nette à chaque instant. */
+/* Filet de catégorie : dessiné par ::before (et non par la bordure) pour
+   pouvoir se dérouler de gauche à droite. */
+#board[data-genre]::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: var(--genre);
+    transform-origin: left;
+}
+
+#board.intro::before { animation: tb-stripe 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+
+#board.intro .tb-head { animation: tb-drop 0.6s ease-out backwards; }
+
+#board.intro .tb-col-head {
+    animation: tb-fade-up 0.5s ease-out backwards;
+    animation-delay: calc(var(--ci) * 0.35s + 0.15s);
+}
+
+#board.intro .tb-heat {
+    animation: tb-heat-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: calc(var(--ci) * 0.35s + var(--bi) * 0.07s + 0.2s);
+}
+
+#board.intro .tb-links path.link {
+    stroke-dasharray: 1;
+    animation: tb-draw 0.5s ease-out backwards;
+    animation-delay: var(--d);
+}
+
+#board.intro .tb-links path.flow {
+    animation: tb-appear 0.01s var(--d) backwards, tb-flow 2.6s linear infinite;
+}
+
+/* Les qualifiés se surlignent d'un balayage vert après l'arrivée de leur série. */
+#board.intro .tb-row.qualified {
+    background-image: linear-gradient(90deg, rgba(63, 174, 60, 0.35), rgba(63, 174, 60, 0.12));
+    background-repeat: no-repeat;
+    animation: tb-sweep 0.6s ease-out backwards;
+    animation-delay: calc(var(--ci) * 0.35s + var(--bi) * 0.07s + 0.6s);
+}
+
+#board.intro .tb-champion {
+    animation: tb-champion 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) 2.2s backwards, tb-glow 3s ease-in-out 3.1s infinite;
+}
+
+/* Prochaine course : pulsation dorée continue. */
+.tb-heat.next .tb-heat-box { animation: tb-pulse 1.8s ease-in-out infinite; }
+
+/* Course en cours : le liseré rouge respire. */
+.tb-heat.live .tb-heat-box { animation: tb-live 1.2s ease-in-out infinite; }
+
+@keyframes tb-stripe { from { transform: scaleX(0); } }
+@keyframes tb-kenburns { from { transform: scale(1); } to { transform: scale(1.1) translateX(-2%); } }
+@keyframes tb-drop { from { opacity: 0; transform: translateY(-24px); } }
+@keyframes tb-fade-up { from { opacity: 0; transform: translateY(10px); } }
+@keyframes tb-heat-in { from { opacity: 0; transform: translateX(-40px) scale(0.97); } }
+@keyframes tb-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes tb-appear { from { opacity: 0; } }
+@keyframes tb-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -0.335; } }
+@keyframes tb-sweep { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
+@keyframes tb-champion { from { opacity: 0; transform: scale(0.6); } }
+@keyframes tb-glow {
+    0%, 100% { box-shadow: 0 0 26px rgba(242, 194, 0, 0.3); }
+    50% { box-shadow: 0 0 56px rgba(242, 194, 0, 0.6); }
+}
+@keyframes tb-shine { 0% { left: -60%; } 40%, 100% { left: 130%; } }
+
+@keyframes tb-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(242, 194, 0, 0.25); }
+    50% { box-shadow: 0 0 34px rgba(242, 194, 0, 0.7); }
+}
+
+@keyframes tb-live {
+    0%, 100% { box-shadow: 0 0 0 rgba(224, 52, 47, 0); }
+    50% { box-shadow: 0 0 22px rgba(224, 52, 47, 0.6); }
+}

@@ -15,6 +15,207 @@ ws.STATE_COMMANDS = new Map([
 ws.RECONNECT_DELAY_MIN = 1000;
 ws.RECONNECT_DELAY_MAX = 15000;
 
+/**
+ * Connexion muette : une liaison coupée sans fermeture propre (wifi qui
+ * décroche, switch redémarré, serveur figé) laisse la socket « ouverte » sans
+ * plus rien recevoir, et la page reste figée sur le dernier état. Le flux
+ * <on_course> arrive à 10 Hz : s'il s'est déjà manifesté sur cette socket et
+ * que plus rien n'arrive pendant ce délai, on la remplace (reconnexion puis
+ * rejeu de l'état, donc rechargement complet depuis le serveur).
+ * Désactivable par ?watchdog=0.
+ */
+ws.SILENCE_RECONNECT = 10000;
+
+/**
+ * Chrono local : le temps tournant ne dépend plus de la régularité du serveur.
+ *
+ * competFFCK envoie <on_course> ~10 fois par seconde : l'horloge (`clock`) et,
+ * pour chaque bateau sur l'eau, son temps de course (`time`). Les pages
+ * affichaient ces valeurs telles quelles : qu'une trame tarde et le chrono se
+ * fige, puis saute.
+ *
+ * Ici, chaque trame sert seulement à recaler une référence locale :
+ *   départ estimé = heure locale de réception - temps reçu.
+ * Une trame en retard donne un départ estimé plus tardif ; on garde donc le
+ * plus précoce, celui de la trame la moins retardée. Le temps affiché est
+ * ensuite calculé localement (maintenant - départ estimé) et, si le serveur se
+ * tait, le poste fabrique lui-même la trame suivante. Les pages reçoivent des
+ * <on_course> réguliers sans rien savoir du mécanisme.
+ *
+ * Régulation : si le serveur indique durablement que l'affichage est en
+ * avance (son horloge dérive, un chrono a été recalé), on ralentit en douceur
+ * jusqu'à le rejoindre. Le chrono ne recule jamais et ne saute jamais en arrière.
+ *
+ * Désactivable par ?chrono=serveur dans l'URL de la page.
+ */
+ws.ChronoLocal = function()
+{
+	this.bibs = new Map();		// dossard -> { ref, samples:[{t, ecart}] }
+	this.clock = null;			// horloge serveur : { ref, samples }, même traitement qu'un bateau
+	this.lastFrame = null;		// dernière <on_course> réelle, servant de gabarit
+	this.lastReal = 0;			// réception de la dernière trame réelle
+	this.lastSent = 0;			// dernière trame distribuée (réelle ou locale)
+	this.timer = null;
+};
+
+ws.ChronoLocal.PERIOD = 100;			// cadence des trames locales (10 Hz, comme le serveur)
+ws.ChronoLocal.MAX_SILENCE = 20000;		// au-delà, serveur perdu : on cesse d'extrapoler
+ws.ChronoLocal.REGUL_WINDOW = 3000;		// avance constatée pendant ce temps -> régulation
+ws.ChronoLocal.REGUL_THRESHOLD = 150;	// écart minimal (ms) pour réguler
+ws.ChronoLocal.REGUL_STEP = 20;			// rattrapage max par trame reçue (ms) : 20 % de ralenti
+
+ws.ChronoLocal.now = function()
+{
+	return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+};
+
+/** Table <on_course> d'une trame : { rows, iBib, iTime } ou null. */
+ws.ChronoLocal.table = function(objJSON)
+{
+	const t = objJSON['table<sqlTable>'];
+	if (!t || !Array.isArray(t.columns) || !Array.isArray(t.rows))
+		return null;
+	const names = t.columns.map(function(c) { return Array.isArray(c) ? c[0] : c; });
+	const iBib = names.indexOf('bib');
+	const iTime = names.indexOf('time');
+	if (iBib < 0 || iTime < 0)
+		return null;
+	return { rows : t.rows, iBib : iBib, iTime : iTime };
+};
+
+/**
+ * Trame <on_course> réelle : recale les références, puis réécrit les temps
+ * avec le chrono local. Retourne la trame (modifiée sur place).
+ */
+ws.ChronoLocal.prototype.Observe = function(objJSON)
+{
+	const now = ws.ChronoLocal.now();
+	const tab = ws.ChronoLocal.table(objJSON);
+
+	if (typeof objJSON.clock === 'number' || (typeof objJSON.clock === 'string' && objJSON.clock !== ''))
+	{
+		const est = now - Number(objJSON.clock);
+		if (this.clock === null)
+			this.clock = { ref : est, samples : [] };
+		else if (est < this.clock.ref)
+			this.clock.ref = est;
+		this.Regulate(this.clock, now, est - this.clock.ref);
+		objJSON.clock = Math.round(now - this.clock.ref);
+	}
+
+	if (tab)
+	{
+		const seen = new Set();
+		for (const row of tab.rows)
+		{
+			const bib = String(row[tab.iBib]);
+			const time = Number(row[tab.iTime]);
+			if (!(time >= 1))
+				continue;	// statut (DNF, DSQ...) ou valeur vide : passe tel quel
+			seen.add(bib);
+
+			const est = now - time;
+			let b = this.bibs.get(bib);
+			if (!b || time < 1000 && est - b.ref > 1000)
+			{
+				// Nouveau départ (ou bateau relancé) : on part de la valeur reçue.
+				b = { ref : est, samples : [] };
+				this.bibs.set(bib, b);
+			}
+			else if (est < b.ref)
+			{
+				// Trame moins retardée que les précédentes : meilleure estimation.
+				b.ref = est;
+			}
+			this.Regulate(b, now, est - b.ref);
+			row[tab.iTime] = Math.round(now - b.ref);
+		}
+		// Bateaux sortis du flux : arrivés, abandons, effacés.
+		for (const bib of Array.from(this.bibs.keys()))
+			if (!seen.has(bib))
+				this.bibs.delete(bib);
+	}
+
+	this.lastFrame = JSON.parse(JSON.stringify(objJSON));
+	delete this.lastFrame.ack_ws;
+	this.lastReal = now;
+	this.lastSent = now;
+	return objJSON;
+};
+
+/**
+ * Le serveur dit-il, sans interruption depuis REGUL_WINDOW, que nous sommes en
+ * avance ? Le plus petit écart de la fenêtre écarte le simple retard réseau :
+ * il suffit d'une trame à l'heure pour qu'il retombe à zéro.
+ */
+ws.ChronoLocal.prototype.Regulate = function(b, now, ecart)
+{
+	b.samples.push({ t : now, ecart : ecart });
+	while (b.samples.length && now - b.samples[0].t > ws.ChronoLocal.REGUL_WINDOW)
+		b.samples.shift();
+	if (now - b.samples[0].t < ws.ChronoLocal.REGUL_WINDOW * 0.9)
+		return;		// pas encore assez d'historique
+
+	const minEcart = Math.min.apply(null, b.samples.map(function(s) { return s.ecart; }));
+	if (minEcart > ws.ChronoLocal.REGUL_THRESHOLD)
+	{
+		const step = Math.min(minEcart, ws.ChronoLocal.REGUL_STEP);
+		b.ref += step;
+		b.samples.forEach(function(s) { s.ecart -= step; });
+	}
+};
+
+/** Arrivée d'un bateau : son chrono local s'arrête tout de suite. */
+ws.ChronoLocal.prototype.Finish = function(bib)
+{
+	const key = String(bib);
+	this.bibs.delete(key);
+	const tab = this.lastFrame && ws.ChronoLocal.table(this.lastFrame);
+	if (tab)
+	{
+		const kept = tab.rows.filter(function(r) { return String(r[tab.iBib]) !== key; });
+		tab.rows.length = 0;
+		Array.prototype.push.apply(tab.rows, kept);
+	}
+};
+
+/** Manche effacée, course changée : on repart de zéro. */
+ws.ChronoLocal.prototype.Reset = function()
+{
+	this.bibs.clear();
+	this.lastFrame = null;
+};
+
+/**
+ * Trame <on_course> fabriquée localement si le serveur se tait depuis plus
+ * d'une période ; null s'il n'y a rien à faire.
+ */
+ws.ChronoLocal.prototype.Tick = function()
+{
+	const now = ws.ChronoLocal.now();
+	if (!this.lastFrame || now - this.lastSent < ws.ChronoLocal.PERIOD)
+		return null;
+	if (now - this.lastReal > ws.ChronoLocal.MAX_SILENCE)
+		return null;	// serveur perdu : l'affichage se fige, comme avant
+
+	const frame = JSON.parse(JSON.stringify(this.lastFrame));
+	frame.__local = true;
+	if (this.clock !== null && frame.clock !== undefined)
+		frame.clock = Math.round(now - this.clock.ref);
+	const tab = ws.ChronoLocal.table(frame);
+	if (tab)
+	{
+		for (const row of tab.rows)
+		{
+			const b = this.bibs.get(String(row[tab.iBib]));
+			if (b)
+				row[tab.iTime] = Math.round(now - b.ref);
+		}
+	}
+	this.lastSent = now;
+	return frame;
+};
+
 ws.Context = function(url='ws://localhost', port=8080)
 {
 	this.url = url;
@@ -34,6 +235,83 @@ ws.Context = function(url='ws://localhost', port=8080)
 	this.reconnectCount = 0;
 	this.stateCommands = [];		// commandes à rejouer après une coupure
 	this.openArgs = null;			// arguments du dernier OpenWebSocket
+
+	// Chrono local, sauf ?chrono=serveur : voir ws.ChronoLocal.
+	const params = (typeof window !== 'undefined' && window.location) ? new URLSearchParams(window.location.search) : null;
+	this.chronoLocal = (params && params.get('chrono') === 'serveur') ? null : new ws.ChronoLocal();
+	this.chronoTimer = null;
+
+	// Surveillance des silences : voir ws.SILENCE_RECONNECT.
+	this.watchdog = !(params && params.get('watchdog') === '0');
+	this.watchdogTimer = null;
+	this.lastFrameAt = 0;			// dernière trame reçue du serveur
+	this.flowSeen = false;			// <on_course> déjà reçu sur cette socket
+};
+
+/** Note l'arrivée d'une trame du serveur (pas des trames du chrono local). */
+ws.Context.prototype.NoteFrame = function(objJSON)
+{
+	if (objJSON.__local)
+		return;
+	this.lastFrameAt = Date.now();
+	if (objJSON[this.keyCommand] === '<on_course>')
+		this.flowSeen = true;
+}
+
+/**
+ * Socket silencieuse depuis trop longtemps : on l'abandonne sans attendre
+ * son onclose, qu'une liaison morte peut mettre des minutes à signaler.
+ */
+ws.Context.prototype.CheckSilence = function()
+{
+	const socket = this.websocket;
+	if (!socket || socket.readyState !== 1 || !this.flowSeen)
+		return;
+
+	const silence = Date.now() - this.lastFrameAt;
+	if (silence < ws.SILENCE_RECONNECT)
+		return;
+
+	this.NotifyStatus('silent', { silence : silence });
+	this.flowSeen = false;
+	socket.onopen = socket.onmessage = socket.onclose = null;
+	try { socket.close(); } catch (e) { /* déjà fermée */ }
+	this.websocket = null;
+
+	const a = this.openArgs;
+	if (a && a.fnClose != undefined)
+		a.fnClose({ code : 4000, reason : 'silence' });
+	this.ScheduleReconnect();
+}
+
+/**
+ * Passe les trames de chrono par le chrono local, et démarre au besoin la
+ * fabrication de trames quand le serveur se tait.
+ */
+ws.Context.prototype.ThroughChronoLocal = function(objJSON)
+{
+	const chrono = this.chronoLocal;
+	if (!chrono || objJSON.__local)
+		return objJSON;
+
+	const key = objJSON[this.keyCommand];
+	if (key === '<on_course>')
+	{
+		chrono.Observe(objJSON);
+		if (this.chronoTimer == null && typeof window !== 'undefined')
+		{
+			this.chronoTimer = window.setInterval(() => {
+				const frame = chrono.Tick();
+				if (frame)
+					this.Dispatch(frame, function(fn, arg) { fn(arg); });
+			}, ws.ChronoLocal.PERIOD / 2);
+		}
+	}
+	else if (key === '<bib_time>' && Number(objJSON.passage) < 1)
+		chrono.Finish(objJSON.bib);
+	else if (key === '<run_erase>' || key === '<race_load>')
+		chrono.Reset();
+	return objJSON;
 };
 
 ws.Context.prototype.SetCommand = function(key, value)
@@ -124,6 +402,11 @@ ws.Context.prototype.ScheduleReconnect = function()
 ws.Context.prototype.Close = function()
 {
 	this.reconnect = false;
+	if (this.watchdogTimer != null)
+	{
+		window.clearInterval(this.watchdogTimer);
+		this.watchdogTimer = null;
+	}
 	if (this.reconnectTimer != null)
 	{
 		window.clearTimeout(this.reconnectTimer);
@@ -184,7 +467,9 @@ ws.Context.prototype.Dispatch = function(objJSON, schedule)
 	if (!objJSON || typeof objJSON !== 'object')
 		return;
 
+	this.NoteFrame(objJSON);
 	this.SendAck(objJSON);
+	this.ThroughChronoLocal(objJSON);
 
 	const call = (fn, label) => {
 		const guarded = (arg) => {
@@ -285,6 +570,10 @@ ws.Context.prototype.OpenWebSocket = function(fnOpen=undefined, fnClose=undefine
 	socket.send = (data) => { this.RememberCommand(data); nativeSend(data); };
 
 	const isReconnection = this.reconnectCount > 0;
+
+	this.flowSeen = false;
+	if (this.watchdog && this.watchdogTimer == null && typeof window !== 'undefined')
+		this.watchdogTimer = window.setInterval(() => this.CheckSilence(), 1000);
 
 	socket.onopen = (evt) => {
 		this.reconnectDelay = ws.RECONNECT_DELAY_MIN;

@@ -1,0 +1,56 @@
+{
+  "label": "Kayak cross — Dames et Hommes intercalés, huitièmes (K1D 24, K1H 32)",
+  "competition": {
+    "Code": 900,
+    "Codex": "KX-2026-902",
+    "Nom": "Kayak Cross simulé — Dames et Hommes",
+    "Ville": "Cesson-Sévigné",
+    "Date_debut": "2026-11-07",
+    "Date_fin": "2026-11-08",
+    "Etat": 4
+  },
+  "format": "ICF_ELIMINATION_DIRECTE",
+  "gates": 6,
+  "roll_after_gate": 4,
+  "gate_profil": "000000",
+  "first_start": "13:30:00",
+  "ecart_series": 120,
+  "ecart_categories": 240,
+  "ecart_phases": 900,
+  "seed": 32,
+  "speed": 4,
+  "categories": [
+    {
+      "code": "K1D",
+      "nom": "Kayak Cross Dame",
+      "sexe": "F",
+      "nb": 24,
+      "inscrits": 26,
+      "tt_base_s": 67,
+      "tt_spread_s": 13
+    },
+    {
+      "code": "K1H",
+      "nom": "Kayak Cross Homme",
+      "sexe": "H",
+      "nb": 32,
+      "inscrits": 35,
+      "tt_base_s": 60,
+      "tt_spread_s": 14
+    }
+  ],
+  "sim": {
+    "call_s": 25,
+    "race_s": 52,
+    "race_spread_s": 6,
+    "validate_s": 12,
+    "gap_s": 20,
+    "p_dns": 0.02,
+    "p_dnf": 0.03,
+    "p_dsq": 0.01,
+    "p_start": 0.02,
+    "p_gate": 0.04,
+    "p_roll": 0.08,
+    "p_ral": 0.015
+  }
+}

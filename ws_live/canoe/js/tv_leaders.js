@@ -32,6 +32,7 @@
  *   ecart=precedent   écart avec le concurrent précédent au lieu du premier
  *   no_ecart          masque la colonne des écarts
  *   no_categ          masque l'en-tête d'épreuve
+ *   no_provisoire     masque la mention « classement provisoire »
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
  *   bg=1              fond magenta au lieu de transparent (régie chroma-key)
  *   anim=0            désactive les animations
@@ -169,6 +170,31 @@ function EnsureEpreuve()
 			return;
 		}
 	}
+}
+
+/**
+ * L'épreuve est-elle encore en cours ? Même définition que tv_results.js :
+ * elle est terminée quand TOUS ses bateaux ont une valeur dans Tps. competFFCK
+ * laisse la case vide tant qu'un bateau n'a pas de résultat, et y met une
+ * valeur négative pour DNF / DNS / DSQ : un abandon compte donc comme traité.
+ */
+function EstProvisoire(categ)
+{
+	if (categ === '')
+		return false;
+
+	const tRanking = canoe.GetTableRanking();
+	const course_phase = canoe.GetCodeCoursePhase();
+
+	for (let row = 0; row < tRanking.GetNbRows(); row++)
+	{
+		if (tRanking.GetCell('Code_categorie', row) != categ)
+			continue;
+		if (String(tRanking.GetCell('Tps' + course_phase, row)) === '')
+			return true;
+	}
+
+	return false;
 }
 
 /**
@@ -395,6 +421,10 @@ function Render()
 	if (wsMain.showCateg)
 		elCateg.textContent = GetLibelleEpreuve();
 
+	// Tant que des bateaux de l'épreuve n'ont pas couru, l'ordre affiché peut
+	// encore bouger : on le dit, sinon il se lit comme un classement définitif.
+	elBlock.classList.toggle('provisoire', wsMain.showProvisoire && EstProvisoire(wsMain.epreuve));
+
 	// Pied de bloc : le dernier arrivé, seulement s'il n'est pas déjà dans les
 	// premiers. Le trait de séparation est porté par le CSS.
 	let pied = null;
@@ -471,6 +501,7 @@ function Init()
 	wsMain.showEcart = !urlParams.has('no_ecart');
 	wsMain.ecartPrecedent = urlParams.get('ecart') === 'precedent';
 	wsMain.showCateg = !urlParams.has('no_categ');
+	wsMain.showProvisoire = !urlParams.has('no_provisoire');
 	wsMain.libelle = urlParams.get('libelle') === '1';
 	wsMain.fmtChrono = urlParams.has('fmt') ? urlParams.get('fmt') : '';
 

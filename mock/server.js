@@ -20,7 +20,7 @@ const WWW = path.join(ROOT, 'ws_live');
 
 const args = parseArgs(process.argv.slice(2));
 const HTTP_PORT = Number(args.port || process.env.PORT || 3000);
-const WS_PORT = Number(args['ws-port'] || process.env.WS_PORT || 20000);
+const WS_PORT = Number(args['ws-port'] || process.env.WS_PORT || 8080);
 
 const fixtureName = args.fixture || 'slalom-finale';
 const fixture = loadFixture(fixtureName);
@@ -28,6 +28,10 @@ if (args.speed) fixture.speed = Number(args.speed);
 
 const engine = new Engine(fixture);
 const clients = new Set();
+// Liaison morte sans fermeture (wifi, switch) : la socket reste ouverte mais
+// plus rien ne passe, dans un sens comme dans l'autre. Les nouveaux clients
+// ne sont pas concernés.
+const muted = new WeakSet();
 
 let recorder = null;
 if (args.record) {
@@ -50,6 +54,7 @@ wss.on('connection', (socket, req) => {
   console.log(`[ws] connexion ${req.socket.remoteAddress} (${clients.size} client(s))`);
 
   socket.on('message', (raw) => {
+    if (muted.has(socket)) return;
     let msg;
     try {
       msg = JSON.parse(raw.toString());
@@ -109,7 +114,7 @@ function handleCommand(socket, msg) {
 }
 
 function send(socket, frame) {
-  if (socket.readyState !== socket.OPEN) return;
+  if (socket.readyState !== socket.OPEN || muted.has(socket)) return;
   socket.send(JSON.stringify(frame));
   record('out', frame);
 }
@@ -117,7 +122,7 @@ function send(socket, frame) {
 function broadcast(frame, except = null) {
   const payload = JSON.stringify(frame);
   for (const c of clients) {
-    if (c !== except && c.readyState === c.OPEN) c.send(payload);
+    if (c !== except && c.readyState === c.OPEN && !muted.has(c)) c.send(payload);
   }
   record('out', frame);
 }
@@ -127,7 +132,39 @@ function record(dir, frame) {
   recorder.write(JSON.stringify({ t: Date.now(), dir, frame }) + '\n');
 }
 
-engine.on('frame', (frame) => broadcast(frame));
+// ----------------------------------------------------------------- latence
+
+/**
+ * Serveur lent simulé (--lag ou bouton du panneau) : chaque trame part avec un
+ * retard aléatoire de 0 à 250 ms, et toutes les 4 s le serveur « gèle » 1,5 s
+ * puis délivre d'un coup ce qu'il a retenu. L'ordre des trames est conservé,
+ * comme sur une vraie connexion TCP.
+ */
+const lag = {
+  on: !!args.lag,
+  queue: [],
+  lastOut: 0,
+  freezeUntil: 0,
+  nextFreeze: Date.now() + 4000,
+  push(frame) {
+    if (!this.on) return broadcast(frame);
+    const now = Date.now();
+    if (now >= this.nextFreeze) {
+      this.freezeUntil = now + 1500;
+      this.nextFreeze = now + 4000;
+    }
+    const at = Math.max(this.lastOut, this.freezeUntil, now + Math.random() * 250);
+    this.lastOut = at;
+    this.queue.push({ at, frame });
+  },
+  flush() {
+    const now = Date.now();
+    while (this.queue.length && this.queue[0].at <= now) broadcast(this.queue.shift().frame);
+  },
+};
+setInterval(() => lag.flush(), 10);
+
+engine.on('frame', (frame) => lag.push(frame));
 
 // ----------------------------------------------------------------- HTTP
 
@@ -211,7 +248,7 @@ function handleApi(req, res, pathname, url) {
     res.end(JSON.stringify(body));
   };
 
-  if (action === 'state') return json(200, engine.snapshot());
+  if (action === 'state') return json(200, { ...engine.snapshot(), lag: lag.on });
   if (action === 'fixtures') return json(200, listFixtures());
 
   readBody(req, (body) => {
@@ -230,9 +267,21 @@ function handleApi(req, res, pathname, url) {
         case 'finish-categ': engine.finishCategory(p.epreuve); break;
         case 'erase': engine.eraseRun(); break;
         case 'mode-chrono': engine.setModeChrono(p.mode || 1); break;
+        case 'pena-plan': engine.penaPlan = !!p.on; break;
+        case 'lag':
+          lag.on = !!p.on;
+          if (!lag.on) {
+            for (const q of lag.queue) broadcast(q.frame);
+            lag.queue = [];
+          }
+          break;
         case 'kill-clients':
           // simule une coupure réseau : le cas que les pages ws_live ne savent pas encore gérer
           for (const c of clients) c.terminate();
+          break;
+        case 'mute-clients':
+          // simule une liaison morte : la socket reste ouverte, plus rien ne passe
+          for (const c of clients) muted.add(c);
           break;
         case 'fixture': {
           const next = loadFixture(p.name);
@@ -246,7 +295,7 @@ function handleApi(req, res, pathname, url) {
     } catch (e) {
       return json(500, { error: e.message });
     }
-    json(200, engine.snapshot());
+    json(200, { ...engine.snapshot(), lag: lag.on });
   });
 }
 

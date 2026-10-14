@@ -1,0 +1,5 @@
+Pour mettre un pied de page il faut 
+une image nommée :
+bandeau_pied.jpg
+
+Utiliser le bandeau_pied_modele.jpg pour avoir les dimensions correctes

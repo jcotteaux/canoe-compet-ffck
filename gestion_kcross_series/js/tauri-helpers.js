@@ -1,0 +1,12 @@
+export async function saveBlobWithTauri(blob,defaultFilename){const isTauri=!!(window.__TAURI__&&window.__TAURI__.core);if(!isTauri){console.warn("Tauri non détecté (Mode Navigateur). Utilisation du téléchargement classique.");downloadInBrowser(blob,defaultFilename);return;}
+try{const{invoke}=window.__TAURI__.core;const extension=defaultFilename.split('.').pop().toLowerCase();let filterName='Fichier';switch(extension){case'csv':filterName='Fichiers CSV';break;case'pdf':filterName='Fichiers PDF';break;case'sql':filterName='Fichiers SQL';break;case'mdv':filterName='Sauvegarde séries KCross';break;}
+const filePath=await invoke('plugin:dialog|save',{options:{defaultPath:defaultFilename,filters:[{name:filterName,extensions:[extension]}]}});if(!filePath){return;}
+const arrayBuffer=await blob.arrayBuffer();const uint8Array=new Uint8Array(arrayBuffer);await window.__TAURI__.fs.writeFile(filePath,uint8Array);}catch(error){console.error("[Tauri] ERREUR CRITIQUE lors de la sauvegarde :",error);alert("Erreur Tauri détectée : "+error.message+"\n\nPassage en mode téléchargement classique.");downloadInBrowser(blob,defaultFilename);}}
+function downloadInBrowser(blob,filename){const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=filename;link.style.visibility='hidden';document.body.appendChild(link);link.click();document.body.removeChild(link);URL.revokeObjectURL(url);}
+export async function savePDFWithTauri(pdf,filename){if(!window.__TAURI__){pdf.save(filename);return;}
+const blob=pdf.output('blob');await saveBlobWithTauri(blob,filename);}
+export function isTauriEnvironment(){return typeof window.__TAURI__!=='undefined';}
+export async function getDownloadsPath(){if(!window.__TAURI__){return null;}
+try{const{invoke}=window.__TAURI__.core;return await invoke('plugin:path|download_dir');}catch(error){console.error("Erreur lors de la récupération du dossier de téléchargements:",error);return null;}}
+export async function showMessage(message,title="Information"){if(!window.__TAURI__){alert(message);return;}
+try{const{invoke}=window.__TAURI__.core;await invoke('plugin:dialog|message',{message:message,title:title});}catch(error){console.error("Erreur dialog message:",error);alert(message);}}

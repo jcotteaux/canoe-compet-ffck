@@ -74,8 +74,11 @@
     <div class="row">
       <button class="danger" id="erase">Effacer la manche &lt;run_erase&gt;</button>
       <button class="danger" id="kill">Couper le réseau (fermer les WebSockets)</button>
+      <button class="danger" id="mute">Liaison morte (sockets muettes)</button>
       <button id="mode">Changer de mode chrono</button>
       <button id="finish_categ">Terminer l'épreuve en cours (déclenche le podium)</button>
+      <button class="danger" id="lag">Serveur lent : désactivé</button>
+      <button id="penaplan">Pénalités prévues : activées</button>
     </div>
     <p class="sub" style="margin:10px 0 0">
       « Couper le réseau » ferme brutalement toutes les sockets. Les pages doivent se reconnecter
@@ -124,6 +127,8 @@ function render(s) {
   $('meta').textContent = `${s.fixture} · ${s.activite} · épreuve ${s.epreuve}` +
     (s.nbPorte ? ` · ${s.nbPorte} portes` : '') + (s.nbInter ? ` · ${s.nbInter} inter` : '');
   $('toggle').textContent = s.running ? 'Mettre en pause' : 'Démarrer';
+  $('penaplan').textContent = s.penaPlan ? 'Pénalités prévues (dossards 1 à 6) : activées' : 'Pénalités prévues : désactivées';
+  $('lag').textContent = s.lag ? 'Serveur lent : ACTIVÉ (retards + gels de 1,5 s)' : 'Serveur lent : désactivé';
   $('speed').value = String(s.speed);
 
   $('boats').innerHTML = s.boats.map((b) => {
@@ -171,8 +176,11 @@ $('toggle').onclick = async () => render(await api(state.running ? 'pause' : 'st
 $('reset').onclick = async () => render(await api('reset', {}));
 $('erase').onclick = async () => render(await api('erase', {}));
 $('kill').onclick = async () => render(await api('kill-clients', {}));
+$('mute').onclick = async () => render(await api('mute-clients', {}));
 $('mode').onclick = async () => render(await api('mode-chrono', { mode: 1 }));
 $('finish_categ').onclick = async () => render(await api('finish-categ', { epreuve: state.epreuve }));
+$('lag').onclick = async () => render(await api('lag', { on: !state.lag }));
+$('penaplan').onclick = async () => render(await api('pena-plan', { on: !state.penaPlan }));
 $('speed').onchange = async (e) => render(await api('speed', { speed: e.target.value }));
 $('fixture').onchange = async (e) => render(await api('fixture', { name: e.target.value }));
 

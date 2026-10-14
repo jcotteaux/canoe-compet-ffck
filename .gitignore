@@ -3,3 +3,9 @@ node_modules/
 .DS_Store
 captures/
 ws_live/adv/ws_params.local.js
+
+# Gros zips d'import, hors dépôt
+archives/
+
+# Clé du serveur live FFCK : copier config.example.php et la renseigner
+gestion_kcross_series/api/config/config.php

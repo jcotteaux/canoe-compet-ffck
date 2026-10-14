@@ -1,0 +1,42 @@
+import{QRCode}from'./lib/qrcode.min.js?v=2.2.0';import{CryptoJS}from'./lib/crypto-js.min.js?v=2.2.0';import{LOG_LEVEL}from'./constants.js?v=2.2.0';import{statusDialogue}from'./constants.js?v=2.2.0';import{ConfigurationPenalites}from'./engine.js?v=2.2.0';const log={error:(...a)=>{if(LOG_LEVEL>=1)console.error(...a);},info:(...a)=>{if(LOG_LEVEL>=2)console.info(...a);},warn:(...a)=>{if(LOG_LEVEL>=3)console.warn(...a);},debug:(...a)=>{if(LOG_LEVEL>=4)console.debug(...a);}};function timeToSeconds(timeStr){if(!timeStr||!/^\d{2}:\d{2}:\d{2}$/.test(timeStr))return null;const[h,m,s]=timeStr.split(':').map(Number);return h*3600+m*60+s;}
+function secondsToTime(totalSeconds){if(totalSeconds===null||isNaN(totalSeconds)||totalSeconds<0)return"00:00:00";const h=Math.floor(totalSeconds/3600);const m=Math.floor((totalSeconds%3600)/60);const s=Math.round(totalSeconds%60);return`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;}
+function changerOrientation(mode){if(window.Android&&typeof window.Android.setOrientation==='function'){window.Android.setOrientation(mode);}}
+function make_QRCode(elementId,adress,size){const qrCodeContainer=document.getElementById(elementId);qrCodeContainer.innerHTML="";QRCode.toCanvas(adress,{width:size,margin:1},function(err,canvas){if(err){log.error(err);return;}
+var link=document.createElement('a');link.href=adress;link.target='_blank';link.appendChild(canvas);qrCodeContainer.appendChild(link);});}
+function deriveKey(password,salt){return CryptoJS.PBKDF2(password,salt,{keySize:256/32,iterations:1000});}
+function encrypt_AES(plainText,password){var iv=CryptoJS.lib.WordArray.random(16);var salt=CryptoJS.lib.WordArray.random(16);var key=deriveKey(password,salt);var encrypted=CryptoJS.AES.encrypt(plainText,key,{iv:iv,mode:CryptoJS.mode.CBC,padding:CryptoJS.pad.Pkcs7});var combined=salt.concat(iv).concat(encrypted.ciphertext);return CryptoJS.enc.Base64url.stringify(combined);}
+function decrypt_AES(base64UrlData,password){var fullData=CryptoJS.enc.Base64url.parse(base64UrlData);var saltLength=16;var ivLength=16;var salt=CryptoJS.lib.WordArray.create(fullData.words.slice(0,saltLength/4),saltLength);var iv=CryptoJS.lib.WordArray.create(fullData.words.slice(saltLength/4,(saltLength+ivLength)/4),ivLength);var ciphertext=CryptoJS.lib.WordArray.create(fullData.words.slice((saltLength+ivLength)/4),fullData.sigBytes-saltLength-ivLength);var key=deriveKey(password,salt);var decrypted=CryptoJS.AES.decrypt({ciphertext:ciphertext},key,{iv:iv,mode:CryptoJS.mode.CBC,padding:CryptoJS.pad.Pkcs7});return decrypted.toString(CryptoJS.enc.Utf8);}
+async function get_baseUrl(){const protocol=window.location.protocol;const host=window.location.host;const port=window.location.port;const pathname=window.location.pathname;if(host!=="localhost"){return{ip_server:host,url_racine:`${protocol}//${host}${port ? ":" + port : ""}`,path:pathname.replace(/\/[^/]*$/,"")};}
+const url='./api/api_get_baseUrl.php';try{const response=await fetch(url);const result=await response.json();if(!response.ok||!result.success){throw new Error(result.message||"Erreur lors de la récupération des prochaines séries.");}
+return result.data;}catch(error){log.error("[Persistence] Échec de get_baseUrl:",error);throw error;}}
+function imageToBase64(src){return new Promise((resolve,reject)=>{const img=new Image();img.crossOrigin='Anonymous';img.onload=()=>{const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);const dataURL=canvas.toDataURL('image/jpeg');resolve(dataURL);};img.onerror=reject;img.src=src;});}
+function formatISODateToFrench(dateString){if(!dateString){return'';}
+const date=new Date(dateString);if(isNaN(date.getTime())){return dateString;}
+const day=String(date.getDate()).padStart(2,'0');const month=String(date.getMonth()+1).padStart(2,'0');const year=date.getFullYear();return`${day}/${month}/${year}`;}
+function notifyError(message){alert(`Erreur : ${message}`);}
+function escapeHtml(str){if(str==null)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');}
+function renderSpecialStatusOptions(selected){return statusDialogue.map(s=>`<option value="${s}" ${selected===s? 'selected' : ''}>${s}</option>`).join('');}
+function createPenaltySummaryHTML(penaltyString,context,cssClassPrefix=''){const hasPenalties=penaltyString&&!penaltyString.split('').every(p=>p==='0');const hasOrder=context.heatResult&&context.heatResult.order!==null&&context.heatResult.order!=='';if(!hasPenalties&&!hasOrder){return'';}
+if(!hasPenalties&&hasOrder){return`<div class="penalty-summary-box${cssClassPrefix}"><div class="penalty-tag${cssClassPrefix} clear">CLR</div></div>`;}
+if(!penaltyString){return'';}
+let html=`<div class="penalty-summary-box${cssClassPrefix}">`;const zones=ConfigurationPenalites.genererSequenceZones(context.gateCount,context.rollZoneAfterGate);const penalties=penaltyString.split('');zones.forEach((zone,index)=>{const penaltyCode=penalties[index];if(penaltyCode&&penaltyCode!=='0'){let label='';let type='';if(zone.type==='START')label='S';else if(zone.type==='PORTE')label=zone.numeroPorte;else if(zone.type==='ROLL')label='R';if(penaltyCode==='2')type='flt';else if(penaltyCode==='5')type='ral';html+=`<div class="penalty-tag${cssClassPrefix} ${type}" title="${type.toUpperCase()} ${zone.nomAffichage}">${label}</div>`;}});html+='</div>';return html;}
+function injectPasswordDialog(){if(document.getElementById('password-dialog')){return;}
+const dialogHTML=`
+        <dialog id="password-dialog">
+            <form id="password-form">
+                <h3>${window.APP_TEXTS.passwordDialog.title}</h3>
+                <p>${window.APP_TEXTS.passwordDialog.prompt}</p>
+                <label for="password-input">${window.APP_TEXTS.passwordDialog.label}</label>
+                <input type="password" id="password-input" name="password" required>
+                <div class="dialog-buttons">
+                    <button type="button" id="cancel-button">${window.APP_TEXTS.passwordDialog.btnCancel}</button>
+                    <button type="submit">${window.APP_TEXTS.passwordDialog.btnSubmit}</button>
+                </div>
+            </form>
+        </dialog>
+    `;document.body.insertAdjacentHTML('beforeend',dialogHTML);}
+function applyStaticTexts(textsObject,parentElement=document){const getText=(key)=>{return key.split('.').reduce((obj,i)=>(obj?obj[i]:null),textsObject);};parentElement.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;const text=getText(key);if(text){const icon=el.querySelector('.material-icons');if(icon){el.innerHTML='';el.appendChild(icon);el.appendChild(document.createTextNode(' '+text));}else{if(text.includes('<')){el.innerHTML=text;}else{el.textContent=text;}}}else{log.warn(`Clé de traduction manquante : ${key}`);el.textContent=`[${key}]`;}});parentElement.querySelectorAll('[data-i18n-title]').forEach(el=>{const key=el.dataset.i18nTitle;const text=getText(key);if(text){el.title=text;}else{log.warn(`Clé de traduction pour title manquante : ${key}`);}});parentElement.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;const text=getText(key);if(text){el.placeholder=text;}else{log.warn(`Clé de traduction pour placeholder manquante : ${key}`);}});}
+async function loadHTMLTemplate(templateFilename,targetElement){const TEMPLATE_BASE_PATH='./templates/';const fullPath=`${TEMPLATE_BASE_PATH}${templateFilename}`;try{const response=await fetch(fullPath);if(!response.ok){throw new Error(`Le chargement du template a échoué: ${response.statusText}`);}
+const html=await response.text();targetElement.insertAdjacentHTML('beforeend',html);}catch(error){log.error(`Erreur critique lors du chargement de ${fullPath}:`,error);document.body.innerHTML=`<h1>Erreur critique</h1><p>Impossible de charger les composants de l'interface. Veuillez vérifier la console pour plus de détails.</p>`;throw error;}}
+function getTextFromKey(obj,key){if(!key||!obj)return null;return key.split('.').reduce((o,i)=>(o?o[i]:null),obj);}
+export{timeToSeconds,secondsToTime,changerOrientation,make_QRCode,encrypt_AES,decrypt_AES,get_baseUrl,imageToBase64,formatISODateToFrench,createPenaltySummaryHTML,renderSpecialStatusOptions,escapeHtml,notifyError,injectPasswordDialog,applyStaticTexts,loadHTMLTemplate,getTextFromKey,log};

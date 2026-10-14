@@ -494,19 +494,535 @@ body.pagine #pagination
 
 /******************** attente ********************/
 
+/*
+ * Aucun classement à montrer (début de journée, competFFCK pas encore
+ * connecté) : un kayakiste pagaie entre deux portes de slalom. Dessin en SVG
+ * dans la page, animé en CSS : aucune image à charger. ?anim=0 fige la scène.
+ */
 #attente
 {
 	position: absolute;
-	left: 96px;
-	top: 450px;
-	width: 1728px;
+	left: 0;
+	top: 300px;
+	width: 1920px;
 
-	font-size: 34px;
-	font-style: italic;
-	letter-spacing: 0.06em;
-	color: #8fa6cc;
-
+	text-align: center;
 	display: none;
+}
+
+#attente_dessin
+{
+	display: block;
+	width: 800px;
+	height: 288px;
+	margin: 0 auto 70px;		/* le titre respire sous la rivière */
+	overflow: hidden;
+
+	/* Bords fondus : la rivière, le câble et les portes s'effacent sur les
+	   côtés au lieu de s'arrêter net dans un cadre. */
+	-webkit-mask-image:
+		linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%),
+		linear-gradient(180deg, #000 82%, transparent 100%);
+	-webkit-mask-composite: source-in;
+	mask-image:
+		linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%),
+		linear-gradient(180deg, #000 82%, transparent 100%);
+	mask-composite: intersect;
+}
+
+#attente_titre
+{
+	font-size: 46px;
+	font-weight: bold;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: white;
+}
+
+/* --- le dessin --- */
+
+#attente_dessin .cable
+{
+	stroke: rgba(255, 255, 255, 0.35);
+	stroke-width: 2;
+}
+
+#attente_dessin .perche
+{
+	stroke-width: 7;
+	stroke-linecap: round;
+	stroke-dasharray: 14 14;
+}
+
+/* Perches rayées vert / blanc et rouge / blanc, comme sur un vrai bassin. */
+#attente_dessin .porte_verte .perche { stroke: #2fbf5b; }
+#attente_dessin .porte_rouge .perche { stroke: #ff4a3d; }
+
+#attente_dessin .porte
+{
+	transform-box: fill-box;
+	transform-origin: 50% 0;
+	animation: att-porte 3.2s ease-in-out infinite alternate;
+}
+
+#attente_dessin .porte_rouge
+{
+	animation-delay: -1.6s;
+}
+
+#attente_dessin .vagues path
+{
+	stroke: none;
+}
+
+/* Vague de devant un peu transparente : on devine le kayakiste sous l'eau. */
+#attente_dessin .vagues_fond path   { fill: rgba(54, 128, 255, 0.45); }
+#attente_dessin .vagues_devant path { fill: rgba(9, 122, 255, 0.78); }
+
+/* L'eau défile : le chemin fait deux fois la largeur, on le décale d'une. */
+#attente_dessin .vagues_fond   { animation: att-vague 7s linear infinite; }
+#attente_dessin .vagues_devant { animation: att-vague 4.5s linear infinite; }
+
+/* Le kayak : carène blanche ombrée, pont bleu FFCK, liseré rouge. */
+#attente_dessin .coque  { fill: url(#att_carene); stroke: #9fb0c8; stroke-width: 1; }
+#attente_dessin .pont   { fill: url(#att_pont); }
+
+#attente_dessin .liseret
+{
+	fill: none;
+	stroke: #ff4a3d;
+	stroke-width: 2.5;
+}
+
+/* Reflet sur le pont : c'est lui qui donne le volume. */
+#attente_dessin .reflet
+{
+	fill: none;
+	stroke: rgba(255, 255, 255, 0.55);
+	stroke-width: 2;
+	stroke-linecap: round;
+}
+
+/* Jupe néoprène tendue sur l'hiloire. */
+#attente_dessin .jupe   { fill: #14182e; }
+
+/* Le kayakiste. */
+#attente_dessin .veste  { fill: #1d2b6b; }
+#attente_dessin .gilet  { fill: url(#att_gilet); }
+#attente_dessin .cou    { fill: #e9b98f; }
+#attente_dessin .tete   { fill: #f5cfa8; }
+#attente_dessin .oeil   { fill: #1b1f3a; }
+
+#attente_dessin .sangle
+{
+	stroke: #1b1f3a;
+	stroke-width: 2;
+	opacity: 0.6;
+}
+
+#attente_dessin .casque
+{
+	fill: #ffffff;
+	stroke: #c9d6ea;
+	stroke-width: 1;
+}
+
+#attente_dessin .aeration
+{
+	stroke: #ff4a3d;
+	stroke-width: 2.5;
+	stroke-linecap: round;
+}
+
+/* Bras : manches de la veste, mains nues. */
+#attente_dessin .bras_pilote
+{
+	fill: none;
+	stroke: #1d2b6b;
+	stroke-width: 7;
+	stroke-linecap: round;
+}
+
+#attente_dessin .main   { fill: #e9b98f; }
+
+/* Pagaie : manche carbone, pales jaunes. */
+#attente_dessin .manche
+{
+	stroke: #1b1f3a;
+	stroke-width: 4.5;
+	stroke-linecap: round;
+}
+
+#attente_dessin .pale
+{
+	fill: url(#att_pale);
+	stroke: #c48f00;
+	stroke-width: 1;
+}
+
+/*
+ * Le scénario. Toutes les étapes partagent la même durée de cycle (18 s) :
+ * les pourcentages des keyframes sont donc synchrones d'un élément à l'autre.
+ *
+ *    0 -> 25 %   il pagaie
+ *   25 -> 31 %   il chavire (rotation autour de l'axe du bateau)
+ *   31 -> 50 %   il sort, nage et pousse le bateau retourné hors de l'écran
+ *   50 -> 67 %   il revient en trombe par la gauche, freine, se cale
+ *   67 -> 76 %   il pagaie
+ *   76 -> 90 %   esquimautage : un tour complet autour de l'axe du bateau,
+ *                avec des bulles quand il a la tête sous l'eau
+ *   90 -> 100 %  gerbe d'eau, il repart en pagayant
+ */
+
+/* Le déplacement horizontal : sortie à droite, retour par la gauche. */
+#attente_dessin .trajet
+{
+	animation: att-trajet 18s infinite;
+}
+
+/* Le bateau danse sur la vague, en permanence. */
+#attente_dessin .bateau
+{
+	transform-box: view-box;
+	transform-origin: 320px 150px;
+	animation: att-bateau 2.4s ease-in-out infinite;
+}
+
+/* Chavirage, puis esquimautage : rotations autour de l'axe du bateau. */
+#attente_dessin .chavire
+{
+	transform-box: view-box;
+	transform-origin: 320px 152px;
+	animation: att-chavire 18s ease-in-out infinite;
+}
+
+/*
+ * Pont et carène vus de dessus, pendant les rotations. Leur hauteur suit le
+ * sinus de l'angle quand le profil suit le cosinus : à 90° le profil n'est
+ * plus qu'un trait, et c'est le pont (ou la carène) qu'on voit en entier.
+ * Repliés par défaut (scaleY 0) : avec ?anim=0, ils restent invisibles.
+ */
+#attente_dessin .dessus
+{
+	transform-box: view-box;
+	transform-origin: 320px 152px;
+	transform: scaleY(0);
+}
+
+#attente_dessin .dessus_pont   { animation: att-dessus-pont 18s ease-in-out infinite; }
+#attente_dessin .dessus_carene { animation: att-dessus-carene 18s ease-in-out infinite; }
+
+#attente_dessin .pont_vu    { fill: url(#att_pont); stroke: #ff4a3d; stroke-width: 2; }
+#attente_dessin .carene_vue { fill: url(#att_carene); stroke: #9fb0c8; stroke-width: 1.5; }
+#attente_dessin .hiloire    { fill: #14182e; }
+#attente_dessin .gilet_vu   { fill: url(#att_gilet); }
+#attente_dessin .casque_vu  { fill: #ffffff; stroke: #c9d6ea; stroke-width: 1; }
+
+#attente_dessin .arete
+{
+	stroke: rgba(255, 255, 255, 0.45);
+	stroke-width: 2;
+}
+
+#attente_dessin .quille
+{
+	stroke: #9fb0c8;
+	stroke-width: 2.5;
+}
+
+/* Le kayakiste quitte le bateau pendant qu'il nage. */
+#attente_dessin .pilote
+{
+	animation: att-pilote 18s linear infinite;
+}
+
+/* Coups de pagaie : la pagaie bascule d'un côté puis de l'autre. */
+#attente_dessin .pagaie
+{
+	transform-box: view-box;
+	transform-origin: 315px 122px;
+	animation: att-pagaie 1.2s ease-in-out infinite;
+}
+
+/* Une gerbe à chaque coup de pagaie, de chaque côté à tour de rôle. */
+#attente_dessin .goutte
+{
+	fill: #ffffff;
+	opacity: 0;
+	animation: att-goutte 1.2s ease-out infinite;
+}
+
+#attente_dessin .g2
+{
+	animation-delay: -0.6s;
+}
+
+/* Traits de vitesse derrière le bateau qui arrive. */
+#attente_dessin .sillage line
+{
+	stroke: rgba(255, 255, 255, 0.75);
+	stroke-width: 4;
+	stroke-linecap: round;
+}
+
+#attente_dessin .sillage
+{
+	opacity: 0;
+	animation: att-sillage 18s linear infinite;
+}
+
+/* Le nageur : tête hors de l'eau, bras qui moulinent (crawl). */
+#attente_dessin .nageur
+{
+	opacity: 0;
+	animation: att-nageur 18s ease-in-out infinite;
+}
+
+#attente_dessin .bras
+{
+	stroke: #1d2b6b;			/* manches de la veste, comme dans le bateau */
+	stroke-width: 7;
+	stroke-linecap: round;
+
+	transform-box: view-box;
+	transform-origin: 0px -2px;			/* l'épaule, en coordonnées du nageur */
+	animation: att-crawl 0.9s linear infinite;
+}
+
+#attente_dessin .b2
+{
+	animation-delay: -0.45s;
+}
+
+/* Le requin : un aileron qui suit le nageur et se rapproche, sans jamais l'atteindre. */
+#attente_dessin .aileron
+{
+	fill: #6b7c93;
+	stroke: #3d4a5c;
+	stroke-width: 2;
+	stroke-linejoin: round;
+}
+
+#attente_dessin .remous
+{
+	fill: none;
+	stroke: rgba(255, 255, 255, 0.8);
+	stroke-width: 2.5;
+	stroke-linecap: round;
+}
+
+#attente_dessin .requin
+{
+	opacity: 0;
+	animation: att-requin 18s ease-in-out infinite;
+}
+
+#attente_dessin .bulles circle
+{
+	fill: none;
+	stroke: rgba(255, 255, 255, 0.85);
+	stroke-width: 2;
+}
+
+#attente_dessin .bulles
+{
+	opacity: 0;
+	animation: att-bulles 18s ease-out infinite;
+}
+
+#attente_dessin .gerbe circle
+{
+	fill: #ffffff;
+}
+
+#attente_dessin .gerbe
+{
+	opacity: 0;
+	transform-box: view-box;
+	transform-origin: 320px 150px;
+	animation: att-gerbe 18s ease-out infinite;
+}
+
+@keyframes att-vague
+{
+	from { transform: translateX(0); }
+	to   { transform: translateX(-640px); }
+}
+
+@keyframes att-bateau
+{
+	0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+	50%      { transform: translateY(-5px) rotate(1.5deg); }
+}
+
+/*
+ * Sortie lente à droite (il nage en poussant), saut hors champ à gauche
+ * pendant que rien n'est visible, puis retour rapide qui dépasse un peu sa
+ * place et revient : c'est ce rebond qui donne l'impression de vitesse.
+ */
+@keyframes att-trajet
+{
+	0%, 33%  { transform: translateX(0);      animation-timing-function: ease-in; }
+	50%      { transform: translateX(580px);  animation-timing-function: steps(1, end); }
+	50.2%    { transform: translateX(-640px); animation-timing-function: cubic-bezier(0.15, 0.7, 0.3, 1); }
+	60%      { transform: translateX(34px);   animation-timing-function: ease-in-out; }
+	64%      { transform: translateX(-10px);  animation-timing-function: ease-in-out; }
+	67%, 100% { transform: translateX(0); }
+}
+
+/*
+ * Chavirage et esquimautage tournent autour de l'axe LONGITUDINAL du kayak,
+ * comme en vrai. Vu de côté, cette rotation écrase le bateau sur la ligne
+ * d'eau puis le déplie de l'autre côté : c'est un scaleY qui passe par 0.
+ * Les paliers intermédiaires suivent le cosinus de l'angle (0,7 ~ 45°), pour
+ * que le mouvement se lise comme une rotation et non comme un écrasement.
+ *   scaleY( 1) : à l'endroit
+ *   scaleY(-1) : retourné, le kayakiste sous l'eau
+ */
+@keyframes att-chavire
+{
+	0%, 25%     { transform: scaleY(1); }
+	27%         { transform: scaleY(0.7); }
+	28.5%       { transform: scaleY(0); }		/* il bascule… */
+	30%         { transform: scaleY(-0.7); }
+	31%, 50%    { transform: scaleY(-1); }	/* …et reste retourné */
+	50.2%, 76%  { transform: scaleY(1); }		/* hors champ : bateau remis d'aplomb */
+	77.5%       { transform: scaleY(0.7); }	/* esquimautage : il se retourne… */
+	78.5%       { transform: scaleY(0); }
+	79.5%       { transform: scaleY(-0.7); }
+	80.5%, 83%  { transform: scaleY(-1); }	/* …la tête sous l'eau… */
+	85%         { transform: scaleY(-0.7); }
+	86.5%       { transform: scaleY(0); }
+	88%         { transform: scaleY(0.75); }
+	89%         { transform: scaleY(1.06); }	/* …et se redresse d'un coup de hanche */
+	90%, 100%   { transform: scaleY(1); }
+}
+
+/*
+ * Quel côté voit-on ? Au chavirage (rotation 0 -> 180) le pont passe face au
+ * spectateur ; à l'esquimautage, qui tourne dans l'autre sens, c'est d'abord
+ * la carène (0 -> -180), puis le pont en se redressant (-180 -> -360).
+ * Instants calés sur att-chavire : les passages par 0 sont à 28,5 %, 78,5 %
+ * et 86,5 %.
+ */
+@keyframes att-dessus-pont
+{
+	0%, 25%     { transform: scaleY(0); }
+	27%         { transform: scaleY(0.7); }
+	28.5%       { transform: scaleY(1); }
+	30%         { transform: scaleY(0.7); }
+	31%, 83%    { transform: scaleY(0); }
+	85%         { transform: scaleY(0.7); }
+	86.5%       { transform: scaleY(1); }
+	88%         { transform: scaleY(0.66); }
+	89%, 100%   { transform: scaleY(0); }
+}
+
+@keyframes att-dessus-carene
+{
+	0%, 76%     { transform: scaleY(0); }
+	77.5%       { transform: scaleY(0.7); }
+	78.5%       { transform: scaleY(1); }
+	79.5%       { transform: scaleY(0.7); }
+	80.5%, 100% { transform: scaleY(0); }
+}
+
+@keyframes att-pilote
+{
+	0%, 31%      { opacity: 1; }
+	31.5%, 50%   { opacity: 0; }
+	50.2%, 100%  { opacity: 1; }
+}
+
+@keyframes att-pagaie
+{
+	0%, 100% { transform: rotate(-24deg); }
+	50%      { transform: rotate(24deg); }
+}
+
+@keyframes att-goutte
+{
+	0%   { opacity: 0;   transform: translateY(0); }
+	10%  { opacity: 0.9; transform: translateY(-6px); }
+	45%  { opacity: 0;   transform: translateY(-22px); }
+	100% { opacity: 0;   transform: translateY(-22px); }
+}
+
+@keyframes att-sillage
+{
+	0%, 50.2% { opacity: 0; transform: translateX(0); }
+	52%       { opacity: 1; transform: translateX(0); }
+	60%       { opacity: 1; transform: translateX(-30px); }
+	64%       { opacity: 0; transform: translateX(-60px); }
+	100%      { opacity: 0; transform: translateX(-60px); }
+}
+
+/* Il sort du cockpit, passe derrière le bateau et pousse en dodelinant. */
+@keyframes att-nageur
+{
+	0%, 31%   { opacity: 0; transform: translate(130px, 12px); }
+	33%       { opacity: 1; transform: translate(40px, 0); }
+	36%       { transform: translate(0, -3px); }
+	40%       { transform: translate(0, 0); }
+	44%       { transform: translate(0, -3px); }
+	50%       { opacity: 1; transform: translate(0, 0); }
+	50.2%     { opacity: 0; }
+	100%      { opacity: 0; transform: translate(130px, 12px); }
+}
+
+/*
+ * Il surgit derrière le nageur, se rapproche par à-coups en ondulant, et sort
+ * de l'écran avec lui. Il plonge (descend sous la vague) avant de disparaître
+ * pour ne pas rester figé quand la scène saute.
+ */
+@keyframes att-requin
+{
+	0%, 33%   { opacity: 0; transform: translate(-70px, 18px); }
+	35%       { opacity: 1; transform: translate(-50px, 0); }
+	38%       { transform: translate(-30px, -2px); }
+	41%       { transform: translate(-34px, 1px); }
+	44%       { transform: translate(-12px, -2px); }
+	47%       { transform: translate(-16px, 1px); }
+	49.5%     { opacity: 1; transform: translate(0, 0); }
+	50.2%     { opacity: 0; transform: translate(0, 18px); }
+	100%      { opacity: 0; transform: translate(-70px, 18px); }
+}
+
+@keyframes att-crawl
+{
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+@keyframes att-bulles
+{
+	0%, 80%  { opacity: 0; transform: translateY(0); }
+	81%      { opacity: 1; transform: translateY(-6px); }
+	87%      { opacity: 0; transform: translateY(-40px); }
+	100%     { opacity: 0; transform: translateY(-40px); }
+}
+
+/* Deux gerbes : au freinage de l'arrivée, puis à la sortie de l'esquimautage. */
+@keyframes att-gerbe
+{
+	0%, 59%  { opacity: 0; transform: scale(0.3); }
+	61%      { opacity: 0.9; transform: scale(0.9); }
+	65%      { opacity: 0; transform: scale(1.4); }
+	86%      { opacity: 0; transform: scale(0.3); }
+	89%      { opacity: 1; transform: scale(1.0); }
+	94%      { opacity: 0; transform: scale(1.5); }
+	100%     { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes att-porte
+{
+	from { transform: rotate(-1.5deg); }
+	to   { transform: rotate(1.5deg); }
+}
+
+body.no-anim #attente_dessin *
+{
+	animation: none !important;
 }
 
 body.vide #attente  { display: block; }
@@ -554,7 +1070,11 @@ body.sans-nation .ligne
 	grid-template-columns: 104px 118px 1fr 120px 230px 190px;
 }
 
-body.sans-nation .c_nation
+/* `.ligne .c_nation` et pas `.c_nation` seul : il faut l'emporter sur
+   `.ligne.res .c_nation { display: flex }`, sinon la cellule reste dans les
+   lignes alors qu'elle a disparu de l'en-tête, et tout se décale d'une
+   colonne. */
+body.sans-nation .ligne .c_nation
 {
 	display: none;
 }
@@ -776,4 +1296,238 @@ body.no-anim .ligne.res.vedette::after
 		var(--ffck-blue) 0%,
 		rgba(9, 122, 255, 0.35) 55%,
 		rgba(9, 122, 255, 0) 100%);
+}
+
+/******************** habillage photo (défaut) ********************/
+
+/*
+ * La première version (fond uni, ?style=classique) reste intacte : tout ce
+ * qui suit ne s'applique que sous body.theme-photo, posé par le JavaScript.
+ *
+ * Principe : une photo d'action plein cadre, assombrie par un voile marine
+ * aux couleurs de la charte, et un tableau en verre dépoli par-dessus. Le
+ * voile est plus dense à gauche et en haut, là où sont les noms et le titre,
+ * et s'ouvre à droite pour laisser respirer la photo.
+ *
+ * La photo (img/fonds/mewen.jpg) fait 94 Ko en 1086x724. Elle est agrandie
+ * mais floutée et voilée : plus de pixels ne se verraient pas, et alourdiraient
+ * le chargement. Pour en changer : ?fond=<nom> pour img/fonds/<nom>.jpg.
+ */
+/*
+ * Fond et voile sont posés sur la FENÊTRE, pas sur la scène : la scène
+ * 1920x1080 est réduite pour tenir dans la fenêtre, et sur un écran qui n'est
+ * pas en 16:9 (Mac en 16:10, fenêtre de contrôle) il resterait sinon deux
+ * bandes de couleur unie en haut et en bas. La photo continue derrière.
+ * Sur la sortie 1920x1080 de la régie, fenêtre et scène coïncident.
+ */
+#fond,
+#voile
+{
+	position: fixed;
+	inset: 0;
+	display: none;
+}
+
+body.theme-photo #fond,
+body.theme-photo #voile
+{
+	display: block;
+}
+
+body.theme-photo #fond
+{
+	/* Un peu plus grand que la scène : le zoom lent ne découvre jamais de bord. */
+	inset: -40px;
+
+	background-image: url("../img/fonds/mewen.jpg");
+	background-size: cover;
+	background-position: 55% 40%;
+
+	/* Le flou fait passer l'agrandissement (1086 px -> 2000 px) inaperçu et
+	   détache le tableau du fond. */
+	filter: blur(3px) saturate(1.15) brightness(0.9);
+
+	animation: res-fond-zoom 40s ease-in-out infinite alternate;
+}
+
+/* Zoom très lent : l'image vit sans jamais attirer l'oeil. */
+@keyframes res-fond-zoom
+{
+	from { transform: scale(1.00); }
+	to   { transform: scale(1.07); }
+}
+
+body.theme-photo #voile
+{
+	background:
+		/* haut et bas un peu assombris, sur une faible hauteur : juste de quoi
+		   asseoir le titre et les bandes du pied */
+		linear-gradient(180deg,
+			rgba(5, 8, 31, 0.60) 0%,
+			rgba(5, 8, 31, 0.25) 12%,
+			rgba(5, 8, 31, 0.25) 86%,
+			rgba(5, 8, 31, 0.65) 100%),
+		/* marine de la charte, dense sous les noms, ouvert à droite */
+		linear-gradient(90deg,
+			rgba(9, 0, 109, 0.80) 0%,
+			rgba(9, 0, 109, 0.45) 55%,
+			rgba(9, 50, 160, 0.20) 100%);
+}
+
+body.no-anim.theme-photo #fond
+{
+	animation: none;
+}
+
+/* Les bandes de la charte, avec une ombre : elles flottent sur la photo. */
+/*
+ * La scène devient transparente : c'est le fond de fenêtre qu'on voit. Elle
+ * ne coupe plus ce qui dépasse, pour que les bandes filent jusqu'aux bords de
+ * la fenêtre au lieu de s'arrêter net au bord du cadre 16:9 (c'est le body,
+ * en overflow: hidden, qui coupe au final).
+ */
+body.theme-photo #scene
+{
+	background: none;
+	overflow: visible;
+}
+
+/* Les bandes collées à un bord de la scène sont prolongées de 1000 px au-delà. */
+body.theme-photo #bande_haut_sombre { left: -1060px; width: 2180px; }
+body.theme-photo #bande_haut_vive   { width: 1980px; }
+body.theme-photo #bande_bas_vive    { left: -1060px; width: 1780px; }
+body.theme-photo #bande_bas_sombre  { width: 1880px; }
+
+/*
+ * Mise en page resserrée : moins de vide au-dessus de l'en-tête et sous les
+ * bandes du pied, la photo et le tableau prennent la place. L'en-tête remonte
+ * de 40 px, le pied descend de 32 px et ses bandes sortent par le bas du
+ * cadre. Le JavaScript tient compte des nouvelles bornes du tableau
+ * (CalerHauteurLignes : 186 -> 876 au lieu de 226 -> 846).
+ */
+body.theme-photo #bande_haut_sombre { top: 44px; }
+body.theme-photo #bande_haut_vive   { top: 68px; }
+body.theme-photo #titre             { top: 48px; }
+body.theme-photo #epreuve           { top: 68px; }
+body.theme-photo #sous_titre        { top: 142px; }
+body.theme-photo #tableau           { top: 186px; }
+body.theme-photo #attente           { top: 270px; }
+
+/* Le logo passe au-dessus de la bande vive remontée : un peu plus petit. */
+body.theme-photo #logo_ffck
+{
+	top: 6px;
+	height: 58px;
+}
+
+body.theme-photo #encourse          { top: 892px; }
+body.theme-photo #bande_bas_vive,
+body.theme-photo #bande_bas_sombre  { top: 1032px; }
+body.theme-photo #pagination        { top: 1040px; }
+
+body.theme-photo .bande
+{
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+body.theme-photo #titre,
+body.theme-photo #lieu,
+body.theme-photo #entete,
+body.theme-photo #attente,
+body.theme-photo #pagination
+{
+	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+}
+
+body.theme-photo #entete
+{
+	color: #a9c8f7;
+}
+
+/*
+ * Lignes en verre dépoli : la photo passe au travers, floutée, sans gêner la
+ * lecture. Un filet clair en haut de ligne donne l'épaisseur du verre.
+ */
+body.theme-photo .ligne.res
+{
+	background: linear-gradient(90deg,
+		rgba(6, 10, 48, 0.82) 0%,
+		rgba(8, 14, 60, 0.70) 55%,
+		rgba(10, 20, 72, 0.52) 100%);
+	-webkit-backdrop-filter: blur(14px) saturate(1.3);
+	backdrop-filter: blur(14px) saturate(1.3);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.10),
+		0 6px 18px rgba(0, 0, 0, 0.30);
+}
+
+/* Le pavé du rang reprend le biseau de la charte sur son bord droit. */
+body.theme-photo .ligne.res .c_rang
+{
+	clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+/*
+ * Podium : la couleur de la médaille déborde du pavé et s'estompe le long de
+ * la ligne. On repère les trois premiers sans avoir à lire le chiffre.
+ */
+body.theme-photo .ligne.res.p1
+{
+	background: linear-gradient(90deg,
+		rgba(212, 175, 55, 0.42) 0%,
+		rgba(8, 14, 60, 0.78) 34%,
+		rgba(10, 20, 72, 0.55) 100%);
+}
+
+body.theme-photo .ligne.res.p2
+{
+	background: linear-gradient(90deg,
+		rgba(170, 180, 191, 0.36) 0%,
+		rgba(8, 14, 60, 0.78) 34%,
+		rgba(10, 20, 72, 0.55) 100%);
+}
+
+body.theme-photo .ligne.res.p3
+{
+	background: linear-gradient(90deg,
+		rgba(181, 121, 58, 0.40) 0%,
+		rgba(8, 14, 60, 0.78) 34%,
+		rgba(10, 20, 72, 0.55) 100%);
+}
+
+/* Le temps du premier, celui que tout le monde vise, en or. */
+body.theme-photo .ligne.res.p1 .c_temps
+{
+	color: #ffe27a;
+}
+
+body.theme-photo .ligne.res.hc
+{
+	background: linear-gradient(90deg,
+		rgba(20, 24, 50, 0.78) 0%,
+		rgba(20, 24, 50, 0.50) 100%);
+}
+
+body.theme-photo .ligne.res.place-vide
+{
+	background: rgba(6, 10, 48, 0.28);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	box-shadow: none;
+}
+
+body.theme-photo .ligne.res.vedette
+{
+	background: linear-gradient(90deg,
+		rgba(23, 12, 150, 0.92) 0%,
+		rgba(30, 22, 165, 0.82) 55%,
+		rgba(20, 40, 150, 0.62) 100%);
+}
+
+/* Bandeau des bateaux en course : même verre que le tableau. */
+body.theme-photo .coureur
+{
+	background: linear-gradient(160deg, rgba(24, 33, 111, 0.82) 0%, rgba(11, 16, 80, 0.72) 100%);
+	-webkit-backdrop-filter: blur(14px) saturate(1.3);
+	backdrop-filter: blur(14px) saturate(1.3);
 }

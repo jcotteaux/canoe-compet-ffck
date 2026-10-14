@@ -7,13 +7,13 @@
  * n'ait à éditer un fichier JS à la main.
  *
  * Ordre de résolution :
- *   1. ?ws=hote:port dans l'URL de la page   -> http://.../live.html?ws=192.168.1.10:20000
+ *   1. ?ws=hote:port dans l'URL de la page   -> http://.../live.html?ws=192.168.1.10:8080
  *   2. localStorage 'competffck.ws'          -> réglage persistant par poste
  *   3. l'hôte qui a servi la page            -> cas normal (Laragon et competFFCK
  *                                               tournent sur la même machine)
  */
 const wsParams = (function () {
-  const DEFAULT_PORT = 20000;
+  const DEFAULT_PORT = 8080;   // port competFFCK constaté sur le serveur de course (cf. canoe_national/ws_params.js)
 
   function parse(value) {
     if (!value) return null;

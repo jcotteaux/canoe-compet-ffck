@@ -8,6 +8,7 @@ function OnCommandRaceLoad(objJSON)
 //	alert("OnCommandRaceLoad :"+JSON.stringify(objJSON));
 	canoe.SetRace(objJSON);
 	canoe.SetFmtChrono(wsMain.fmtChrono);
+	wsMain.raceReady = true;
 
 	// Chargement de toutes les épreuves ...
 	const cmd = { key : '<epreuve_load>',  epreuve : '' };	
@@ -25,9 +26,9 @@ function OnCommandEpreuveLoad(objJSON)
 	canoe.ComputeTpsInter(tRanking, 1);
 	canoe.ComputeTpsInter(tRanking, 2);
 	
-	const nb_porte = canoe.GetNbPorte();
-	CreateBlockPena('block_running', nb_porte);
-	CreateBlockPena('block_finish', nb_porte);
+	ResetPenalties();
+	wsMain.rankingReady = true;
+	Resync();
 
 	if (wsMain.bib_finish_force > 0)
 		ForceBibFinish(wsMain.bib_finish_force);
@@ -42,19 +43,63 @@ function OnCommandEpreuveLoad(objJSON)
 	}
 }
 
-function CreateBlockPena(block_name, nb_porte) 
+/*
+ * Le classement vient d'être (re)chargé : à l'ouverture de la page, après une
+ * reconnexion, un effacement, ou parce qu'un dossard inconnu est apparu.
+ * L'affichage en cours est recalé sur ce que dit le serveur ; les index de
+ * lignes de l'ancien classement ne valent plus rien.
+ */
+function Resync()
 {
-	const elemPena = document.querySelector('#'+block_name+' div.pena');
-	if (elemPena && typeof elemPena === "object")
+	if (wsMain.bib_select <= 0)
+		return;
+
+	const tRanking = canoe.GetTableRanking();
+	const row = canoe.GetRankingBibIndex(tRanking, wsMain.bib_select);
+	if (row < 0)
 	{
-		var html = '<table><tr>';
-		for (let p=1;p<=nb_porte;p++)
-		{
-			html += "<td class='gate' data-pen='-1' data-col='"+p+"'>&nbsp;</td>";
-		}
-		html += '</tr></table>';
-		elemPena.innerHTML = html;
+		// Bateau disparu du classement (dossard retiré, autre course) : on repart de zéro.
+		EndFinish();
+		ClearRunning();
+		document.getElementById('block_start').style.display = 'none';
+		return;
 	}
+
+	SetLeader();
+	if (wsMain.timeoutFinish != null)
+	{
+		ShowFinish(tRanking, row, canoe.GetCodeCoursePhase(), false);
+		return;
+	}
+
+	SetName('#block_start', tRanking, row);
+	SetClub('#block_start', tRanking, row);
+	SetCateg('#block_start', tRanking, row);
+	if (canoe.GetCodeActivite() == 'SLA')
+	{
+		for (let p=1;p<=canoe.GetNbPorte();p++)
+			ShowPenalty(p, tRanking.GetCell('Pena_'+p.toString(), row), 'block_running');
+	}
+}
+
+/*
+ * Le serveur parle d'un dossard que notre classement ne connaît pas : il est
+ * périmé (bateau ajouté, trames manquées). On le redemande, au plus toutes
+ * les 5 s pour ne pas inonder le serveur.
+ */
+function RequestResync()
+{
+	if (!wsMain.rankingReady)
+		return;		// premier chargement déjà en route
+
+	const now = Date.now();
+	if (now - (wsMain.resyncAt || 0) < 5000)
+		return;
+	wsMain.resyncAt = now;
+	if (wsMain.raceReady)
+		wsMain.Send({ key : '<epreuve_load>', epreuve : '' });
+	else
+		OnOpenWebSocketCommand();
 }
 
 function OnBroadcastPenaltyAdd(objJSON) 
@@ -93,10 +138,20 @@ function OnBroadcastPenaltyAdd(objJSON)
 			}
 		}
 	}
+	else
+		RequestResync();
 }
 
 function OnBroadcastBibTime(objJSON) 
 {
+	if (!wsMain.rankingReady)
+		return;		// le classement à venir contiendra ce temps
+	if (canoe.GetRankingBibIndex(canoe.GetTableRanking(), objJSON.bib) < 0)
+	{
+		RequestResync();
+		return;
+	}
+
 	const passage = parseInt(objJSON.passage);
 	if (passage >= 1)
 		DoBroadcastBibTimeInter(objJSON.bib, objJSON.time_chrono, passage);
@@ -114,9 +169,16 @@ function DoBroadcastBibTimeInter(bib, time_chrono, inter)
 
 		if (bib == wsMain.bib_select && row >= 0)
 		{
+			// ForceBibStart efface la référence du leader (ClearLeader) à
+			// chaque trame pendant les delay_start premières secondes : un
+			// intermédiaire dans cette fenêtre restait sans écart.
+			if (wsMain.leader_index < 0)
+				SetLeader();
+
 			var tps = time_chrono;
 			var txtDiff = '';
 			var txtColor = 'red';
+			var newLeader = false;	// devant le leader à cet intermédiaire
 			
 			if (tps > 0)
 			{
@@ -133,6 +195,7 @@ function DoBroadcastBibTimeInter(bib, time_chrono, inter)
 					if (tpsLeader > 0)
 					{
 						const diff = tps - tpsLeader;
+						newLeader = diff < 0 && wsMain.leader_index != row;
 						txtDiff = adv.GetChronoDiffXSCC(diff);
 						
 						if (diff > 0)
@@ -157,7 +220,7 @@ function DoBroadcastBibTimeInter(bib, time_chrono, inter)
 
 			document.querySelector('#block_start .bib').innerHTML = bib;
 			SetName('#block_start', tRanking, row);
-			SetNation('#block_start', tRanking, row);
+			SetClub('#block_start', tRanking, row);
 			SetCateg('#block_start', tRanking, row);
 
 			var txtTime = '';
@@ -166,6 +229,8 @@ function DoBroadcastBibTimeInter(bib, time_chrono, inter)
 			else
 				txtTime = adv.GetChronoHHMMSSCC(tps);
 			
+			document.querySelector('#block_inter .row .label').textContent = 'Inter '+inter;
+			document.querySelector('#block_inter').classList.toggle('new-leader', newLeader);
 			document.querySelector('#block_inter .time').innerHTML = txtTime;
 			document.querySelector("#block_inter .diff").innerHTML = txtDiff;
 			
@@ -275,9 +340,31 @@ function ShowFinish(tRanking, row, course_phase, timerRestart=false)
 				tps += canoe.GetCurrentSlalomTotalPena(tRanking, row)*1000;
 
 				txtTime = adv.GetChrono(tps, 'XSCC');
+
+				// Portes pas toutes jugées : place et écart provisoires, calculés
+				// sur le temps connu face aux bateaux déjà classés de la catégorie.
+				const categ = tRanking.GetCell('Code_categorie', row);
+				let rank = 1;
+				let best = null;
+				for (let r = 0; r < tRanking.GetNbRows(); r++)
+				{
+					if (r == row || tRanking.GetCell('Code_categorie', r) != categ)
+						continue;
+					const t = tRanking.GetCellInt('Tps'+course_phase, r, -1);
+					if (t > 0)
+					{
+						if (t < tps)
+							rank++;
+						if (best === null || t < best)
+							best = t;
+					}
+				}
+				txtRk = rank;
+				if (best !== null)
+					txtDiff = adv.GetChronoDiffXSCC(tps - best);
 			}
-			
-			ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart);
+
+			ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart, totalPena < 0);
 		}
 		else
 		{
@@ -295,7 +382,7 @@ function ShowFinish(tRanking, row, course_phase, timerRestart=false)
 	}
 }
 
-function ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart=false)
+function ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart=false, provisional=false)
 {
 	var txtColor = '';
 	if (txtDiff.length > 0)
@@ -317,22 +404,13 @@ function ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart=fal
 		if (wsMain.timeoutFinish != null)
 			window.clearTimeout(wsMain.timeoutFinish);
 	
-		wsMain.timeoutFinish = window.setTimeout(function() { 
-				wsMain.timeoutFinish = null; 
-				if (wsMain.bib_force > 0)
-					wsMain.bib_select = wsMain.bib_force;
-				else
-					wsMain.bib_select = -1;
-				
-				HideBlockFinish();
-				ClearLeader();
-			},	wsMain.timeoutFinishDelay
-		);
+		wsMain.timeoutFinish = window.setTimeout(EndFinish, wsMain.timeoutFinishDelay);
+		wsMain.finishShownAt = Date.now();
 	}
 
 	document.querySelector('#block_finish .bib').innerHTML = wsMain.bib_select;
 	SetName('#block_finish', tRanking, row);
-	SetNation('#block_finish', tRanking, row);
+	SetClub('#block_finish', tRanking, row);
 	SetCateg('#block_finish', tRanking, row);
 	
 	if (parseInt(txtRk) == 1)
@@ -342,7 +420,14 @@ function ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart=fal
 
 	
 
+	// Toutes les portes ne sont pas encore jugées : place et temps provisoires.
+	document.querySelector('#block_finish .result .label').textContent = provisional ? 'Provisoire' : 'Arrivée';
+	document.querySelector('#block_finish').classList.toggle('provisional', provisional);
 	document.querySelector('#block_finish .rank').innerHTML = txtRk;
+	const elFinish = document.querySelector('#block_finish');
+	elFinish.classList.toggle('first', parseInt(txtRk) == 1);
+	elFinish.classList.toggle('second', parseInt(txtRk) == 2);
+	elFinish.classList.toggle('third', parseInt(txtRk) == 3);
 	document.querySelector('#block_finish .time').innerHTML = txtTime;
 	document.querySelector('#block_finish .diff').innerHTML = txtDiff;
 	
@@ -360,6 +445,37 @@ function ShowFinishData(tRanking, row, txtRk, txtTime, txtDiff, timerRestart=fal
 	ShowBlockFinish();
 	SetLeader();
 } 
+
+/** Fin de l'affichage de l'arrivée : l'incrustation repart sur le bateau suivant. */
+function EndFinish()
+{
+	if (wsMain.timeoutFinish != null)
+		window.clearTimeout(wsMain.timeoutFinish);
+	wsMain.timeoutFinish = null;
+	if (wsMain.bib_force > 0)
+		wsMain.bib_select = wsMain.bib_force;
+	else
+		wsMain.bib_select = -1;
+
+	HideBlockFinish();
+	ClearLeader();
+}
+
+/**
+ * L'arrivée a été vue assez longtemps (delay_finish_min) et un autre bateau
+ * est sur l'eau : on passe à lui. Sans cela le résultat restait delay_finish
+ * (40 s) à l'écran, pendant que le chrono du bateau suivant tournait sans
+ * être affiché.
+ */
+function FinishCanEnd(tOnCourse)
+{
+	if (wsMain.bib_force > 0)
+		return false;	// bateau imposé par l'URL : on reste sur lui
+	if (Date.now() - wsMain.finishShownAt < wsMain.timeoutFinishMinDelay)
+		return false;
+	const next = GetBibSelect(tOnCourse);
+	return next > 0 && next != wsMain.bib_select && tOnCourse.GetIndexRow('bib', next) >= 0;
+}
 
 function ForceBib(bib)
 {
@@ -394,7 +510,7 @@ function ForceBibStart(bib)
 			document.querySelector('#block_start .bib').innerHTML = wsMain.bib_select;
 
 			SetName('#block_start', tRanking, row);
-			SetNation('#block_start', tRanking, row);
+			SetClub('#block_start', tRanking, row);
 			SetCateg('#block_start', tRanking, row);
 			ShowBlockStart();
 			
@@ -470,12 +586,24 @@ function Reload()
 
 function OnFlowOnCourse(objJSON)
 {
-	if (wsMain.timeoutFinish != null || wsMain.timeoutInter != null)
+	if (wsMain.timeoutInter != null)
+		return;
+
+	// Avant le classement, on ne saurait ni nommer le bateau ni le situer :
+	// à l'ouverture de la page, on attend qu'il soit chargé.
+	if (!wsMain.rankingReady)
 		return;
 
 	const tOnCourse = adv.GetTableUnique(objJSON, 'table');
 	if (tOnCourse == null || typeof tOnCourse !== 'object')
 		return;
+
+	if (wsMain.timeoutFinish != null)
+	{
+		if (!FinishCanEnd(tOnCourse))
+			return;
+		EndFinish();
+	}
 
 	if (wsMain.next_start > 0)
 	{
@@ -533,6 +661,7 @@ function OnFlowOnCourse(objJSON)
 				{
 					//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'HHMMSSCC');
 					document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'XSCC');
+					RequestResync();
 				}
 			}
 			else
@@ -543,7 +672,10 @@ function OnFlowOnCourse(objJSON)
 			
 			const block_running = document.getElementById("block_running");
 			if (block_running != null && block_running.style.display == 'none')
+			{
 				block_running.style.display = 'block';
+				UpdatePenaPanel();
+			}
 			
 			if (wsMain.leader_index < 0)
 				SetLeader();
@@ -574,32 +706,87 @@ function ShowBibNext(tOncourse)
 	}
 }
 
+/*
+ * Pénalités du bateau affiché, sur le bord droit : une ligne par porte
+ * pénalisée (2 s touchée, 50 s manquée), dans l'ordre des portes, ajoutée dès
+ * que le juge la saisit. Les portes passées proprement ne sont pas listées.
+ * `block_name` reste dans la signature d'origine mais ne sert plus : le
+ * panneau est le même en course et à l'arrivée.
+ */
 function ShowPenalty(gate, pena, block_name)
 {
-	const elem = document.querySelectorAll('#'+block_name+' div.pena td[data-col="'+gate.toString()+'"]');
-	if (elem && typeof elem === "object" && elem.length == 1)
-	{
-		if (pena == '0')
+	if (wsMain.penaBib !== wsMain.bib_select)
+		ResetPenalties();
+
+	const value = String(pena);
+	if (value === '2' || value === '50')
+		wsMain.penaGates.set(parseInt(gate), value);
+	else
+		wsMain.penaGates.delete(parseInt(gate));
+	RenderPenalties();
+}
+
+function ResetPenalties()
+{
+	wsMain.penaBib = wsMain.bib_select;
+	wsMain.penaGates = new Map();
+	const list = document.querySelector('#block_pena .pena-list');
+	if (list)
+		list.innerHTML = '';
+	UpdatePenaPanel();
+}
+
+/** Met à jour le panneau sans le reconstruire : seule une nouvelle porte s'anime. */
+function RenderPenalties()
+{
+	const list = document.querySelector('#block_pena .pena-list');
+	if (!list)
+		return;
+
+	const gates = Array.from(wsMain.penaGates.keys()).sort(function(a, b) { return a - b; });
+	Array.from(list.children).forEach(function(el) {
+		if (!wsMain.penaGates.has(parseInt(el.dataset.gate)))
+			el.remove();
+	});
+	gates.forEach(function(gate, i) {
+		const value = wsMain.penaGates.get(gate);
+		let el = list.querySelector('.gate[data-gate="'+gate+'"]');
+		if (!el)
 		{
-			elem[0].setAttribute("data-pen", '0');
-			elem[0].innerHTML = '';
+			el = document.createElement('div');
+			el.className = 'gate';
+			el.dataset.gate = gate;
+			el.innerHTML = '<span class="num"><small>Porte</small>'+gate+'</span><span class="val"></span>';
 		}
-		else if (pena == '2')
-		{
-			elem[0].setAttribute("data-pen", '2');
-			elem[0].innerHTML = '2';
-		}
-		else if (pena == '50')
-		{
-			elem[0].setAttribute("data-pen", '50');
-			elem[0].innerHTML = '50';
-		}
-		else
-		{
-			elem[0].setAttribute("data-pen", '-1');
-			elem[0].innerHTML = '';
-		}
-	}
+		el.dataset.pen = value;
+		el.querySelector('.val').textContent = '+'+value;
+		if (list.children[i] !== el)
+			list.insertBefore(el, list.children[i] || null);
+	});
+
+	UpdatePenaPanel();
+}
+
+/** Visible tant que le bateau est affiché (en course, intermédiaire, arrivée) et pénalisé. */
+function UpdatePenaPanel()
+{
+	const panel = document.getElementById('block_pena');
+	if (!panel || !wsMain.penaGates)
+		return;
+	const shown = function(id) {
+		const el = document.getElementById(id);
+		return el != null && el.style.display == 'block';
+	};
+	const visible = wsMain.penaGates.size > 0 && (shown('block_running') || shown('block_inter') || shown('block_finish'));
+	panel.style.display = visible ? 'flex' : 'none';
+}
+
+function ClearRunning()
+{
+	const el = document.getElementById('block_running');
+	if (el != null)
+		el.style.display = 'none';
+	ResetPenalties();
 }
 
 function TruncateName(name)
@@ -644,27 +831,19 @@ function SetName(blockName, tRanking, row)
 			let equipier1 = bateau.substring(0, iSeparator).trim();
 			let equipier2 = bateau.substring(iSeparator+1).trim();
 			el.innerHTML = TruncateName(equipier1)+'<br>'+TruncateName(equipier2);
-			el.style.fontSize = "24pt";
+			el.classList.add('crew');
 		}
 		else
 		{
 			el.innerHTML = TruncateName(bateau);
-			el.style.fontSize = "48pt";
+			el.classList.remove('crew');
 		}
 	}
 }
 
-function SetNation(blockName, tRanking, row)
+function SetClub(blockName, tRanking, row)
 {
-	let nation = '';
-	if (row >= 0)
-		nation = tRanking.GetCell('Code_nation', row);
-
-	document.querySelector(blockName+' .nation').innerHTML = nation;
-	if (nation == '')
-		document.querySelector(blockName+' .img_nation').src = "./img/Flags/Empty.png";
-	else
-		document.querySelector(blockName+' .img_nation').src = "./img/Flags/"+nation+".png";
+	document.querySelector(blockName+' .club').textContent = row >= 0 ? tRanking.GetCell('Club', row) : '';
 }
 
 function SetCateg(blockName, tRanking, row)
@@ -817,14 +996,12 @@ function SetLeaderName(el)
 				if (equipier2.length > 15)
 					equipier2 = equipier2.substring(0,14)+'.';
 				
-				el.innerHTML = TruncateName(equipier1)+'<br>'+TruncateName(equipier2);
-				el.style.fontSize = "10pt";
+				// Une seule ligne : la bande du leader n'a la hauteur que d'un nom.
+				el.textContent = equipier1+' / '+equipier2;
 			}
 			else
 			{
-				el.innerHTML = TruncateNameLeader(bateau);
-				//el.style.fontSize = "16pt";
-				el.style.fontSize = "18pt";
+				el.textContent = TruncateNameLeader(bateau);
 			}
 		}
 	}
@@ -903,6 +1080,7 @@ function ShowBlockFinish()
 	el = document.getElementById("block_finish");
 	if (el != null)
 		el.style.display = 'block';
+	UpdatePenaPanel();
 }
 
 function HideBlockFinish()
@@ -912,6 +1090,7 @@ function HideBlockFinish()
 	el = document.getElementById("block_finish");
 	if (el != null)
 		el.style.display = 'none';
+	UpdatePenaPanel();
 }
 
 function ShowBlockInter()
@@ -933,6 +1112,7 @@ function ShowBlockInter()
 	el = document.getElementById("block_inter");
 	if (el != null)
 		el.style.display = 'block';
+	UpdatePenaPanel();
 }
 
 function HideBlockInter()
@@ -944,6 +1124,13 @@ function HideBlockInter()
 	el = document.getElementById("block_inter");
 	if (el != null)
 		el.style.display = 'none';
+
+	// Le chrono reprend aussitôt, sans attendre la trame suivante : sinon le
+	// coin reste vide un instant. La trame suivante le met à jour (ou affiche
+	// l'arrivée si le bateau a fini entre-temps).
+	el = document.getElementById("block_running");
+	if (el != null && wsMain.bib_select > 0 && wsMain.timeoutFinish == null)
+		el.style.display = 'block';
 }
 
 function ShowBlockStart()
@@ -1100,6 +1287,10 @@ function Init()
 
 	wsMain.timeoutFinish = null;
 	wsMain.timeoutInter = null;
+	wsMain.raceReady = false;
+	wsMain.rankingReady = false;
+	wsMain.resyncAt = 0;
+	ResetPenalties();
 
 	wsMain.leader_index = -1;
 	wsMain.leader_before_inter = 5000;
@@ -1109,6 +1300,12 @@ function Init()
 	wsMain.timeoutFinishDelay = 40000;
 	if (urlParams.has('delay_finish'))
 		wsMain.timeoutFinishDelay = parseInt(urlParams.get('delay_finish'));
+
+	// Durée minimale de l'arrivée avant de passer au bateau suivant sur l'eau.
+	wsMain.timeoutFinishMinDelay = 8000;
+	if (urlParams.has('delay_finish_min'))
+		wsMain.timeoutFinishMinDelay = parseInt(urlParams.get('delay_finish_min'));
+	wsMain.finishShownAt = 0;
 	
 	wsMain.timeoutInterDelay = 5000;
 	if (urlParams.has('delay_inter'))

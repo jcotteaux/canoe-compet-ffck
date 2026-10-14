@@ -18,6 +18,9 @@ const ON_COURSE_EVERY = 1;    // <on_course> à chaque tick (10 Hz, comme compet
 class Engine extends EventEmitter {
   constructor(fixture) {
     super();
+    // Pénalités prévues par la fixture (pena_plan) : actives par défaut, la
+    // suite de tests les coupe pour garder ses totaux exacts.
+    this.penaPlan = true;
     this.load(fixture);
   }
 
@@ -52,7 +55,8 @@ class Engine extends EventEmitter {
       status: null,                  // null | 'DNF' | 'DNS' | 'DSQ' | 'DES'
       chrono: null,                  // temps d'arrivée en ms
       inters: {},                    // { 1: ms, 2: ms }
-      pena: {},                      // { numéro de porte: 2 | 50 }
+      pena: {},                      // { numéro de porte: 0 | 2 | 50 }, absente tant que non jugée
+      planDone: {},                  // portes du pena_plan de la fixture déjà jugées
     }));
 
     this.emitFrame(this.onCourseFrame());
@@ -105,9 +109,29 @@ class Engine extends EventEmitter {
         this.currentEpreuve = b.epreuve;
       }
 
+      // Slalom : les juges valident les portes restantes peu après l'arrivée.
+      if (b.state === 'finished' && b.judgeAt && this.clock >= b.judgeAt) {
+        b.judgeAt = null;
+        for (let p = 1; p <= this.nbPorte; p++) {
+          if (b.pena[p] === undefined) this.addPenalty(b.bib, p, 0);
+        }
+      }
+
       if (b.state !== 'running') continue;
 
       const elapsed = this.clock - b.hour_start;
+
+      // Pénalités prévues par la fixture : le juge les saisit 1,5 s après
+      // le passage de la porte, réparties comme les inters sur le parcours.
+      if (this.penaPlan && b.pena_plan) {
+        for (const [porte, value] of Object.entries(b.pena_plan)) {
+          const at = (b.ref_time_ms * Number(porte)) / (this.nbPorte + 1) + 1500;
+          if (!b.planDone[porte] && elapsed >= at) {
+            b.planDone[porte] = true;
+            this.addPenalty(b.bib, porte, value);
+          }
+        }
+      }
 
       for (let n = 1; n <= this.nbInter; n++) {
         if (b.inters[n] === undefined && elapsed >= this.interTarget(b, n)) {
@@ -144,6 +168,7 @@ class Engine extends EventEmitter {
   finish(b, chronoMs) {
     b.state = 'finished';
     b.chrono = chronoMs;
+    if (this.nbPorte > 0) b.judgeAt = this.clock + 3000;
 
     const frame = {
       key: '<bib_time>',
@@ -182,6 +207,7 @@ class Engine extends EventEmitter {
     b.status = null;
     b.chrono = null;
     b.inters = {};
+    b.planDone = {};
     this.currentEpreuve = b.epreuve;
   }
 
@@ -244,8 +270,9 @@ class Engine extends EventEmitter {
     if (!b) return;
     const p = Number(porte);
     const v = Number(value);
-    if (v === 0) delete b.pena[p];
-    else b.pena[p] = v;
+    // 0 = porte jugée sans faute : on la garde. Une porte absente n'est pas
+    // jugée, et le client affiche alors un temps provisoire (Total_pena = -1).
+    b.pena[p] = v;
 
     // Noms de champs imposes par le client : live.js:307-309 lit bib / gate /
     // penalty. `penalty` est une chaine ('0', '2' ou '50'), comparee telle
@@ -514,6 +541,7 @@ class Engine extends EventEmitter {
       clockMs: Math.round(this.clock),
       running: this.running,
       speed: this.speed,
+      penaPlan: this.penaPlan,
       epreuve: this.currentEpreuve,
       fixture: this.fixture.id,
       activite: this.fixture.competition.Code_activite,

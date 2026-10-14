@@ -36,10 +36,12 @@ sur une vraie compétition : effacement de manche en plein live, DSQ, pénalité
 | dossier | contenu |
 |---|---|
 | `ws_live/` | le front officiel, importé tel quel du zip du 2025-02-02 |
+| `gestion_kcross_series/` | competCrossFFCK : gestion et live du kayak cross (PHP + MySQL) |
 | `mock/` | le bouchon : serveur WebSocket + serveur statique + panneau de contrôle |
-| `fixtures/` | compétitions simulées (JSON) |
+| `mock/kcross/` | le simulateur kayak cross : API PHP en mémoire + directeur de course |
+| `fixtures/` | compétitions simulées (JSON) ; `fixtures/kcross/` pour le kayak cross |
 | `tools/` | générateur de fixtures, pilote de navigateur |
-| `docs/` | [le protocole WebSocket](docs/PROTOCOL.md), rétro-ingénieré |
+| `docs/` | [le protocole WebSocket](docs/PROTOCOL.md), rétro-ingénieré ; [tester contre un serveur distant](docs/SERVEUR_DISTANT.md) |
 
 Le premier commit contient `ws_live` **non modifié** : tout changement apporté
 au front apparaît donc en diff, ce qui n'était pas possible avec la
@@ -61,7 +63,7 @@ node mock/server.js --record captures/ma-session.jsonl
 | `--fixture <id>` | `slalom-finale` | compétition simulée |
 | `--speed <n>` | celui de la fixture | accélération du temps |
 | `--port <n>` | 3000 | serveur HTTP |
-| `--ws-port <n>` | 20000 | serveur WebSocket |
+| `--ws-port <n>` | 8080 | serveur WebSocket |
 | `--record <fichier>` | — | journalise toutes les trames émises (JSONL) |
 
 Le panneau de contrôle (`/mock/`) pilote la course en direct : départs,
@@ -79,6 +81,183 @@ utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
 `inrace.php` et `pena_biathlon.php`. `notation_fs.php` utilise le vrai framework
 `advPage` (classes PHP) et n'est pas rendu — le bouchon le signale sur la sortie
 standard au lieu de produire une page silencieusement cassée.
+
+## Simulateur kayak cross
+
+`gestion_kcross_series/` (competCrossFFCK) n'a rien à voir avec ws_live côté
+transport : pas de WebSocket, des pages qui **interrogent des API PHP toutes les
+1,5 s**, elles-mêmes adossées à MySQL (tables `KCross_*` plus les tables
+competFFCK pour les bateaux et le time trial). Le simulateur remplace PHP et
+MySQL par une base en mémoire et fait courir une compétition entière.
+
+```bash
+npm run kcross                                  # K1D 24 et K1H 32, huitièmes, tours intercalés
+node mock/kcross/server.mjs --fixture icf       # K1D 12, K1H 16
+node mock/kcross/server.mjs --fixture montante  # montante-descendante 2 tours
+node mock/kcross/server.mjs --paused --manual   # tout se pilote depuis les vraies pages
+```
+
+→ <http://localhost:3001/mock/> (panneau de contrôle)
+→ <http://localhost:3001/live.html?competition=900>
+
+| option | défaut | rôle |
+|---|---|---|
+| `--fixture <id>` | `huitiemes` | compétition simulée (`fixtures/kcross/*.json`), toujours servie sous le code `900` pour que les URL d'OBS survivent à un changement |
+| `--speed <n>` | celui de la fixture | accélération du temps |
+| `--port <n>` | 3001 | serveur HTTP (le bouchon slalom garde 3000) |
+| `--paused` | en marche | démarre en pause |
+| `--manual` | validation auto | les séries attendent la validation du gestionnaire |
+| `--no-config` | configurée | base vide : la compétition se configure depuis `admin.html` |
+
+### Ce qui est simulé
+
+Un directeur de course tient les postes d'une vraie compétition et agit sur la
+base **par les mêmes actions `api_save_state.php` que les tablettes** :
+
+| poste | action | effet |
+|---|---|---|
+| départ | `launch_heat` | série en course, pénalités à zéro, DNS éventuels |
+| juges de zone | `validate_zone_penalties` | une zone après l'autre, au passage des bateaux (FLT, RAL) |
+| arrivée | `update_place` puis `record_arrivals` | places au fil des arrivées, puis série à valider |
+| gestionnaire | `save_progression` | série officielle, qualifiés placés dans le tour suivant |
+
+**Les classements et la progression ne sont pas réécrits** : le simulateur
+charge le vrai `gestion_kcross_series/js/engine.js` dans Node et lui fait
+générer les séries, les horaires, puis valider chaque série comme le bouton
+« Valider » du gestionnaire. Un changement de format ou de règle dans
+l'application est donc repris sans toucher au simulateur. Les scripts de
+l'application sont des modules ES pour navigateur ; `mock/kcross/hooks.mjs` les
+fait accepter par Node malgré le `package.json` en CommonJS.
+
+Le temps est simulé de bout en bout : appel en pré-départ, course (l'ordre
+d'arrivée suit, avec du hasard, le classement du time trial), passage des juges,
+validation, pause avant la série suivante. Les tirages sont déterministes : même
+fixture, même compétition.
+
+Toutes les pages de l'application tournent dessus sans erreur console :
+`live.html`, `speaker.html`, `admin.html` (tableaux de progression remplis au
+fil de la course), `video/video_control.html` et l'incrustation,
+`classement-time-trial.html`, `index.html`, ainsi que les postes `depart.html`,
+`arrivee.html`, `penalite.html`.
+
+### Panneau de contrôle
+
+- pause / relance, étape suivante, vitesse, validation automatique ou non ;
+- incidents sur la série en course : DNF, DSQ, FLT ou RAL sur la prochaine zone
+  non jugée ;
+- bouton « Valider » sur chaque série à valider ;
+- **coupure réseau** de 15 ou 60 s : les connexions des API sont fermées comme
+  sur un Wi-Fi perdu, les postes doivent passer hors-ligne et rejouer leurs
+  saisies au retour ;
+- programme complet, classements par catégorie, journal de course.
+
+En pause, rien ne bouge seul : les vraies pages pilotent la même base, avec les
+mêmes verrous que le PHP (série officielle, zone déjà jugée…). À la relance, une
+série partie depuis `depart.html` est reprise là où elle en est.
+
+### Incrustation OBS
+
+`video/video_incrustation.html` n'affiche que ce que lui pousse la régie
+(`video_control.html`). Le simulateur joue cette régie (case « régie
+automatique » du panneau) : tableau des phases finales puis rampe de départ à
+l'appel, live au départ et à chaque arrivée ou pénalité, résultats à la
+validation. Tant que la case est cochée, il est seul à écrire l'incrustation.
+
+Les tours Dames et Hommes s'intercalent (1/8 D, 1/8 H, 1/4 D, 1/4 H…), dans
+l'ordre que le moteur de l'application calcule à partir de l'ordre des
+catégories. Le tableau passe avant chaque départ, centré sur la branche de la
+série qui part, et une fois après chaque finale avec le vainqueur.
+
+Ajouts à `gestion_kcross_series/video/` :
+
+- **style « TV »** (`css/incrustation_TV.css`), sélectionnable dans la régie :
+  charte des pages TV ws_live. Les deux qualifiés d'une série forment un
+  groupe vert, séparé des éliminés ;
+- **Dames / Hommes** : libellé et couleur par catégorie (rose / bleu) en tête
+  des bandeaux du style TV et sur le tableau, déduits du code (K1D, K1H) ;
+- **club** sous le nom sur la rampe, le live et les résultats. La régie le
+  demande désormais à l'API ; les anciens styles le masquent ;
+- **tableau des phases finales** (`video_tableau.html`) : deux branches qui
+  convergent vers la finale, la règle en une phrase, la prochaine course
+  encadrée, les places à venir libellées (« Vainqueur S1 », « 2e de S2 »), les
+  qualifiés d'office du time trial, le vainqueur une fois la finale jouée.
+  L'incrustation l'embarque et l'affiche en mode `BRACKET` ; seul, il se teste
+  avec `?force=1&categorie=K1H`. À l'antenne, il ne montre que la branche de
+  la série qui part (en 1/8 et 1/4 : les séries qui alimentent la même série,
+  celle-ci et le tour d'après ; ensuite la fin de l'arbre), en caractères
+  lisibles sur YouTube ; `?vue=complet` affiche l'arbre entier. Composé pour
+  1920 × 1080, il se réduit d'un bloc sur un écran plus petit, comme
+  l'incrustation. Les tours se lisent de gauche à droite ; à
+  32 bateaux (8 huitièmes) la première colonne ne tiendrait pas à l'écran et le
+  tableau passe en deux branches qui convergent vers la finale
+  (`?disposition=ltr|branches` pour forcer). Dessiné pour l'élimination directe
+  ICF de 8 à 32 bateaux, y compris les huitièmes « barrage » à 20 ; pas pour
+  le Joker, la montante-descendante ni les Piges, qui ne sont pas des arbres ;
+- **écran TV du site** (`ecran_tv.html?competition=…`) : page autonome pour
+  le public sur place, sans régie. En haut, la progression de la journée
+  (programme par blocs 1/8 Dames, 1/8 Hommes…, course n° x sur y, heure) ; à
+  gauche la branche du tableau de la série en cours ; à droite la série en
+  cours (au départ, en course avec places et pénalités, arrivée, résultats
+  avec les qualifiés) et la série suivante. Une série validée reste à l'écran
+  avec son tableau `?maintien=20` secondes, puis l'écran passe à la suivante
+  (aussitôt si elle part avant). L'arbre est dessiné par `js/tableau_view.js`,
+  partagé avec l'incrustation ;
+- **correctif** : en mode Live, l'incrustation empilait ses lignes à chaque
+  mise à jour (ids créés `live-row-0`, cherchés `live-row-R`).
+
+### Garde-fou : live web coupé
+
+La configuration livrée (`api/config/config.php`) active l'envoi vers
+`livecompet.ffck.org`. Le simulateur renvoie `fonction_live_enabled: false`
+dans `load_full_competition` : un gestionnaire ouvert sur une compétition
+simulée ne publie rien sur le live public.
+
+### Non simulé
+
+Import de sauvegarde, compétitions manuelles, journal d'audit, création des
+tables, export/import de course : ces API répondent `501` avec leur nom, et le
+simulateur le signale sur sa sortie standard.
+
+## Incrustation du bateau suivi (`tv_inrace`) refaite
+
+`canoe/tv_inrace.html` gardait la mise en page du gabarit d'origine : blocs
+dessinés par des images de fond, police Calibri jamais déclarée (Times sur
+macOS), textes qui débordaient des gabarits, pays et drapeau à moitié
+masqués. La logique (départ, intermédiaires avec écart au leader, arrivée,
+ordres de régie, filtres d'URL) est conservée ; l'affichage est refait avec la
+charte des autres incrustations TV :
+
+- **bas gauche** : dossard dans un pavé, nom, **club** (à la place du pays et
+  du drapeau) et catégorie ;
+- **bas droite** : chrono tournant dans le pavé de temps ; au passage d'un
+  intermédiaire, « Inter 1 », l'écart au leader (vert devant, rouge derrière)
+  et le temps du leader au-dessus, avec un badge doré **NEW LEADER** quand le
+  bateau passe devant ; à l'approche de l'arrivée, la bande « Leader » ;
+- **bord droit** : les **pénalités au fil des portes jugées**, une ligne par
+  porte pénalisée (« Porte 7 +50 », jaune pour 2 s, rouge pour 50 s) ; les
+  portes passées proprement ne sont pas listées ;
+- **arrivée** : « Arrivée », écart, temps et place (en or pour le meilleur
+  temps). Tant qu'une porte n'est pas jugée, place et écart sont calculés sur
+  le temps connu face aux bateaux classés de la catégorie, sous le libellé
+  orange « Provisoire », puis confirmés ;
+- **enchaînement** : l'arrivée reste au moins 8 s (`?delay_finish_min=`), puis
+  l'incrustation passe au bateau suivant s'il est sur l'eau. Auparavant elle
+  restait 40 s (`?delay_finish=`) sur le résultat pendant que le chrono du
+  suivant tournait sans être affiché ; ce délai ne sert plus que lorsque
+  personne n'est en course, ou avec un bateau imposé (`?bib_select=`).
+
+Tous les blocs du bas ont la même hauteur et la même ligne de base. Les tailles
+de police ne sont plus posées par le script. `?bg=1` (fond magenta) et
+`?anim=0` fonctionnent comme sur les autres pages TV.
+
+Corrigés au passage : `Reload()` appelait une fonction `ClearRunning()` qui
+n'existait pas (erreur à chaque effacement de manche) ; un intermédiaire dans
+les 10 premières secondes de l'affichage d'un bateau perdait son écart au
+leader (la référence était effacée à chaque trame par le bloc de départ).
+
+Bouchon : une porte jugée « 0 » était effacée au lieu d'être enregistrée,
+toutes les arrivées restaient donc provisoires ; les juges valident désormais
+les portes restantes 3 s (simulées) après l'arrivée.
 
 ## Nouvelle page : tous les bateaux en course
 
@@ -333,6 +512,50 @@ competFFCK s'en sert réellement en production, cela se verra immédiatement et
 il suffira d'ajouter la fonction concernée. **À vérifier avant de déployer sur
 une compétition.**
 
+## Chrono local
+
+Le temps tournant ne dépend plus de la régularité du serveur. competFFCK
+envoie `<on_course>` environ 10 fois par seconde (horloge et temps de chaque
+bateau sur l'eau) et les pages affichaient ces valeurs telles quelles : qu'un
+serveur ralentisse et le chrono se figeait, puis sautait.
+
+`adv/ws.js` (`ws.ChronoLocal`) intercepte désormais ces trames avant les pages :
+
+- chaque trame recale une référence locale par bateau
+  (`départ estimé = réception - temps reçu`) ; on garde l'estimation la plus
+  précoce, celle de la trame la moins retardée, si bien qu'une trame en retard
+  ne fait ni reculer ni geler l'affichage ;
+- le temps transmis aux pages est calculé localement, et si le serveur se tait
+  plus de 100 ms, le poste fabrique lui-même la trame suivante (10 Hz) ;
+- **régulation** : si le serveur indique sans interruption pendant 3 s que
+  l'affichage est en avance de plus de 150 ms, le chrono ralentit de 20 % au
+  plus jusqu'à le rejoindre. Il ne recule jamais ;
+- à l'arrivée (`<bib_time>`, passage 0) le chrono du bateau s'arrête aussitôt ;
+  `<run_erase>` et `<race_load>` remettent tout à zéro ; au-delà de 20 s sans
+  trame, on cesse d'extrapoler et l'affichage se fige comme avant.
+
+Toutes les pages en profitent sans modification (`live`, `live_web`,
+`inrace`, `tv_inrace`, `tv_oncourse`, `tv_results`, et `canoe_national`, qui
+charge le même `ws.js`). `?chrono=serveur` dans l'URL rétablit l'ancien
+comportement.
+
+Mesure avec le bouchon en mode « serveur lent » (retard aléatoire de 0 à
+250 ms par trame, gel de 1,5 s toutes les 4 s), chrono relevé toutes les 20 ms :
+
+| page | gel le plus long, serveur | gel le plus long, chrono local |
+|---|---|---|
+| `tv_oncourse` | 1 499 ms | 162 ms |
+| `tv_inrace` | 1 501 ms | 161 ms |
+| `inrace.php` | 1 539 ms | 161 ms |
+| `tv_results` | 1 479 ms | 162 ms |
+| `live`, `live_web` (à la seconde) | 2 380 ms, saut de 2 s | 1 100 ms, 1 s par seconde |
+
+Aucun retour en arrière dans les deux cas ; les gels volontaires de
+`inrace`/`tv_inrace` (affichage du temps intermédiaire) sont exclus de la mesure.
+
+Pour reproduire : `node mock/server.js --lag`, ou bouton « Serveur lent » du
+panneau.
+
 ## Reconnexion automatique
 
 `adv/ws.js` se reconnecte désormais seul. Auparavant, `onclose` se contentait de
@@ -363,13 +586,44 @@ Aucun affichage n'est imposé : une page d'incrustation TV ne doit rien dessiner
 Pour le vérifier : bouton « Couper le réseau » du panneau, ou `Ctrl-C` sur le
 serveur puis relance — la page doit repartir seule sur la même épreuve.
 
+### Liaison morte
+
+Une coupure sans fermeture propre (wifi qui décroche, switch redémarré,
+serveur figé) laisse la socket « ouverte » : aucun `onclose`, la page reste
+figée sur le dernier état. Une fois que `<on_course>` (10 Hz) s'est manifesté sur
+la socket, 10 s sans aucune trame suffisent : la socket est abandonnée sans
+attendre sa fermeture, puis rouverte avec le rejeu de l'état
+(`ws.SILENCE_RECONNECT`, statut `silent`, `?watchdog=0` pour désactiver).
+Comme seul `<on_course>` arme la surveillance, un serveur qui se tait
+volontairement provoque au plus une reconnexion, pas une boucle.
+
+API du bouchon : `POST /mock/api/mute-clients` rend muettes les sockets
+ouvertes (rien ne passe, ni dans un sens ni dans l'autre) ; les nouvelles
+connexions fonctionnent.
+
+### `tv_inrace` : toujours recalée sur le serveur
+
+- au chargement de la page, le flux `<on_course>` est ignoré tant que le
+  classement n'est pas arrivé : le bateau est choisi une fois qu'on sait le
+  nommer, son identité s'affiche, ses pénalités déjà jugées aussi ;
+- chaque rechargement du classement (ouverture, reconnexion, effacement de
+  manche) recale l'affichage : leader recalculé (les index de lignes de
+  l'ancien classement ne valent plus rien), pénalités reconstruites, arrivée
+  en cours réaffichée avec les données fraîches ; une arrivée survenue pendant
+  la coupure s'affiche à la reprise ;
+- un dossard inconnu du classement (en course, temps, pénalité) déclenche un
+  nouveau `<epreuve_load>`, au plus toutes les 5 s.
+
+Vérifié sur le bouchon : coupure muette pendant une course, avec pénalités et
+arrivée manquées, puis page ouverte en plein parcours.
+
 ### Configuration de l'adresse WebSocket
 
 `ws_live/adv/ws_params.js` **n'existe pas dans le zip officiel** : chaque
 déploiement doit le créer, en codant l'IP en dur. La version de ce dépôt la
 déduit :
 
-1. `?ws=192.168.1.10:20000` dans l'URL de la page (mémorisé ensuite) ;
+1. `?ws=192.168.1.10:8080` dans l'URL de la page (mémorisé ensuite) ;
 2. `localStorage['competffck.ws']` ;
 3. à défaut, l'hôte qui a servi la page.
 
