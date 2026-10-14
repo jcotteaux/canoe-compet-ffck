@@ -62,7 +62,7 @@
 	<script src="../adv/adv.js"></script>
 	<script src="../adv/adv_table.js"></script>
 	<script src="../adv/canoe.js"></script>
-	<script src="./js/inrace_ter.js?v=20261014-chrono4"></script>
+	<script src="./js/inrace_ter.js?v=20261014-chrono5"></script>
 	
 	<script>
 		// Afficher le passage dans la case de classement pendant un intermediaire.

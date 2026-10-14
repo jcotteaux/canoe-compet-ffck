@@ -697,7 +697,7 @@ function Init()
 	wsMain.lastOnCourseJSON = null;
 	
 	wsMain.timeoutFinish = null;
-	wsMain.timeoutFinishDelay = 25000;
+	wsMain.timeoutFinishDelay = 15000;
 	
 	wsMain.timeoutInter = null;
 	wsMain.timeoutInterDelay = 5000;
