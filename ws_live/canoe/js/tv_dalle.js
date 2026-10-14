@@ -286,13 +286,15 @@ function HeureCompet()
 /******************** formats pour la dalle ********************/
 
 /** Nom de famille seul : les mots tout en capitales (« CHEVALIER Arthur » -> « CHEVALIER »). */
-function NomCourt(nom)
+function NomCourt(nom, max)
 {
+	if (max === undefined)
+		max = wsMain.lengthIdentity;
 	const mots = String(nom || '').trim().split(/\s+/);
 	const capitales = mots.filter(function(m) { return m.length > 1 && m === m.toUpperCase() && /[A-Z]/i.test(m); });
 	let n = (capitales.length ? capitales : mots.slice(0, 1)).join(' ');
-	if (n.length > wsMain.lengthIdentity)
-		n = n.substring(0, wsMain.lengthIdentity);
+	if (max > 0 && n.length > max)
+		n = n.substring(0, max);
 	return n.toUpperCase();
 }
 
@@ -608,11 +610,18 @@ function SyncSeul(el, v)
 	SyncPortes(bande, v.type !== 'prochain' ? (v.portes || []) : []);
 	if (bande.firstChild)
 	{
+		CalerPortes(bande);
 		// Le chiffre prend toute la place de la case : on lui donne sa taille.
 		const c = bande.firstChild;
 		bande.style.setProperty('--pw', c.offsetWidth + 'px');
 		bande.style.setProperty('--ph', c.offsetHeight + 'px');
 	}
+
+	// Largeurs au pixel entier : le texte donne des fractions qui décaleraient
+	// tout ce qui suit d'un demi-pixel.
+	['.s_bib', '.s_pena', '.s_diff', '.s_chrono', '.s_ecart', '.s_place'].forEach(function(sel) {
+		LargeurEntiere(el.querySelector(sel));
+	});
 
 	// Le nom rétrécit si la ligne est chargée ; un nom composé garde sa
 	// première partie.
@@ -621,7 +630,8 @@ function SyncSeul(el, v)
 	if (el.dataset.charge !== charge)
 	{
 		el.dataset.charge = charge;
-		elNom.textContent = NomCourt(v.nom);
+		// Pas de coupe à length_identity ici : le nom entier rétrécit d'abord.
+		elNom.textContent = NomCourt(v.nom, 0);
 		Ajuster(elNom);
 		if (elNom.scrollWidth > elNom.clientWidth && /[-\s]/.test(elNom.textContent))
 		{
@@ -767,6 +777,41 @@ function SyncPortes(bande, portes)
 	});
 }
 
+/**
+ * Des cases de largeur entière, 1 pixel d'écart, de bord à bord de la bande :
+ * les pixels qui restent sont répartis régulièrement (une case sur deux ou
+ * trois a 1 pixel de plus), plutôt que des bords flous ou des écarts de 0
+ * ou 2 pixels.
+ */
+function CalerPortes(bande)
+{
+	const n = bande.children.length;
+	const largeur = Math.floor(bande.getBoundingClientRect().width);
+	const utile = largeur - (n - 1);
+	if (n === 0 || utile < n)
+		return;
+	const cle = largeur + '/' + n;
+	if (bande.dataset.cale === cle)
+		return;
+	bande.dataset.cale = cle;
+	for (let i = 0; i < n; i++)
+	{
+		const w = Math.floor((i + 1) * utile / n) - Math.floor(i * utile / n);
+		bande.children[i].style.flex = '0 0 ' + w + 'px';
+	}
+}
+
+/** Arrondit la largeur d'une boîte au pixel supérieur. */
+function LargeurEntiere(el)
+{
+	el.style.minWidth = '';
+	if (!el.textContent)
+		return;
+	const w = el.getBoundingClientRect().width;
+	if (w !== Math.round(w))
+		el.style.minWidth = Math.ceil(w) + 'px';
+}
+
 /** Un texte trop long rétrécit jusqu'à tenir dans sa place (jamais sous 45 %). */
 function Ajuster(el)
 {
@@ -776,7 +821,7 @@ function Ajuster(el)
 	while (k > 0.45 && el.scrollWidth > el.clientWidth)
 	{
 		k -= 0.05;
-		el.style.fontSize = (base * k) + 'px';
+		el.style.fontSize = Math.round(base * k) + 'px';
 	}
 }
 
@@ -810,10 +855,10 @@ function Redimensionner()
 	else
 	{
 		// Aperçu : les copies empilées, le tout le plus grand possible.
-		h = Math.min(window.innerHeight / n, window.innerWidth / wsMain.ratio);
-		w = h * wsMain.ratio;
-		x = (window.innerWidth - w) / 2;
-		y = (window.innerHeight - h * n) / 2;
+		h = Math.floor(Math.min(window.innerHeight / n, window.innerWidth / wsMain.ratio));
+		w = Math.round(h * wsMain.ratio);
+		x = Math.floor((window.innerWidth - w) / 2);
+		y = Math.floor((window.innerHeight - h * n) / 2);
 	}
 
 	wsMain.copies.forEach(function(copie, k) {
@@ -824,6 +869,9 @@ function Redimensionner()
 		el.style.height = h + 'px';
 	});
 	document.documentElement.style.setProperty('--u', (h / 100) + 'px');
+	// Vue « dernier » : les tailles en pixels entiers, --u1 à --u100.
+	for (let k = 1; k <= 100; k++)
+		document.documentElement.style.setProperty('--u' + k, Math.round(k * h / 100) + 'px');
 	document.querySelectorAll('.l_nom').forEach(Ajuster);
 }
 

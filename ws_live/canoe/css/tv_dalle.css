@@ -225,8 +225,7 @@ html, body
 
 /******************** états ********************/
 
-/* Arrivé : dossard or, temps en jaune, place à la fin. */
-.ligne.arrive .l_bib    { background: var(--or); color: #000; }
+/* Arrivé : temps en jaune, place à la fin. */
 .ligne.arrive .l_chrono { color: var(--jaune); }
 
 /* Prochain partant : dossard en creux, compte à rebours en bleu ciel. */
@@ -246,22 +245,29 @@ html, body
  * Un bateau seul sur les 512 x 128 d'une rangée de dalles.
  *   En course :  dossard | nom | pénalités | [écart inter] | chrono
  *                portes, sur toute la largeur, en grand
- *   Arrivé :     dossard | nom                     | pénalités
- *                dossard | temps | écart (grand)    | place
+ *   Arrivé :     dossard | nom             | pénalités | place
+ *                dossard | temps | écart                 | (sur 2 lignes)
+ *                portes, en grand comme pendant la course
+ *
+ * Au pixel près : toutes les tailles sont des --uN, N centièmes de la hauteur
+ * arrondis au pixel entier par le JS (--u44 vaut 56px sur une dalle de 128).
+ * Les aplats (dossard, pastilles, portes) touchent les bords de la dalle et
+ * s'alignent sur les lignes de la grille : dossard et pénalités en haut,
+ * dossard et place en bas, portes jusqu'aux deux bords.
  */
 .dalle.seul .ligne
 {
 	height: 100%;
-	padding-right: calc(var(--u) * 3);
+	padding: 0;
 
 	display: grid;
 	grid-template-columns: auto minmax(0, 1fr) auto auto auto;
-	grid-template-rows: 60fr 40fr;
+	grid-template-rows: var(--u59) minmax(0, 1fr);
 	grid-template-areas:
 		"bib    nom    pena   diff   chrono"
 		"portes portes portes portes portes";
-	column-gap: calc(var(--u) * 4);
-	row-gap: calc(var(--u) * 2);
+	column-gap: var(--u4);
+	row-gap: var(--u2);
 	align-items: center;
 }
 
@@ -269,15 +275,16 @@ html, body
 {
 	grid-area: bib;
 	align-self: stretch;
-	min-width: calc(var(--u) * 54);
-	padding: 0 calc(var(--u) * 4);
+	min-width: var(--u54);
+	padding: 0 var(--u4);
+	box-sizing: border-box;
 
 	display: flex;
 	align-items: center;
 	justify-content: center;
 
 	background: var(--bleu);
-	font-size: calc(var(--u) * 44);
+	font-size: var(--u44);
 	line-height: 1;
 }
 
@@ -285,7 +292,7 @@ html, body
 {
 	grid-area: nom;
 	min-width: 0;
-	font-size: calc(var(--u) * 32);
+	font-size: var(--u32);
 	line-height: 1;
 	white-space: nowrap;
 	overflow: hidden;
@@ -295,19 +302,28 @@ html, body
 {
 	grid-area: chrono;
 	justify-self: end;
-	font-size: calc(var(--u) * 48);
+	/* Le dernier chiffre à un pixel du bord, comme le dossard à gauche. */
+	padding-right: var(--u2);
+	box-sizing: border-box;
+	text-align: right;
+	font-size: var(--u48);
 	line-height: 1;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 }
 
+/* Les pastilles : hauteur entière, texte centré dedans. */
 .s_pena,
 .s_diff,
 .s_ecart,
 .s_place
 {
-	padding: calc(var(--u) * 2) calc(var(--u) * 4) 0;
-	line-height: 1.1;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 var(--u4);
+	line-height: 1;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 }
@@ -323,7 +339,8 @@ html, body
 .s_pena
 {
 	grid-area: pena;
-	font-size: calc(var(--u) * 28);
+	height: var(--u36);
+	font-size: var(--u28);
 }
 
 .s_pena.jaune { background: var(--jaune); color: #000; }
@@ -333,7 +350,8 @@ html, body
 .s_diff
 {
 	grid-area: diff;
-	font-size: calc(var(--u) * 30);
+	height: var(--u36);
+	font-size: var(--u30);
 	background: #fff;
 	color: #000;
 }
@@ -347,9 +365,10 @@ html, body
 .s_place { grid-area: place; }
 
 /*
- * Les portes en grand : la bande prend toute la largeur. Le chiffre prend la
- * plus grande taille que la case permet (--pw, --ph posés par le JS) : « 2 »
- * sur presque toute la case, « 50 » un peu plus petit pour ses deux chiffres.
+ * Les portes en grand : la bande prend toute la largeur, chaque case a une
+ * largeur entière posée par le JS (CalerPortes). Le chiffre prend la plus
+ * grande taille que la case permet (--pw, --ph posés par le JS) : « 2 » sur
+ * presque toute la case, « 50 » un peu plus petit pour ses deux chiffres.
  */
 .s_portes
 {
@@ -357,7 +376,6 @@ html, body
 	align-self: stretch;
 	display: flex;
 	gap: 1px;
-	margin-bottom: calc(var(--u) * 1);
 }
 
 .s_portes:empty
@@ -367,13 +385,13 @@ html, body
 
 .s_portes .porte
 {
-	font-size: min(calc(var(--ph, 30px) * 0.85), calc(var(--pw, 20px) * 1.7));
+	font-size: round(min(calc(var(--ph, 30px) * 0.85), calc(var(--pw, 20px) * 1.7)), 1px);
 }
 
 /* « 50 » : deux chiffres, comprimés en largeur pour garder de la hauteur. */
 .s_portes .porte.p50
 {
-	font-size: min(calc(var(--ph, 30px) * 0.8), calc(var(--pw, 20px) * 1.3));
+	font-size: round(min(calc(var(--ph, 30px) * 0.8), calc(var(--pw, 20px) * 1.3)), 1px);
 }
 
 .porte span
@@ -390,26 +408,39 @@ html, body
 
 .dalle.seul .ligne.arrive
 {
-	grid-template-columns: auto auto minmax(0, 1fr) auto;
-	grid-template-rows: 34fr 44fr 22fr;
+	grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+	/* Les deux lignes du haut font la hauteur de celle de la course
+	   (--u59) : les portes gardent leur taille à l'arrivée. */
+	grid-template-rows: var(--u24) var(--u33) minmax(0, 1fr);
 	grid-template-areas:
-		"bib    nom    nom    pena"
-		"bib    chrono ecart  place"
-		"portes portes portes portes";
+		"bib    nom    nom    pena   place"
+		"bib    chrono ecart  ecart  place"
+		"portes portes portes portes portes";
 }
 
-.ligne.seul.arrive .s_bib    { background: var(--or); color: #000; }
-.ligne.seul.arrive .s_pena   { justify-self: end; }
-.ligne.seul.arrive .s_nom    { font-size: calc(var(--u) * 26); }
-.ligne.seul.arrive .s_pena   { font-size: calc(var(--u) * 24); }
-.ligne.seul.arrive .s_chrono { justify-self: start; font-size: calc(var(--u) * 40); color: #fff; }
+.ligne.seul.arrive .s_nom    { font-size: var(--u21); }
+.ligne.seul.arrive .s_chrono { justify-self: start; padding-right: 0; font-size: var(--u36); color: #fff; }
 
-/* L'écart au premier, en grand, juste à droite du temps final. */
+/* Temps et écart sur la même ligne de base ; la boîte du temps tient dans sa
+   ligne de la grille. */
+.ligne.seul.arrive .s_chrono,
+.ligne.seul.arrive .s_ecart  { align-self: baseline; line-height: var(--u33); }
+
+/* Pénalités en haut, contre la place : elles touchent le haut de la dalle. */
+.ligne.seul.arrive .s_pena
+{
+	justify-self: end;
+	align-self: stretch;
+	height: auto;
+	font-size: var(--u20);
+}
+
+/* L'écart au premier, juste à droite du temps final, plus petit que lui. */
 .ligne.seul.arrive .s_ecart
 {
 	justify-self: start;
 	padding: 0;
-	font-size: calc(var(--u) * 28);
+	font-size: var(--u26);
 	color: #fff;
 }
 
@@ -417,13 +448,15 @@ html, body
 .ligne.seul.arrive .s_ecart.plus   { color: var(--rouge); }
 .ligne.seul.arrive .s_ecart.moins  { color: #3BE36B; }
 
-/* La place, tout à droite. */
+/* La place, tout à droite et sur toute la hauteur du dossard : c'est elle
+   qu'on lit de loin. */
 .ligne.seul.arrive .s_place
 {
 	justify-self: end;
-	padding: calc(var(--u) * 2) calc(var(--u) * 6) 0;
-	font-size: calc(var(--u) * 40);
-	line-height: 1.05;
+	align-self: stretch;
+	min-width: var(--u54);
+	padding: 0 var(--u6);
+	font-size: var(--u50);
 	background: var(--bleu);
 }
 
@@ -435,14 +468,14 @@ html, body
 
 .dalle.seul .ligne.prochain
 {
-	grid-template-rows: 1fr;
+	grid-template-rows: minmax(0, 1fr);
 	grid-template-areas: "bib nom pena diff chrono";
 }
 
 .ligne.seul.prochain .s_bib
 {
 	background: #000;
-	box-shadow: inset 0 0 0 calc(var(--u) * 3) var(--bleu-ciel);
+	box-shadow: inset 0 0 0 var(--u3) var(--bleu-ciel);
 	color: var(--bleu-ciel);
 }
 .ligne.seul.prochain .s_nom    { color: #B8CCEE; }
