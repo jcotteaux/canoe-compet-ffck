@@ -160,11 +160,14 @@ c'est une page d'incrustation, à poser sur un fond dans OBS si besoin.
 
 `dalle.html` est l'équivalent kayak-cross de `tv_dalle.html`, pour les mêmes
 dalles (zone `512x128+0+0`, la copie dessous ; `&zone=`, `&copies=` comme
-pour `tv_dalle`). À gauche le tour, Dames / Hommes et la série ; une ligne
-par couloir : couleur et dossard, nom, pénalités (« FLT P2 » en jaune, « RAL
-S » en rouge, DNS / DNF / DSQ en blanc), ordre d'arrivée. Une fois la série
-validée, le classement reste 20 s (`&maintien=`) : qualifiés en vert, éliminés
-grisés, podium en finale.
+pour `tv_dalle`). À gauche le tour, Dames / Hommes et la série ; une bande
+par couloir : sa lettre sur sa couleur (R, V, B, J), le nom, une case par zone
+du parcours (S, les portes, R ; sombre tant qu'elle n'est pas jugée, verte
+sans pénalité, jaune FLT, rouge RAL avec la zone écrite dedans ; DNS / DNF /
+DSQ en blanc à la place), l'ordre d'arrivée. Une fois la série validée, le
+classement reste 20 s (`&maintien=`) : qualifiés sur bande verte, éliminés en
+retrait, bandes or, argent, bronze en finale. Le nombre de cases suit le
+nombre de portes de la compétition (7 aux France Elite : 9 cases).
 
 ```bash
 export SERVEUR_KX=192.168.1.52     # la machine de competCrossFFCK

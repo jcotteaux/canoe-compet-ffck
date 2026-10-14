@@ -14,7 +14,7 @@
 	<link rel="icon" href="./16x16_ffck.png"/>
 	
 	<link href="./css/head.css?v1" rel="stylesheet">
-	<link href="./css/inrace_ter.css?v1" rel="stylesheet">
+	<link href="./css/inrace_ter.css?v3" rel="stylesheet">
 	
 	<?php 
 	if ($iframe == '1') {
@@ -23,6 +23,17 @@
 	<?php 
 	}?>
 
+	<style>
+		.running-panel .rank[data-inter] {
+			font-size: 32px;
+		}
+			.running-panel .time.next-start {
+			left: 0;
+			width: 100%;
+			font-size: 28px;
+			color: #69F0AE;
+		}
+	</style>
 </head>
 <body>
 	<div id="block_running" class="running-panel">
@@ -51,9 +62,49 @@
 	<script src="../adv/adv.js"></script>
 	<script src="../adv/adv_table.js"></script>
 	<script src="../adv/canoe.js"></script>
-	<script src="./js/inrace.js"></script>
+	<script src="./js/inrace_ter.js?v=20261014-chrono4"></script>
 	
 	<script>
+		// Afficher le passage dans la case de classement pendant un intermediaire.
+		(function() {
+			let currentPassage = null;
+			const originalBroadcastInter = DoBroadcastBibTimeInter;
+			const originalShowInter = ShowRunningInter;
+
+			DoBroadcastBibTimeInter = function(objJSON, passage) {
+				const previousPassage = currentPassage;
+				currentPassage = Number(passage);
+				try {
+					return originalBroadcastInter.apply(this, arguments);
+				} finally {
+					currentPassage = previousPassage;
+				}
+			};
+
+			ShowRunningInter = function() {
+				const result = originalShowInter.apply(this, arguments);
+				const rank = document.querySelector('#block_running .rank');
+				if (rank && Number.isInteger(currentPassage) && currentPassage >= 1 && currentPassage <= 3) {
+					rank.textContent = 'Inter ' + currentPassage;
+					rank.setAttribute('data-inter', String(currentPassage));
+					rank.style.display = 'flex';
+				}
+				return result;
+			};
+
+			// Retirer le style de l'intermediaire a la reprise ou a l'arrivee.
+			['HideRunningInter', 'ShowRunningFinish', 'ShowRunning', 'ClearRunning'].forEach(function(name) {
+				const original = window[name];
+				window[name] = function() {
+					const rank = document.querySelector('#block_running .rank');
+					if (rank) {
+						rank.removeAttribute('data-inter');
+					}
+					return original.apply(this, arguments);
+				};
+			});
+		})();
+
 		function syncRunningBlocks() {
 			const original = document.getElementById('block_running');
 			const copy = document.getElementById('block_running_copy');
@@ -73,6 +124,12 @@
 
 				target.className = source.className;
 				target.innerHTML = source.innerHTML;
+
+				if (source.hasAttribute('data-inter')) {
+					target.setAttribute('data-inter', source.getAttribute('data-inter'));
+				} else {
+					target.removeAttribute('data-inter');
+				}
 
 				if (source.hasAttribute('style')) {
 					target.setAttribute('style', source.getAttribute('style'));
@@ -96,7 +153,7 @@
 
 			observer.observe(original, {
 				attributes: true,
-				attributeFilter: ['class', 'style', 'data-pen'],
+				attributeFilter: ['class', 'style', 'data-pen', 'data-inter'],
 				childList: true,
 				characterData: true,
 				subtree: true

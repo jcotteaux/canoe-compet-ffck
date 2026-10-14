@@ -1,27 +1,61 @@
+/*
+ * Dalles LED (inrace_ter.php) : 512 x 128, la copie dessous. La disposition
+ * est celle que le public connaît :
+ *   dossard | nom
+ *   les portes
+ *   place   | chrono           | écart
+ *
+ * Fait pour des LED : aplats francs (un dégradé bave sur 42 pixels de haut),
+ * couleurs des pages TV (bleu FFCK, jaune +2, rouge +50), blocs au pixel près
+ * séparés d'un pixel noir : 3 bandes de 42 px, 42 + 1 + 42 + 1 + 42 = 128.
+ */
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--bleu: #0A5BFF;
+	--nuit: #0D1A6E;
+	--or: #FFC400;
+	--vert: #19C34A;
+	--jaune: #FFD21F;
+	--rouge: #E8202A;
+	--porte: #2A2F45;
+}
+
 body
 {
-	background-color:black;
-	padding:0px;
-	margin:0px;
-	overflow:hidden;
+	background-color: black;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	font-family: Calibri, 'Carlito', 'Arial Narrow', Arial, sans-serif;
+	font-weight: bold;
 }
 
 .running-panel
 {
 	position: absolute;
-	left:0px;
-	width:512px;
-	height:128px;
+	left: 0;
+	width: 512px;
+	height: 128px;
+	overflow: hidden;
 }
 
 #block_running
 {
-	top:0px;
+	top: 0;
 }
 
 #block_running_copy
 {
-	top:128px;
+	top: 128px;
 }
 
 .running-panel .bib,
@@ -32,195 +66,175 @@ body
 .running-panel .diff,
 .running-panel .pena
 {
-	box-sizing:border-box;
+	position: absolute;
+	box-sizing: border-box;
+	overflow: hidden;
+	white-space: nowrap;
+	color: white;
+	font-weight: bold;
+	line-height: 1;
 }
 
-.running-panel .bib
+.running-panel .bib,
+.running-panel .nation,
+.running-panel .rank,
+.running-panel .time,
+.running-panel .diff
 {
-	position: absolute;
-	top:0px;
-	left:0px;
-	width:15%;
-	height:33%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-size:32px;
-	color:white;
-	font-weight:bold;
-	text-align:center;
-	vertical-align: middle;
-	overflow:hidden;
-	white-space:nowrap;
-	background: linear-gradient(#414141, #B3B3B3);
+	text-align: center;
+}
+
+/******************** bande du haut : dossard | nom ********************/
+
+.running-panel .bib
+{
+	top: 0;
+	left: 0;
+	width: 76px;
+	height: 42px;
+	font-size: 34px;
+	background: var(--bleu);
 }
 
 .running-panel .identity
 {
-	position: absolute;
-	top:0px;
-	left:15%;
-	width:70%;
-	height:33%;
-	display:block;
-	padding:0 12px;
-	line-height:42px;
-	font-size:32px;
-	color:white;
-	font-weight:bold;
-	text-align:center;
-	vertical-align: middle;
-	overflow:hidden;
-	white-space:nowrap;
-	text-overflow:ellipsis;
-	box-sizing:border-box;
-	background: linear-gradient(#46475B, #12122C);
+	top: 0;
+	left: 77px;
+	width: 435px;
+	height: 42px;
+	display: block;
+	padding: 0 8px;
+	line-height: 42px;
+	font-size: 32px;
+	text-align: center;
+	text-overflow: ellipsis;
+	background: var(--nuit);
 }
 
+/* Pas de drapeau : le nom prend toute la largeur. Le JS remplit encore la
+   case, elle reste dans la page mais n'est pas affichée. */
 .running-panel .nation
 {
-	position: absolute;
-	top:0px;
-	left:85%;
-	width:15%;
-	height:33%;
+	display: none !important;
+}
+
+/******************** bande du milieu : les portes ********************/
+
+.running-panel .pena
+{
+	top: 43px;
+	left: 0;
+	width: 512px;
+	height: 42px;
+}
+
+/* Le tableau des portes, en cases jointives d'un pixel d'écart sur toute la
+   largeur, quelle que soit leur nombre. */
+.running-panel .pena table,
+.running-panel .pena tbody,
+.running-panel .pena tr
+{
+	display: flex;
+	width: 100%;
+	height: 100%;
+	gap: 1px;
+	margin: 0;
+	border: 0;
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+.running-panel td.gate
+{
+	flex: 1 1 0;
+	min-width: 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	overflow:hidden;
-	background: linear-gradient(#414141, #B3B3B3);
+	padding: 0;
+	border: 0;
+	font-size: 22px;
+	font-weight: bold;
+	line-height: 1;
+	background-color: var(--porte);
 }
 
-.running-panel .nation img
+.running-panel td.gate[data-pen="0"]
 {
-	max-width:100%;
-	max-height:100%;
+	background-color: var(--vert);
 }
+
+.running-panel td.gate[data-pen="2"]
+{
+	background-color: var(--jaune);
+	color: black;
+}
+
+/* « 50 » : deux chiffres dans une case étroite, un peu plus petits. */
+.running-panel td.gate[data-pen="50"]
+{
+	background-color: var(--rouge);
+	color: white;
+	font-size: 17px;
+	letter-spacing: -1px;
+}
+
+.running-panel td.gate[data-pen="-1"]
+{
+	background-color: var(--porte);
+}
+
+/******************** bande du bas : place | chrono | écart ********************/
 
 .running-panel .rank
 {
-	position: absolute;
-	top:66%;
-	left:0%;
-	width:30%;
-	height:33%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size:42px;
-	color:black;
-	font-weight:bold;
-	text-align:center;
-	vertical-align: middle;
-	overflow:hidden;
-	white-space:nowrap;
-	background: linear-gradient(#C6A617, #F0C819);
+	top: 86px;
+	left: 0;
+	width: 153px;
+	height: 42px;
+	font-size: 40px;
+	color: black;
+	background: var(--or);
 }
 
 .running-panel .time
 {
-	position: absolute;
-	top:66%;
-	left:30%;
-	width:40%;
-	height:33%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size:40px;
-	color:white;
-	font-weight:bold;
-	text-align:center;
-	vertical-align: middle;
-	overflow:hidden;
-	white-space:nowrap;
-	background: linear-gradient(#46475B, #12122C);
-}
-
-.running-panel .diff.green
-{
-	position: absolute;
-	top:66%;
-	left:70%;
-	width:30%;
-	height:33%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size:43px;
-	color:white;
-	font-weight:bold;
-	font-style:italic;
-	text-align:center;
-	overflow:hidden;
-	white-space:nowrap;
-	background: linear-gradient(#1E702E, #289F41);
-}
-
-.running-panel .diff.red
-{
-	position: absolute;
-	top:66%;
-	left:70%;
-	width:30%;
-	height:33%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size:43px;
-	color:white;
-	font-weight:bold;
-	font-style:italic;
-	text-align:center;
-	overflow:hidden;
-	white-space:nowrap;
-	background: linear-gradient(#8D0102, #C00301);
+	top: 86px;
+	left: 154px;
+	width: 204px;
+	height: 42px;
+	font-size: 40px;
+	font-variant-numeric: tabular-nums;
+	background: var(--nuit);
 }
 
 .running-panel .diff
 {
-	overflow:hidden;
-	white-space:nowrap;
+	top: 86px;
+	left: 359px;
+	width: 153px;
+	height: 42px;
+	font-size: 36px;
+	font-variant-numeric: tabular-nums;
 }
 
-.running-panel .pena
+/* Écart : vert en avance, rouge en retard. */
+.running-panel .diff.green
 {
-	position: absolute;
-	top:33%;
-	left:0%;
-	width:100%;
-	height:33%;
-	overflow:hidden;
+	color: black;
+	background: var(--vert);
 }
 
-.running-panel td.gate {
-	border: 1px solid black;
-	padding: 2px;
-	width: 18px;
-	height:32px;
-	font-weight: bold;
-	text-align: center;
-	vertical-align: middle;
+.running-panel .diff.red
+{
+	color: white;
+	background: var(--rouge);
 }
 
-.running-panel td.gate[data-pen="0"] {
-	background-color: green;
-}
-
-.running-panel td.gate[data-pen="2"] {
-	background-color: yellow;
-	color:black;
-}
-
-.running-panel td.gate[data-pen="50"] {
-	background-color: red;
-	color:white;
-}
-
-.running-panel td.gate[data-pen="-1"] {
-	background-color: white;
-}
-
-#header-image {
-	display:none;
+#header-image
+{
+	display: none;
 }

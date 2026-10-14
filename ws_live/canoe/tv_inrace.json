@@ -1,0 +1,13 @@
+{
+	"tv_bsm":{
+		"title": "TV BSM",
+		"icon": "./16x16_ffck.png",
+		"css": [ 
+			"./css/tv_inrace.css?v1", 
+			"./tv_bsm/tv_inrace.css?v1"
+		],
+		"js": [
+			"./tv_bsm/context.js?v1"
+		]
+	}
+}

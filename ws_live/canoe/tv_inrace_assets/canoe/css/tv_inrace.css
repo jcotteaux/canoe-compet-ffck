@@ -1,0 +1,660 @@
+:root {
+	--font-ffck: 'Calibri','Carlito';
+	--block_pena_width: 100px;
+	--block_pena_sla_height: 35px; /** Calibration de la hauteur du block en SLA **/
+	--block_pena_exs_height: 85px; /** Calibration de la hauteur du block en EXS **/
+	--pena-opacity: 0.3; /** règlage de la transparence des portes non franchies  **/
+	--block-opacity: 1;  /** règlage de la transparence des images   **/
+}
+
+body
+{
+	background-color:transparent;
+	padding:0px;
+	margin:0px;
+}
+
+@keyframes apparitionG {
+	from{
+		opacity: 0;
+		transform: translateX(-900px);
+	}
+	to{
+		opacity: var(--block-opacity);
+		transform: translateX(0px);
+	}
+}
+
+@keyframes apparitionBas {
+	from{
+		opacity: 0;
+		transform: translateY(200px);
+	}
+	to{
+		opacity: var(--block-opacity);
+		transform: translateY(0px);
+	}
+}
+
+@keyframes apparitionD {
+	from{
+		opacity: 0;
+		transform: translateX(400px);
+	}
+	to{
+		opacity: var(--block-opacity);
+		transform: translateX(0px);
+	}
+}
+
+@keyframes appena {
+	0% {
+		transform: translateX(0px);
+	}
+	20% {
+		transform: translateX(-5px);
+	}
+	40% {
+		transform: translateX(5px);
+	}
+	60% {
+		transform: translateX(-5px);
+	}
+	80% {
+		transform: translateX(5px);
+	}
+	100% {
+		transform: translateX(0px);
+	}
+
+}
+
+/******************* block_start ********************/
+#block_start
+{
+	position:absolute;
+
+	background-image: url("../img/Graphic_FFCK/block_name.png");
+
+	background-repeat: no-repeat;	
+	animation: apparitionG 0.7s ease-out;
+	opacity: var(--block-opacity);
+
+	left:0px;
+	top:890px;
+	width:1202px;
+	height:145px;
+	}
+
+#block_start .bib
+{
+	position: absolute;
+
+	left:-6px;
+	width:100px;
+	top:-5px;
+
+	font-family: var(--font-ffck);
+	font-size:42pt;
+	color:white;
+	text-align:center;
+}
+
+#block_start .name
+{
+	position: absolute;
+
+	left:110px;
+	top:-6px;
+
+	font-family: var(--font-ffck);
+	font-size:55pt;  /*est gérée dans le Javascript*/
+	color:white;
+}
+
+#block_start .nation
+{
+position: absolute;
+
+	left:925px;
+	top:11px;
+
+	font-family: var(--font-ffck);
+	font-size:25pt;
+	color:white;
+}
+
+#block_start .img_nation
+{
+	position: absolute;
+
+	width:60px;
+	height:50px;
+
+	left:992px;
+	top:13px;
+}
+
+#block_start .categ {
+    position: absolute;
+
+    left:193px;               /* centre le bloc dans la page */
+	top: 71px;
+	
+    transform: translateX(-50%); /* compense la moitié de sa largeur */
+    margin-left: 150px;      /* décale ensuite de 150px vers la droite */
+
+    font-family: var(--font-ffck);
+    font-style: italic;
+    font-size: 28pt;
+    color: white;
+    text-align: center;      /* centre le texte à l’intérieur */
+}
+
+
+/******************* block_running ********************/
+#block_running
+{
+	position:absolute;
+	background-image:none;
+	animation: apparitionD 0.7s ease-out;
+	opacity: var(--block-opacity);
+
+}
+
+#block_running .time
+{
+	position: absolute;
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	color:white;
+	text-align:right;
+	
+	left:1428px;
+	top:890px;
+	width:491px;
+	height:76px;
+	padding-right: 40px; /* Décale le texte vers la gauche */
+
+	background-image: url("../img/Graphic_FFCK/block_running.png");
+
+	background-repeat: no-repeat;	
+	}
+
+
+#block_running .pena
+{
+	position: absolute;
+	left:1800px;
+	top:75px;
+
+	width:var(--block_pena_width);
+	height:841px;
+}
+
+/******************* block_inter ********************/
+#block_inter
+{
+	position:absolute;
+
+	left:1420px;
+	top:890px;
+	width:500px;
+	height:170px;
+	opacity: var(--block-opacity);
+
+}
+
+#block_inter .pena
+{
+	position: absolute;
+	left:380px;
+	top:75px;
+
+	width:var(--block_pena_width);
+	height:860px;
+	height:860px;
+}
+
+#block_inter.green
+{
+	background-image: url("../img/Graphic_FFCK/block_inter_green.png");
+
+	background-repeat: no-repeat;	
+	animation: apparitionD 0.7s ease-out;									  
+}
+
+#block_inter.red
+{
+	background-image: url("../img/Graphic_FFCK/block_inter_red.png");
+
+	background-repeat: no-repeat;	
+	animation: apparitionD 0.7s ease-out;									  
+}
+
+#block_inter .time
+{
+	position: absolute;
+
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	color:white;
+
+	left:250px;
+	width:240px;
+	padding-right:40px;
+	top:-4px;
+	
+	text-align:right;
+}
+
+#block_inter .diff
+{
+	position: absolute;
+
+	font-family: var(--font-ffck);
+	font-style:italic;
+	font-size:40pt;
+	color:white;
+
+	left:65px;
+	width:175px;
+	top:-4px;
+
+	text-align:center;
+}
+
+/******************* block_finish ********************/
+#block_finish
+{
+	position:absolute;
+
+	left:0px;
+	top:890px;
+	width:1920px;
+	height:190px;
+	opacity: var(--block-opacity);
+
+}
+
+#block_finish .pena
+{
+	position: absolute;
+	left:1800px;
+	top:75px;
+
+	width:var(--block_pena_width);
+	height:800px;
+}
+
+#block_finish.green
+{
+	background-image: url("../img/Graphic_FFCK/block_finish_green.png");
+
+	background-repeat: no-repeat;
+	animation: apparitionBas 0.4s ease-out;
+}
+
+#block_finish.red
+{
+	background-image: url("../img/Graphic_FFCK/block_finish_red.png");
+
+	background-repeat: no-repeat;
+	animation: apparitionBas 0.4s ease-out;
+}
+
+#block_finish .bib
+{
+	position: absolute;
+
+	left:-6px;
+	width:100px;
+	top:-6px;
+
+	font-family: var(--font-ffck);
+	font-size:42pt;
+	color:white;
+	text-align:center;
+}
+
+#block_finish .name
+{
+	position: absolute;
+
+	left:110px;
+	top:-6px;
+
+	font-family: var(--font-ffck);
+	font-size:48pt;  /*est gérée dans je Javascript*/
+	color:white;
+}
+
+#block_finish .nation
+{
+	position: absolute;
+
+	left:925px;
+	top:11px;
+
+	font-family: var(--font-ffck);
+	font-size:25pt;
+	color:white;
+}
+
+#block_finish .img_nation
+{
+	position: absolute;
+
+	width:60px;
+	height:50px;
+
+	left:992px;
+	top:13px;
+}
+
+#block_finish .categ
+{
+	position: absolute;
+
+	left:160px;
+	top:71px;
+
+	text-align:center;
+	font-family: var(--font-ffck);
+	font-style:italic;
+	font-size:28pt;
+	color:white;
+}
+
+#block_finish .time
+{
+	position: absolute;
+
+	left:1680px;
+	top:-4px;
+	width:240px;
+
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	color:white;
+	text-align:center;
+}
+
+#block_finish .rank
+{
+	position: absolute;
+
+	left:1730px;
+	top:72px;
+	width:60px;
+
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	font-weight:bold;
+	color:white;
+	text-align:center;
+}
+
+#block_finish .diff
+{
+	position: absolute;
+
+	left:1465px;
+	top:-4px;
+	width:175px;
+
+	font-family: var(--font-ffck);
+	font-size:40pt;
+	font-style:italic;
+	color:white;
+	text-align:center;
+}
+
+/******************* block_leader ********************/
+#block_leader
+{
+	position:absolute;
+
+	background-image: url("../img/Graphic_FFCK/block_leader.png");
+
+	background-repeat: no-repeat;	
+
+	left:1388px;
+	top:964px;
+	width:531px;
+	height:49px;
+	animation: apparitionD 0.8s ease-out;
+	opacity: var(--block-opacity);
+
+}
+
+#block_leader .name
+{
+	position: absolute;
+
+	font-family: var(--font-ffck);
+	font-size:24pt;  /* géré dans le JS  */
+	color:yellow;
+
+	left:36px;
+	width:330px;
+	top:1px;
+
+	text-align:center;
+}
+
+#block_leader .time
+{
+	position: absolute;
+
+	font-family: var(--font-ffck);
+	font-size:24pt;
+	color:yellow;
+
+	left:382px;
+	width:150px;
+	top:1px;
+
+	text-align:center;
+}
+/******************* creation block portes/pénalités SLA ********************/
+
+.pena .gate
+{
+	color:black;
+
+	font-family: var(--font-ffck);
+	font-weight:bold;
+	font-size:16pt;
+	text-align:left;
+
+	padding-left: 30px; /* ← ajuste ici pour plus de précision sur le placement du N° de porte */
+
+	height:var(--block_pena_sla_height);
+}
+
+.pena .gate[data-pen="0"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_0.png");
+	background-repeat: no-repeat;	
+}
+	
+.pena .gate[data-pen="2"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_2.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="50"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_50.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="-1"][data-red="0"]
+{
+	background-image: url("../img/pena/pena_v_0.png");
+	opacity: var(--pena-opacity);
+	background-repeat: no-repeat;	
+	font-weight:normal;
+}
+
+.pena .gate[data-pen="0"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_0.png");
+	background-repeat: no-repeat;	
+}
+	
+.pena .gate[data-pen="2"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_2.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="50"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_50.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate[data-pen="-1"][data-red="1"]
+{
+	background-image: url("../img/pena/pena_r_0.png");
+	opacity: var(--pena-opacity); 
+	background-repeat: no-repeat;	
+	font-weight:normal;
+}
+
+/******************* creation block portes/pénalités EXS ********************/
+
+.pena .gate_exs
+{
+	color:black;
+
+	font-family: var(--font-ffck);
+	font-weight:bold;
+	font-size:16pt;
+	text-align:left;
+
+	padding-left: 32px; /* ← ajuste ici pour plus de précision sur le placement du N° de porte */
+
+	height:var(--block_pena_exs_height);
+}
+
+.pena .gate_exs[data-pen="0"][data-info="S"]
+{
+	background-image: url("../img/pena/pena_srf_0.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="0"][data-info=""]
+{
+	background-image: url("../img/pena/pena_v_0.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="0"][data-info="R"]
+{
+	background-image: url("../img/pena/pena_r_0.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="0"][data-info="E"]
+{
+	background-image: url("../img/pena/pena_srf_0.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="0"][data-info="F"]
+{
+	background-image: url("../img/pena/pena_srf_0.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="2"][data-info="S"]
+{
+	background-image: url("../img/pena/pena_srf_flt.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="2"][data-info=""]
+{
+	background-image: url("../img/pena/pena_v_flt.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="2"][data-info="R"]
+{
+	background-image: url("../img/pena/pena_r_flt.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="2"][data-info="E"]
+{
+	background-image: url("../img/pena/pena_srf_flt.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="2"][data-info="F"]
+{
+	background-image: url("../img/pena/pena_srf_flt.png");
+	background-repeat: no-repeat;	
+}
+
+.pena .gate_exs[data-pen="-1"][data-info="S"]
+{
+	background-image: url("../img/pena/pena_srf_0.png");
+	background-repeat: no-repeat;	
+	opacity: var(--pena-opacity); 
+}
+
+.pena .gate_exs[data-pen="-1"][data-info=""]
+{
+	background-image: url("../img/pena/pena_v_0.png");
+	background-repeat: no-repeat;	
+	opacity: var(--pena-opacity); 
+}
+
+.pena .gate_exs[data-pen="-1"][data-info="R"]
+{
+	background-image: url("../img/pena/pena_r_0.png");
+	background-repeat: no-repeat;	
+	opacity: var(--pena-opacity); 
+}
+
+.pena .gate_exs[data-pen="-1"][data-info="E"]
+{
+	background-image: url("../img/pena/pena_srf_0.png");
+	background-repeat: no-repeat;	
+	opacity: var(--pena-opacity); 
+}
+.pena .gate_exs[data-pen="-1"][data-info="F"]
+{
+	background-image: url("../img/pena/pena_srf_0.png");
+	background-repeat: no-repeat;	
+	opacity: var(--pena-opacity); 
+}
+/* Porte franchie sans pénalité : même case que les 2 et 50. */
+.pena .gate,
+.pena .gate_exs {
+    position: relative;
+}
+.pena .gate[data-pen="0"]::after,
+.pena .gate_exs[data-pen="0"]::after {
+    content: "0";
+    position: absolute;
+    left: 59px;
+    top: 3px;
+    width: 34px;
+    height: 27px;
+    line-height: 27px;
+    padding: 0;
+    background: #00a000;
+    color: black;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    text-align: center;
+    clip-path: polygon(18% 0, 100% 0, 82% 100%, 0 100%);
+    pointer-events: none;
+}

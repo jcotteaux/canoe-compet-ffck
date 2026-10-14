@@ -86,10 +86,22 @@ function nomCourt(nom) {
   return (capitales.length ? capitales : mots.slice(0, 1)).join(' ').toUpperCase();
 }
 
-/** « VASSEUR Marie » → « VASSEUR M. » : deux homonymes dans la même série. */
-function avecInitiale(nom) {
-  const prenom = String(nom || '').trim().split(/\s+/).find((m) => m !== m.toUpperCase());
-  return prenom ? `${nomCourt(nom)} ${prenom[0].toUpperCase()}.` : nomCourt(nom);
+/** Le prénom : les mots qui ne sont pas en capitales. */
+function prenomDe(nom) {
+  return String(nom || '').trim().split(/\s+/).filter((m) => m !== m.toUpperCase()).join(' ');
+}
+
+/**
+ * Deux homonymes dans la même série : « VASSEUR M. », ou le prénom entier
+ * si les initiales sont les mêmes (« MERCIER Arthur », « MERCIER Adam »).
+ */
+function nomDistinct(nom, autres) {
+  const n = nomCourt(nom);
+  const prenom = prenomDe(nom);
+  if (!prenom || !autres.some((a) => nomCourt(a) === n)) return n;
+  const initiale = (x) => prenomDe(x).charAt(0).toUpperCase();
+  const memeInitiale = autres.some((a) => nomCourt(a) === n && initiale(a) === initiale(nom));
+  return memeInitiale ? `${n} ${prenom}` : `${n} ${initiale(nom)}.`;
 }
 
 /** Ce que montre la dalle : la tête et les 4 lignes. */
@@ -108,8 +120,7 @@ function vue(h) {
     lignes.sort((a, b) => (parseInt(a.p.finalRank, 10) || 99) - (parseInt(b.p.finalRank, 10) || 99));
   }
 
-  const noms = lignes.filter((l) => l.p).map((l) => nomCourt(l.p.name));
-  const homonyme = (n) => noms.filter((x) => x === n).length > 1;
+  const noms = lignes.filter((l) => l.p).map((l) => l.p.name);
 
   return {
     etat,
@@ -134,7 +145,7 @@ function vue(h) {
       }
       return {
         lane,
-        nom: homonyme(nomCourt(p.name)) ? avecInitiale(p.name) : nomCourt(p.name),
+        nom: nomDistinct(p.name, noms.filter((x) => x !== p.name)),
         statut,
         zones: zones(h, p, etat !== 'attente'),
         place,

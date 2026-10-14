@@ -10,9 +10,9 @@
     "Etat": 4
   },
   "format": "ICF_ELIMINATION_DIRECTE",
-  "gates": 6,
+  "gates": 7,
   "roll_after_gate": 4,
-  "gate_profil": "000000",
+  "gate_profil": "0000000",
   "first_start": "13:30:00",
   "ecart_series": 120,
   "ecart_categories": 240,
