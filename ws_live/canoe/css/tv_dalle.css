@@ -1,0 +1,188 @@
+/*
+ * Dalles LED extérieures (tv_dalle.html), 4 de large pour 1 de haut.
+ *
+ * Très basse résolution : fond noir (LED éteinte), aplats francs et saturés,
+ * gros caractères gras, aucun dégradé, aucun filet fin, aucune transparence.
+ * Toutes les tailles sont en --u, le centième de la hauteur de la dalle (posé
+ * par le JS) : la mise en page est la même à 64 comme à 1080 pixels de haut.
+ */
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--u: 1px;
+
+	--bleu: #0A5BFF;
+	--bleu-ciel: #5FA0FF;
+	--or: #FFC400;
+	--jaune: #FFD21F;
+	--rouge: #FF1E1E;
+	--argent: #C8D2DC;
+	--bronze: #D08A40;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: #000;
+	color: #fff;
+	font-family: Calibri, 'Carlito', 'Arial Narrow', Arial, sans-serif;
+	font-weight: bold;
+}
+
+#dalle
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	overflow: hidden;
+}
+
+/*
+ * Une ligne par bateau, sur toute la largeur des 4 dalles : 512 x 64 pixels.
+ * Dossard | nom | pénalités | intermédiaire | chrono | place. Une barre bleue
+ * sépare les deux lignes.
+ */
+.ligne
+{
+	/* Posée par le JS en translateY(0 | 100 %) : tout monte d'un cran quand
+	   une ligne sort par le haut, la suivante entre par le bas. */
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 50%;
+	box-sizing: border-box;
+	background: #000;
+	transition: transform 0.8s cubic-bezier(0.45, 0, 0.2, 1);
+	will-change: transform;
+
+	display: flex;
+	align-items: center;
+	gap: calc(var(--u) * 3);
+	padding-right: calc(var(--u) * 3);
+}
+
+/* La ligne du bas porte la barre de séparation. */
+.ligne.bas
+{
+	border-top: calc(var(--u) * 2) solid var(--bleu);
+}
+
+.ligne.vide > *
+{
+	visibility: hidden;
+}
+
+.l_bib
+{
+	flex: 0 0 auto;
+	align-self: stretch;
+	min-width: calc(var(--u) * 44);
+	padding: 0 calc(var(--u) * 3);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	background: var(--bleu);
+	font-size: calc(var(--u) * 32);
+	line-height: 1;
+}
+
+.l_nom
+{
+	flex: 1 1 auto;
+	min-width: 0;
+
+	font-size: calc(var(--u) * 30);
+	line-height: 1;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.l_chrono
+{
+	flex: 0 0 auto;
+	/* Largeur de « 108,3 » : la pastille de pénalités ne bouge pas quand le
+	   chrono passe de 9,9 à 10,0 puis à 100,0. */
+	min-width: calc(var(--u) * 90);
+	text-align: right;
+
+	font-size: calc(var(--u) * 36);
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.l_pena,
+.l_place,
+.l_inter
+{
+	flex: 0 0 auto;
+	padding: calc(var(--u) * 3) calc(var(--u) * 3) 0;
+
+	font-size: calc(var(--u) * 24);
+	line-height: 1.1;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.l_pena:empty,
+.l_place:empty,
+.l_inter:empty
+{
+	display: none;
+}
+
+/* Comme sur toutes les pages TV : jaune pour des touches, rouge pour un 50. */
+.l_pena.jaune { background: var(--jaune); color: #000; }
+
+/* Un peu d'air entre les pénalités et le chrono. */
+.l_pena { margin-right: calc(var(--u) * 5); }
+.l_pena.rouge { background: var(--rouge); color: #fff; }
+
+/* Intermédiaire : vert en avance sur le meilleur de l'épreuve, rouge en retard. */
+.l_inter         { background: #fff; color: #000; }
+.l_inter.avance  { background: #19C34A; color: #000; }
+.l_inter.retard  { background: var(--rouge); color: #fff; }
+
+/* Pendant l'intermédiaire, le chrono figé sur le temps de passage, teinté :
+   vert en avance, rouge en retard, blanc si l'écart est inconnu. */
+.ligne.inter-avance .l_chrono { color: #A8FFB8; }
+.ligne.inter-retard .l_chrono { color: #FFB0B0; }
+
+.l_place     { background: var(--bleu); }
+.l_place.p1  { background: var(--or); color: #000; }
+.l_place.p2  { background: var(--argent); color: #000; }
+.l_place.p3  { background: var(--bronze); color: #000; }
+
+/******************** états ********************/
+
+/* Arrivé : dossard or, temps en jaune, place à la fin. */
+.ligne.arrive .l_bib    { background: var(--or); color: #000; }
+.ligne.arrive .l_chrono { color: var(--jaune); }
+
+/* Prochain partant : dossard en creux, compte à rebours en bleu ciel. */
+.ligne.prochain .l_bib
+{
+	background: #000;
+	box-shadow: inset 0 0 0 calc(var(--u) * 3) var(--bleu-ciel);
+	color: var(--bleu-ciel);
+}
+
+.ligne.prochain .l_nom    { color: #B8CCEE; }
+.ligne.prochain .l_chrono { color: var(--bleu-ciel); }

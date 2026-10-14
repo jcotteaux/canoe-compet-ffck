@@ -105,12 +105,26 @@ s'il héberge `ws_live` : remplacer `http://localhost:3000` par
 | liste de départ de l'épreuve en cours ou à venir | `http://localhost:3000/canoe/tv_departs.html?ws=SERVEUR:8080` |
 | liste de départ d'une épreuve précise | `http://localhost:3000/canoe/tv_departs.html?epreuve=K1D&ws=SERVEUR:8080` |
 | live complet (toutes épreuves, chronos, pénalités) | `http://localhost:3000/canoe/live.html?ws=SERVEUR:8080` |
+| **dalles LED extérieures** (4 de large × 1 de haut) : les 2 bateaux en course, chrono et pénalités | `http://localhost:3000/canoe/tv_dalle.html?ws=SERVEUR:8080` |
 
 Codes d'épreuve : `INV`, `K1H`, `K1D`, `C1H`, `C1D` en slalom ; `XK1INV`,
 `XK1H`, `XK1D` au contre-la-montre de kayak-cross.
 
+`tv_dalle.html` est faite pour 4 dalles **ADJ EVS3** côte à côte (128 × 128
+pixels chacune, carte NovaStar) : fond noir, aplats, gros caractères. Le
+contrôleur NovaStar prélève une zone fixe de la sortie HDMI du PC sans rien
+mettre à l'échelle : la page se dessine donc à **512 × 128 pixels en haut à
+gauche** de l'écran, chaque moitié sur 2 dalles. Autre position ou autre
+nombre de dalles : `&zone=LARGEURxHAUTEUR+X+Y` (3 dalles : `&zone=384x128+0+0`) ;
+`&zone=auto` pour l'aperçu en plein écran.
+Une moitié par bateau sur l'eau : dossard, nom de famille, chrono au dixième,
+pénalités (jaune : touches, rouge : 50). Un arrivant garde sa moitié 8 s avec
+son temps et sa place ; une moitié libre montre le dernier arrivé, sinon le
+prochain partant et son compte à rebours.
+
 ```bash
 open "http://localhost:3000/canoe/tv_results.html?ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_dalle.html?ws=$SERVEUR:8080"
 open "http://localhost:3000/canoe/tv_results.html?encours=1&ws=$SERVEUR:8080"
 open "http://localhost:3000/canoe/tv_departs.html?ws=$SERVEUR:8080"
 open "http://localhost:3000/canoe/live.html?ws=$SERVEUR:8080"

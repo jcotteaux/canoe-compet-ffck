@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Dalle</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_dalle.css?v11" rel="stylesheet">
+</head>
+
+<!--
+	Écran pour les dalles LED extérieures : 4 dalles de large pour 1 de haut,
+	en très basse résolution. Deux lignes, un bateau chacune : dossard, nom,
+	pénalités, chrono, intermédiaires, place. Voir js/tv_dalle.js.
+-->
+<body>
+	<div id="dalle">
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v3"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/tv_dalle.js?v12"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>
