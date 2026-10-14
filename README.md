@@ -227,6 +227,13 @@ sur une vraie compétition : effacement de manche en plein live, DSQ, pénalité
 | `fixtures/` | compétitions simulées (JSON) ; `fixtures/kcross/` pour le kayak cross |
 | `tools/` | générateur de fixtures, pilote de navigateur |
 | `docs/` | [le protocole WebSocket](docs/PROTOCOL.md), rétro-ingénieré ; [tester contre un serveur distant](docs/SERVEUR_DISTANT.md) |
+| `canoe-atem/` | app iOS de régie : macros du mélangeur ATEM + bateaux sur l'eau (competFFCK) ; simulateur ATEM dans `sim/`. Voir [son README](canoe-atem/README.md) |
+| `canoe-judge/` | app d'aide au jugement vidéo (clips par bateau et par caméra, revue des 50), en Swift ; dépend de `canoe-atem` par `../canoe-atem` : les deux dossiers restent côte à côte |
+| `canoe-viewer-atem/` | lecteur multi-vues des enregistrements ATEM (`npm start`), et synchro incrémentale des vidéos depuis le disque réseau (`npm run sync`) |
+
+Les trois derniers ont rejoint ce dépôt le 15 octobre 2026, sans historique
+(ils n'étaient pas sous git). Projets Swift : `swift build` / `swift test`
+dans leur dossier, ou le projet Xcode de `App/`.
 
 Le premier commit contient `ws_live` **non modifié** : tout changement apporté
 au front apparaît donc en diff, ce qui n'était pas possible avec la

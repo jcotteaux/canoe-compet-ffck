@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archireport</title>
+  <link rel="stylesheet" href="style.css?v=9">
+</head>
+
+<body>
+  <header>
+    <h1>Archireport</h1>
+    <div class="path-bar">
+      <input type="text" id="path-input" placeholder="/chemin/vers/videos">
+      <button id="btn-load">Charger</button>
+      <button id="btn-browse">Parcourir…</button>
+    </div>
+    <label class="mode-selector">
+      Mode
+      <select id="mode-select">
+        <option value="live">Live</option>
+        <option value="videos" selected>Vidéos</option>
+      </select>
+    </label>
+  </header>
+  <div id="content">
+    <aside id="sidebar">
+      <h2>Caméras</h2>
+      <div id="cam-list"></div>
+    </aside>
+    <main id="grid"></main>
+  </div>
+  <footer id="transport">
+    <div class="scrub-bar">
+      <input type="range" id="scrubber" min="0" max="1000" value="0" step="1">
+    </div>
+    <div class="controls">
+      <button id="btn-sidebar" title="Afficher/masquer les caméras">☰</button>
+      <button id="btn-rw-slow" title="Ralenti arrière 0.25x">◀◀ 0.25x</button>
+      <button id="btn-reverse" title="Marche arrière">◀ Reverse</button>
+      <button id="btn-play" title="Play / Pause (Espace)">▶ Play</button>
+      <button id="btn-fw-slow" title="Ralenti avant 0.25x">0.25x ▶▶</button>
+      <button id="btn-multicam" title="Retour vue multicam (Échap)" class="hidden">⊞ Multicam</button>
+      <span id="timecode" title="Cliquer pour saisir un temps">00:00:00.000</span>
+      <input type="text" id="timecode-input" class="hidden" placeholder="HH:MM:SS ou 13:54:46">
+      <span id="clock" title="Cliquer pour saisir une heure">🕐 --:--:--</span>
+      <input type="text" id="clock-input" class="hidden" placeholder="ex: 14:30:00">
+      <label class="speed-label">
+        Vitesse: <select id="speed-select">
+          <option value="0.1">0.1x</option>
+          <option value="0.25">0.25x</option>
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="2">2x</option>
+        </select>
+      </label>
+    </div>
+  </footer>
+
+  <!-- Browse modal -->
+  <div id="browse-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sélectionner un dossier</h2>
+        <button id="modal-close">✕</button>
+      </div>
+      <div class="modal-path" id="modal-path"></div>
+      <div class="modal-list" id="modal-list"></div>
+      <div class="modal-footer">
+        <button id="modal-up">⬆ Dossier parent</button>
+        <button id="modal-select" class="btn-primary" disabled>Sélectionner ce dossier</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=18"></script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "canoe-atem",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Simulateur de melangeur ATEM, pour developper l'app iOS sans materiel",
+  "scripts": {
+    "start": "node sim/atem-sim.js",
+    "verbose": "node sim/atem-sim.js --verbose"
+  }
+}

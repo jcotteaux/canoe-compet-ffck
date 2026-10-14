@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:canoe-atem}",
+            "name": "Debug atemctl",
+            "target": "atemctl",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug atemctl"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:canoe-atem}",
+            "name": "Release atemctl",
+            "target": "atemctl",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release atemctl"
+        }
+    ]
+}

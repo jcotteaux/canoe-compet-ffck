@@ -1,0 +1,8 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "/^pwd && xcodebuild -list -project App/CanoeJudge\\.xcodeproj$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
+}

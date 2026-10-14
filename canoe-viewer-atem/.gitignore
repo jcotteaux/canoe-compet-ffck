@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+# vidéos synchronisées depuis le disque réseau (sync.sh) : trop lourdes
+videos/
+local-videos/

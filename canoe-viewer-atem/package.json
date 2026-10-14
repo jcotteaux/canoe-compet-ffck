@@ -1,0 +1,13 @@
+{
+  "name": "viewer-atem",
+  "version": "1.0.0",
+  "description": "Multi-view video player for ATEM recordings",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "sync": "bash sync.sh"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

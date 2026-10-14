@@ -1,0 +1,571 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #111;
+  color: #eee;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+header {
+  background: #1a1a1a;
+  padding: 10px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e44;
+  letter-spacing: 1px;
+}
+
+.path-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#path-input {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 13px;
+  width: 320px;
+  font-family: "SF Mono", "Menlo", monospace;
+}
+
+#path-input:focus {
+  border-color: #e44;
+  outline: none;
+}
+
+#btn-load {
+  background: #e44;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#btn-load:hover {
+  background: #f55;
+}
+
+#btn-browse {
+  background: #555;
+  color: #eee;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#btn-browse:hover {
+  background: #777;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  width: 550px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #333;
+}
+
+.modal-header h2 {
+  font-size: 16px;
+  color: #eee;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal-header button:hover {
+  color: #fff;
+}
+
+.modal-path {
+  padding: 10px 18px;
+  font-family: "SF Mono", "Menlo", monospace;
+  font-size: 13px;
+  color: #fc0;
+  background: #111;
+  border-bottom: 1px solid #333;
+  word-break: break-all;
+}
+
+.modal-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  min-height: 200px;
+  max-height: 400px;
+}
+
+.modal-list .dir-item {
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-list .dir-item:hover {
+  background: #2a2a2a;
+}
+
+.modal-list .dir-item .icon {
+  color: #fc0;
+}
+
+.modal-list .has-videos {
+  color: #4c4;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid #333;
+  gap: 12px;
+}
+
+.modal-footer button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.modal-footer #modal-up {
+  background: #333;
+  color: #eee;
+}
+
+.modal-footer #modal-up:hover {
+  background: #555;
+}
+
+.modal-footer .btn-primary {
+  background: #e44;
+  color: #fff;
+  font-weight: 600;
+}
+
+.modal-footer .btn-primary:hover {
+  background: #f55;
+}
+
+.modal-footer .btn-primary:disabled {
+  background: #555;
+  color: #888;
+  cursor: default;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mode-selector {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+#mode-select {
+  background: #222;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 5px 24px 5px 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#mode-select:disabled {
+  opacity: 0.6;
+}
+
+body.live-mode .controls,
+body.live-mode .scrub-bar,
+body.live-mode .path-bar {
+  display: none;
+}
+
+#btn-play {
+  background: #e44;
+  color: #fff;
+  border: none;
+  padding: 6px 18px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#btn-play:hover {
+  background: #f55;
+}
+
+#btn-play.playing {
+  background: #4a4;
+}
+
+#btn-sidebar {
+  background: #333;
+  color: #eee;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#btn-sidebar:hover {
+  background: #555;
+}
+
+#btn-reverse, #btn-rw-slow, #btn-fw-slow {
+  background: #444;
+  color: #eee;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#btn-reverse:hover, #btn-rw-slow:hover, #btn-fw-slow:hover {
+  background: #666;
+}
+
+#btn-reverse.active, #btn-rw-slow.active, #btn-fw-slow.active {
+  background: #f80;
+  color: #fff;
+}
+
+#btn-multicam {
+  background: #36a;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#btn-multicam:hover {
+  background: #48c;
+}
+
+#btn-multicam.hidden {
+  display: none;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+#timecode {
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 16px;
+  color: #0f0;
+  min-width: 140px;
+  cursor: pointer;
+  border-bottom: 1px dashed #0f06;
+}
+
+#timecode:hover {
+  border-bottom-color: #0f0;
+}
+
+#timecode-input {
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 16px;
+  color: #0f0;
+  background: #222;
+  border: 1px solid #0f0;
+  border-radius: 3px;
+  padding: 2px 8px;
+  width: 150px;
+  outline: none;
+}
+
+#timecode-input.hidden {
+  display: none;
+}
+
+#clock {
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 16px;
+  color: #fc0;
+  min-width: 100px;
+  cursor: pointer;
+  border-bottom: 1px dashed #fc06;
+}
+
+#clock:hover {
+  border-bottom-color: #fc0;
+}
+
+#clock-input {
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 16px;
+  color: #fc0;
+  background: #222;
+  border: 1px solid #fc0;
+  border-radius: 3px;
+  padding: 2px 8px;
+  width: 120px;
+  outline: none;
+}
+
+#clock-input.hidden {
+  display: none;
+}
+
+.speed-label {
+  font-size: 13px;
+  color: #aaa;
+}
+
+#speed-select {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.scrub-bar {
+  flex: 1;
+  min-width: 200px;
+}
+
+#scrubber {
+  width: 100%;
+  accent-color: #e44;
+  cursor: pointer;
+}
+
+/* Transport bar (ISO playback controls) below the videos */
+footer#transport {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+footer#transport .scrub-bar {
+  flex: none;
+  width: 100%;
+}
+
+footer#transport .controls {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+body.live-mode footer#transport {
+  display: none;
+}
+
+#content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+#sidebar {
+  width: 180px;
+  background: #1a1a1a;
+  border-right: 1px solid #333;
+  padding: 10px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  transition: margin-left 0.2s;
+}
+
+#sidebar.collapsed {
+  margin-left: -180px;
+}
+
+#sidebar h2 {
+  font-size: 13px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.cam-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #ccc;
+  transition: background 0.15s;
+}
+
+.cam-toggle:hover {
+  background: #2a2a2a;
+}
+
+.cam-toggle input {
+  accent-color: #e44;
+}
+
+.cam-toggle.zoomed {
+  background: #e44;
+  color: #fff;
+}
+
+main#grid {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  padding: 2px;
+  background: #000;
+  overflow: hidden;
+}
+
+/* Dynamic grid columns set via JS */
+.video-cell {
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.video-cell.hidden {
+  display: none;
+}
+
+.video-cell.zoomed {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 / -1 !important;
+}
+
+/* Live webcam pinned to the top row, spanning the full width (large, on top) */
+.video-cell.live-slot {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.video-cell video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.video-cell.program-cell {
+  box-shadow: inset 0 0 0 2px #e33;
+}
+
+.video-cell.program-cell:not(.zoomed) {
+  cursor: zoom-in;
+}
+
+.video-cell.program-cell.zoomed {
+  cursor: zoom-out;
+}
+
+.video-cell.program-cell .label {
+  background: #c22;
+  color: #fff;
+}
+
+.video-cell .label {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  pointer-events: none;
+  font-family: "SF Mono", "Menlo", monospace;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 18px;
+  text-align: center;
+  padding: 40px;
+  line-height: 1.6;
+}

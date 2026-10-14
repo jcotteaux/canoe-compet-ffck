@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:canoe-judge}",
+            "name": "Debug judgectl",
+            "target": "judgectl",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug judgectl"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:canoe-judge}",
+            "name": "Release judgectl",
+            "target": "judgectl",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release judgectl"
+        }
+    ]
+}
