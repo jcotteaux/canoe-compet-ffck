@@ -227,14 +227,6 @@ function DoBroadcastBibTimeInter(objJSON, passage)
 	if (tc != adv.chrono.KO && tc != adv.chrono.DNS)
 		NoterInter(bib, passage, tc);
 
-	// Un résultat affiché depuis assez longtemps cède la place à
-	// l'intermédiaire du bateau qu'on suivra ensuite : sinon, un départ par
-	// minute, ce résultat masquerait presque tous les intermédiaires.
-	if (wsMain.timeoutFinish != null && wsMain.lastOnCourse &&
-		performance.now() - wsMain.finishAt >= wsMain.finishMinDelay &&
-		GetBibSelect(wsMain.lastOnCourse) == bib)
-		FinResultat();
-
 	if (bib == wsMain.bib_select)
 	{
 		const time_chrono = objJSON.time_chrono;
@@ -467,7 +459,6 @@ function ShowRunningFinish(tRanking, i, course_phase, timerRestart)
 		if (wsMain.timeoutFinish != null)
 			window.clearTimeout(wsMain.timeoutFinish);
 	
-		wsMain.finishAt = performance.now();
 		wsMain.timeoutFinish = window.setTimeout(FinResultat, wsMain.timeoutFinishDelay);
 	}
 	
@@ -707,9 +698,6 @@ function Init()
 	
 	wsMain.timeoutFinish = null;
 	wsMain.timeoutFinishDelay = 25000;
-	// Durée minimale du résultat avant qu'un intermédiaire ne le remplace.
-	wsMain.finishMinDelay = 8000;
-	wsMain.finishAt = 0;
 	
 	wsMain.timeoutInter = null;
 	wsMain.timeoutInterDelay = 5000;
