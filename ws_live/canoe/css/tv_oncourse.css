@@ -254,11 +254,10 @@ body.ancre-droite #oncourse_titre
 {
 	flex: 0 0 auto;
 
-	background: linear-gradient(180deg,
-		var(--oncourse-pena-top) 0%,
-		var(--oncourse-pena-mid) 50%,
-		var(--oncourse-pena-bot) 100%);
-	color: white;
+	/* Couleurs des portes de tv_duo : jaune pour des touches (+2, +4…),
+	   rouge dès qu'une porte est manquée (+50). */
+	background: #FFD21F;
+	color: #2a2300;
 
 	padding-left: 10px;
 	padding-right: 10px;
@@ -266,6 +265,12 @@ body.ancre-droite #oncourse_titre
 	font-variant-numeric: tabular-nums;
 	text-align: center;
 	min-width: 2.6em;
+}
+
+.racer .pena.eliminatoire
+{
+	background: #E8202A;
+	color: white;
 }
 
 /* Place à l'arrivée, sur le jaune maison. */

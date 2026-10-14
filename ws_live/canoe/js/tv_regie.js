@@ -63,6 +63,14 @@
  *                             (présentateur, titre, résultats) sont alors
  *                             rallongées de la vitesse mesurée du bouchon : à
  *                             ×10, le présentateur reste ses 15 s réelles.
+ *   kx=http://hote:3001       scénario kayak-cross : adresse du serveur competCrossFFCK
+ *                             (dossier gestion_kcross_series) ; défaut : le bouchon
+ *   kx_competition=900        son code de compétition (défaut : celui du scénario,
+ *                             sinon 900, celui du bouchon)
+ *   kx_pilote=0               ne pas piloter l'incrustation (un opérateur tient
+ *                             video_control.html)
+ *   kx_maintien=20            résultats d'une série validée dans l'incrustation, en s,
+ *                             avant le titre du bloc suivant
  *   bg=0                      fond transparent au lieu de la couleur de clé
  *   debug=1                   affiche l'état calculé (jamais à l'antenne)
  */
@@ -86,6 +94,7 @@ const regie = {
 	genKO : false,			// générique absent ou illisible : sauté
 	genDuree : 18,			// durée du générique en s (relue sur la vidéo)
 	cadres : {},
+	kx : null,				// kayak-cross : { base, competition, heats, offset, recu }
 	reglages : {},
 };
 
@@ -123,6 +132,10 @@ function Heure(txt)
 function Maintenant()
 {
 	const local = Date.now() + regie.decalage;
+
+	// Kayak-cross : l'heure du serveur competCrossFFCK, competFFCK ne court pas.
+	if (regie.kx && regie.scenario.categories.every(function(c) { return c.vue === 'kcross'; }))
+		return local + regie.kx.offset;
 	const minuit = MinuitScenario();
 
 	if (regie.clock > 0 && Date.now() - regie.clockRecu < 10000
@@ -243,6 +256,9 @@ function Bateaux(epreuve)
  */
 function Etat(cat, heure)
 {
+	if (cat.vue === 'kcross')
+		return EtatKcross(heure);
+
 	const bateaux = Bateaux(cat.epreuve);
 	const surLeau = bateaux.some(function(b) { return regie.onCourse.indexOf(b.bib) >= 0; });
 	const avecResultat = bateaux.filter(function(b) { return b.resultat; });
@@ -261,6 +277,127 @@ function Etat(cat, heure)
 	});
 
 	return { commencee : commencee, finie : finie, finA : finA, surLeau : surLeau };
+}
+
+/******************** kayak-cross ********************/
+
+/**
+ * Les séries de competCrossFFCK, lues toutes les 1,5 s sur son API (elle
+ * autorise les appels d'une autre origine). États : 1 en attente, 2 prête,
+ * 3 en course, 4 à valider, 5 officielle, 6 en modification.
+ */
+async function LireKcross()
+{
+	const kx = regie.kx;
+	try
+	{
+		const r = await fetch(kx.base + '/api/api_get_next_heats.php?competition='
+			+ encodeURIComponent(kx.competition) + '&etat=1,2,3,4,5,6');
+		const j = await r.json();
+		kx.heats = (j.heats || []).filter(function(h) { return h.name !== '_TEST_RESEAU_' && h.globalHeatNumber; });
+		kx.recu = Date.now();
+	}
+	catch (e)
+	{
+		// Serveur injoignable : on garde le dernier état connu.
+	}
+}
+
+async function HeureKcross()
+{
+	const kx = regie.kx;
+	try
+	{
+		const t0 = Date.now();
+		const j = await (await fetch(kx.base + '/api/api_get_server_time.php')).json();
+		if (j.serverTime > 0)
+			kx.offset = j.serverTime - (t0 + Date.now()) / 2;
+	}
+	catch (e) { /* on garde l'écart précédent */ }
+}
+
+/** Même contrat que Etat(), d'après les séries. */
+function EtatKcross(heure)
+{
+	const heats = regie.kx ? regie.kx.heats : [];
+	const surLeau = heats.some(function(h) { return h.etat === 3 || h.etat === 4 || h.etat === 6; });
+	const commencee = heats.some(function(h) { return h.etat >= 3; });
+	const finie = heats.length > 0 && heats.every(function(h) { return h.etat === 5; });
+
+	// Heure de la dernière validation, ramenée sur l'horloge de la régie : on
+	// retranche à `heure` le temps écoulé depuis, mesuré sur l'heure du serveur.
+	// Ainsi un ?maintenant= de répétition ne décale rien.
+	let finA = 0;
+	if (finie)
+	{
+		const derniere = heats.reduce(function(m, h) { return Math.max(m, h.lastModified || 0); }, 0);
+		finA = heure - Math.max(0, Date.now() + regie.kx.offset - derniere);
+	}
+
+	return { commencee : commencee, finie : finie, finA : finA, surLeau : surLeau };
+}
+
+/** Tours de kayak-cross, au pluriel : un titre annonce tout un bloc de séries. */
+const KX_TOURS = {
+	INVITES : 'Invités', TOUR1 : 'Tour 1', TOUR2 : 'Tour 2', TOUR3 : 'Tour 3',
+	MANCHE1 : 'Manche 1', MANCHE2 : 'Manche 2', MANCHE3 : 'Manche 3',
+	HUITIEMES : 'Huitièmes de finale', QUARTS : 'Quarts de finale', DEMI : 'Demi-finales', FINALE : 'Finale',
+};
+
+/** Un bloc : les séries consécutives d'une même catégorie et d'un même tour (1/8 Dames…). */
+function BlocKcross(h)
+{
+	return h.categoryKey + '|' + h.roundKey;
+}
+
+/**
+ * Titre d'un bloc de séries, pour la scène `titre` : la catégorie (Kayak Dame),
+ * le tour (Huitièmes de finale) et le nombre de séries du bloc.
+ */
+function TitreKcross(cat, h)
+{
+	const heats = regie.kx ? regie.kx.heats : [];
+	const n = heats.filter(function(x) { return BlocKcross(x) === BlocKcross(h); }).length;
+	const nomCat = typeof Categorie_name === 'function' ? Categorie_name(h.categoryKey) : h.categoryKey;
+
+	return {
+		nom : 'titre', cat : cat, bloc : BlocKcross(h),
+		libelle : nomCat || h.categoryKey,
+		phase : KX_TOURS[h.roundKey] || h.roundKey,
+		info : n + (n > 1 ? ' séries' : ' série'),
+	};
+}
+
+/**
+ * Pendant les séries : l'incrustation, sauf au passage d'un bloc à l'autre.
+ * La dernière série d'un bloc validée, l'incrustation montre ses résultats
+ * (`resultats` s), puis le titre du bloc suivant passe en plein écran (`titre`
+ * s) ; le pilote montre ensuite le tableau, puis la rampe. Calé sur l'heure de
+ * validation de la série, comme le pilote : rien n'est retenu.
+ */
+function CalculerKcross(cat, heure)
+{
+	const R = regie.reglages;
+	const heats = regie.kx ? regie.kx.heats.slice().sort(function(a, b) { return a.globalHeatNumber - b.globalHeatNumber; }) : [];
+	const course = { nom : 'course', cat : cat, vue : 'kcross' };
+
+	if (heats.some(function(h) { return h.etat === 3 || h.etat === 4 || h.etat === 6; }))
+		return course;
+
+	const derniere = heats.slice().reverse().find(function(h) { return h.etat === 5; });
+	const suivante = heats.find(function(h) { return h.etat <= 2; });
+	if (!derniere || !suivante || BlocKcross(derniere) === BlocKcross(suivante))
+		return course;
+
+	// Temps écoulé depuis la validation, en heure du serveur competCrossFFCK :
+	// c'est aussi celle du pilote, les deux restent calés.
+	const depuis = Date.now() + regie.kx.offset - derniere.lastModified;
+	if (depuis < R.kxMaintien * 1000)
+		return course;
+	if (depuis < (R.kxMaintien + R.titre) * 1000)
+		return TitreKcross(cat, suivante);
+
+	return course;
 }
 
 /** tv_duo ou tv_inrace, selon l'intervalle entre deux départs. */
@@ -314,12 +451,21 @@ function Calculer()
 		const derniere = cats[cats.length - 1];
 		const fin = etats[cats.length - 1].finA || heure;
 		if (heure < fin + Duree(R.resultats))
+		{
+			// Kayak-cross : les résultats de la finale sont dans l'incrustation.
+			if (derniere.vue === 'kcross')
+				return { nom : 'course', cat : derniere, vue : 'kcross' };
 			return { nom : 'resultats', cat : derniere };
+		}
 		return { nom : 'fin' };
 	}
 
 	const cat = cats[i];
 	const depart = Heure(cat.depart);
+
+	// Kayak-cross commencé : l'incrustation, avec un titre entre deux blocs.
+	if (etats[i].commencee && cat.vue === 'kcross')
+		return CalculerKcross(cat, heure);
 
 	// Catégorie commencée, personne sur l'eau : entre deux bateaux.
 	if (etats[i].commencee)
@@ -347,7 +493,18 @@ function Calculer()
 		// Le nom de la catégorie, puis sa liste de départ jusqu'au premier
 		// départ : c'est lui qui amène la course.
 		if (heure < listes + Duree(R.titre))
-			return { nom : 'titre', cat : cat };
+		{
+			// Kayak-cross : le titre annonce le premier bloc de séries.
+			const premiere = cat.vue === 'kcross' && regie.kx
+				? regie.kx.heats.slice().sort(function(a, b) { return a.globalHeatNumber - b.globalHeatNumber; })
+					.find(function(h) { return h.etat <= 2; })
+				: null;
+			return premiere ? TitreKcross(cat, premiere) : { nom : 'titre', cat : cat };
+		}
+
+		// Kayak-cross : l'incrustation montre elle-même le tableau puis la rampe.
+		if (cat.vue === 'kcross')
+			return { nom : 'course', cat : cat, vue : 'kcross' };
 
 		return { nom : 'depart', cat : cat };
 	}
@@ -375,6 +532,8 @@ function Cle(s)
 {
 	if (s.nom === 'course')
 		return 'course:' + s.vue;
+	if (s.nom === 'titre' && s.bloc)
+		return 'titre:' + s.bloc;
 	if (s.nom === 'resultats' || s.nom === 'titre' || s.nom === 'depart')
 		return s.nom + ':' + s.cat.epreuve;
 	return s.nom;
@@ -505,7 +664,7 @@ function Montrer(s)
 		rose : null, fin : null, generique : 'generique',
 		compte : 'compte', speaker : 'speaker', titre : 'titre',
 		depart : 'c_depart', resultats : 'c_resultats',
-		course : s.vue === 'inrace' ? 'c_inrace' : 'c_duo',
+		course : s.vue === 'inrace' ? 'c_inrace' : s.vue === 'kcross' ? 'c_kcross' : 'c_duo',
 	}[s.nom];
 
 	document.querySelectorAll('.couche').forEach(function(el) {
@@ -552,6 +711,11 @@ function PreparerCadres(s)
 		res = s.nom === 'course' ? s.cat : (cats[i - 1] || null);
 		dep = s.nom === 'course' ? (cats[i + 1] || null) : s.cat;
 	}
+
+	if (res && res.vue === 'kcross')
+		res = null;
+	if (dep && dep.vue === 'kcross')
+		dep = null;
 
 	Cadre('c_resultats', res ? 'tv_results.html?epreuve=' + encodeURIComponent(res.epreuve) : null);
 	Cadre('c_depart', dep ? 'tv_departs.html?epreuve=' + encodeURIComponent(dep.epreuve) : null);
@@ -649,9 +813,16 @@ function MettreAJour(s)
 		}
 	}
 
-	if (s.nom === 'titre' && s.cat)
+	if (s.nom === 'titre' && s.bloc)
+	{
+		SetTexte('ti_cat', s.libelle);
+		SetTexte('ti_phase', s.phase);
+		SetTexte('ti_info', s.info);
+	}
+	else if (s.nom === 'titre' && s.cat)
 	{
 		SetTexte('ti_cat', Libelle(s.cat));
+		SetTexte('ti_phase', regie.scenario.phase);
 		const n = Bateaux(s.cat.epreuve).length || s.cat.nb;
 		SetTexte('ti_info', n + ' bateaux · premier départ ' + HeureLisible(s.cat.depart));
 	}
@@ -660,8 +831,12 @@ function MettreAJour(s)
 	{
 		const d = new Date(Maintenant());
 		SetTexte('debug', d.toLocaleTimeString('fr-FR') + (regie.repetition ? ' ×' + regie.vitesse : '') + ' · ' + Cle(s)
-			+ (regie.clock > 0 && Date.now() - regie.clockRecu < 10000 ? ' · horloge competFFCK' : ' · horloge poste')
-			+ ' · sur l\'eau : ' + (regie.onCourse.join(', ') || '—'));
+			+ (regie.kx && regie.scenario.categories.every(function(c) { return c.vue === 'kcross'; }) ? ' · horloge competCrossFFCK'
+				: regie.clock > 0 && Date.now() - regie.clockRecu < 10000 ? ' · horloge competFFCK' : ' · horloge poste')
+			+ ' · sur l\'eau : ' + (regie.onCourse.join(', ') || '—')
+			+ (regie.kx ? ' · KX ' + regie.kx.heats.length + ' séries, '
+				+ regie.kx.heats.filter(function(h) { return h.etat === 5; }).length + ' officielles'
+				+ (Date.now() - regie.kx.recu < 5000 ? '' : ' (serveur muet)') : ''));
 	}
 }
 
@@ -716,6 +891,7 @@ function Init()
 		speakerDelai : num('speaker_delai', 3),
 		speakerDuree : num('speaker_duree', 10),
 		departsAvant : num('departs_avant', 30),
+		kxMaintien : num('kx_maintien', 20),
 		generique : true,
 		anim : urlParams.get('anim') !== '0',
 		son : urlParams.get('son') !== '0',
@@ -765,6 +941,31 @@ function Init()
 				regie.genDuree = v.duration;
 		};
 		v.src = gen;
+	}
+
+	// Kayak-cross : l'incrustation de competCrossFFCK et son pilote, servis par
+	// son propre serveur (leurs pages appellent ../api/ en relatif).
+	if (regie.scenario.categories.some(function(c) { return c.vue === 'kcross'; }))
+	{
+		const base = (urlParams.get('kx') || 'http://' + location.hostname + ':3001').replace(/\/+$/, '');
+		const comp = (urlParams.get('kx_competition') || (regie.scenario.kcross && regie.scenario.kcross.competition) || '900')
+			.replace(/[^a-zA-Z0-9_]/g, '');
+
+		if (/^https?:\/\/[^\s"'<>]+$/.test(base))
+		{
+			regie.kx = { base : base, competition : comp, heats : [], offset : 0, recu : 0 };
+			const q = '?competition=' + encodeURIComponent(comp);
+			document.querySelector('#c_kcross iframe').src = base + '/video/video_incrustation.html' + q;
+			// Le pilote décale son tableau de la durée du titre de bloc de la régie.
+			if (urlParams.get('kx_pilote') !== '0')
+				document.getElementById('kx_pilote').src = base + '/video/video_pilote.html' + q
+					+ '&maintien=' + regie.reglages.kxMaintien + '&titre=' + regie.reglages.titre;
+
+			HeureKcross();
+			setInterval(HeureKcross, 60000);
+			LireKcross();
+			setInterval(LireKcross, 1500);
+		}
 	}
 
 	// Écrans de course chargés une fois pour toutes.

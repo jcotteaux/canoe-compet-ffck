@@ -576,8 +576,9 @@ body.chroma #block_inter .live::before { animation: none; }
 }
 
 /* 2 s : touche (jaune) ; 50 s : porte manquée (rouge). */
-#block_pena .gate[data-pen="2"] .val { background: var(--flt); color: var(--row-dark); }
-#block_pena .gate[data-pen="50"] .val { background: var(--red); color: #fff; }
+/* Couleurs des portes de tv_duo, communes à toutes les pages TV. */
+#block_pena .gate[data-pen="2"] .val { background: #FFD21F; color: #2a2300; }
+#block_pena .gate[data-pen="50"] .val { background: #E8202A; color: #fff; }
 
 /* ------------------------------------------------------------ animations */
 

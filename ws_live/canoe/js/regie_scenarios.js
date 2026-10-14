@@ -11,15 +11,21 @@
  *   libelle   nom affiché sur les titres
  *   depart    heure du premier départ, fin : heure du dernier départ
  *   nb        nombre de bateaux
- *   vue       'duo' ou 'inrace' ; absent = déduit de l'intervalle entre deux
+ *   vue       'duo', 'inrace' ou 'kcross' ; absent = déduit de l'intervalle entre deux
  *             départs, (fin - depart) / (nb - 1) : moins de 2 min, plusieurs
  *             bateaux sont sur l'eau en même temps, d'où tv_duo ; 2 min et
  *             plus, un seul à la fois, d'où tv_inrace.
  *
  * date : jour du scénario (AAAA-MM-JJ) ; null = aujourd'hui (scénario de test).
+ *
+ * vue 'kcross' : les séries de kayak-cross, gérées par competCrossFFCK
+ * (gestion_kcross_series) et non par competFFCK. L'écran de course est alors
+ * l'incrustation video/video_incrustation.html de cette application, pilotée
+ * par video/video_pilote.html. `kcross.competition` : son code de compétition ;
+ * l'adresse du serveur se passe à la régie par ?kx=http://hote/chemin.
  */
 
-const REGIE_SPEAKER = { nom : 'Frédéric Castryck', role : 'Présentateur' };
+const REGIE_SPEAKER = { nom : 'Frédéric Castryck', role : 'Speaker' };
 
 const REGIE_SCENARIOS = {
 
@@ -56,6 +62,18 @@ const REGIE_SCENARIOS = {
 			{ epreuve : 'XK1INV', libelle : 'Invités',     depart : '10:15:00', fin : '10:29:00', nb : 15 },
 			{ epreuve : 'XK1H',   libelle : 'Kayak Homme', depart : '10:33:00', fin : '11:06:00', nb : 34 },
 			{ epreuve : 'XK1D',   libelle : 'Kayak Dame',  depart : '11:10:00', fin : '11:38:00', nb : 29 },
+		],
+	},
+
+	// Les séries (phases finales) de kayak-cross. Horaires à confirmer : la
+	// première série et la fin sont des estimations.
+	'samedi-apres-midi' : {
+		titre : 'Championnats de France Elite Kayak-Cross',
+		phase : 'Kayak-Cross — phases finales',
+		date : '2026-10-17',
+		kcross : { competition : null },
+		categories : [
+			{ epreuve : 'KX', libelle : 'Kayak-Cross', depart : '14:00:00', fin : '17:00:00', nb : 0, vue : 'kcross' },
 		],
 	},
 

@@ -5,6 +5,7 @@
   "description": "Front live competFFCK (ws_live) + bouchon de serveur WebSocket pour developper sans competFFCK ni MySQL",
   "scripts": {
     "start": "node mock/server.js",
+    "serve": "node tools/serve.js",
     "descente": "node mock/server.js --fixture descente-sprint",
     "slalom": "node mock/server.js --fixture slalom-finale",
     "international": "node mock/server.js --fixture descente-internationale",

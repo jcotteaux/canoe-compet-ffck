@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>KCross - Pilote automatique de l'incrustation</title>
+<link rel="icon" type="image/png" sizes="64x64" href="../favicons/favicon-64x64.png">
+<style>
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #10142a; color: #dce8fb; padding: 16px; }
+  code { color: #ffd24a; }
+</style>
+</head>
+<body>
+<!--
+  Pilote automatique de video_incrustation.html : fait seul, sans opérateur,
+  ce que video_control.html fait à la main. Sans affichage utile : la régie
+  TV de ws_live (tv_regie.html) l'embarque masquée, à côté de l'incrustation.
+  Ne pas ouvrir video_control.html en même temps : les deux écriraient l'état.
+
+  ?competition=…   la compétition
+  ?style=…         feuille de style de l'incrustation (défaut incrustation_TV.css)
+  ?maintien=20     résultats d'une série validée, en s
+  ?tableau=12      tableau des phases finales avant la rampe, en s (0 = jamais)
+  ?titre=10        au changement de bloc (1/8 Dames -> 1/8 Hommes), le tableau
+                   attend tant de s : le titre de la régie TV couvre l'écran
+-->
+<p>Pilote automatique de l'incrustation — compétition <code id="comp"></code></p>
+<p id="etat">démarrage…</p>
+<script type="module" src="js/video_pilote.js?v=2.2.0"></script>
+</body>
+</html>

@@ -331,6 +331,8 @@ function SyncRow(container, r, ordre, estDernier)
 	{
 		elPena.textContent = '+' + r.pena;
 		elPena.style.display = '';
+		// Jaune pour des touches, rouge dès qu'une porte est manquée (tv_duo).
+		elPena.classList.toggle('eliminatoire', r.pena >= 50);
 	}
 	else
 	{

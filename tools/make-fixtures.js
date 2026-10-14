@@ -299,6 +299,8 @@ const regieFixtures = [];
 let regieSeed = 20261100;
 for (const [id, sc] of Object.entries(scenariosRegie())) {
   if (id === 'test') continue;          // le scénario test a sa fixture, france-elite-test
+  // Séries de kayak-cross : c'est le bouchon kayak-cross qui les court (npm run kcross).
+  if (sc.categories.some((c) => c.vue === 'kcross')) continue;
 
   const cross = sc.categories.every((c) => c.epreuve.startsWith('XK'));
   const rand = rng(++regieSeed);

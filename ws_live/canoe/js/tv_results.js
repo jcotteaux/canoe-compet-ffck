@@ -6,11 +6,13 @@
  * jour toute seule.
  *
  * Choix de l'épreuve
- *   Par défaut : la DERNIÈRE épreuve qui a au moins un classé, c'est-à-dire
+ *   Par défaut : l'épreuve du bateau sur l'eau, dès son départ (en attente
+ *   de la première arrivée, l'écran le dit). Rivière vide : la DERNIÈRE
+ *   épreuve qui a au moins un classé, c'est-à-dire
  *   celle du dernier bateau arrivé (le plus tard parti parmi ceux qui ont un
  *   résultat). Tant qu'elle n'est pas finie, elle est marquée « classement
- *   provisoire ». Avant le premier classé d'une nouvelle épreuve, on reste
- *   sur la précédente : l'écran ne se vide jamais entre deux épreuves.
+ *   provisoire ». Avant le premier DÉPART d'une nouvelle épreuve, on reste
+ *   sur la précédente : ses résultats restent affichés entre deux épreuves.
  *
  *   ?terminee=1 rétablit la règle d'origine, décrite ci-dessous : la
  *   dernière épreuve TERMINÉE d'abord.
@@ -37,15 +39,14 @@
  *
  * Disposition
  *   Les `fixes` premiers du classement restent en haut en permanence : ce
- *   sont eux que le spectateur cherche, les faire tourner avec le reste
- *   l'obligerait à attendre son tour pour savoir qui mène. Seule la queue
- *   défile, par fenêtres de `max - fixes` lignes.
+ *   sont eux que le spectateur cherche. La suite défile en continu dans une
+ *   fenêtre de `max - fixes` lignes ; arrivée en bas, elle s'efface en fondu
+ *   et repart du haut.
  *
  * Arrivée mise en valeur
- *   Quand un bateau de l'épreuve affichée franchit la ligne, la fenêtre qui
- *   le contient est amenée à l'écran et sa ligne encadrée. Le défilement est
- *   gelé pendant toute la durée de l'encadrement, sinon l'arrivée
- *   disparaîtrait avant d'avoir été lue.
+ *   Quand un bateau de l'épreuve affichée franchit la ligne, sa ligne est
+ *   encadrée quelques secondes, sans interrompre le défilement : le dernier
+ *   arrivé est de toute façon en bas, dans la première tuile du bandeau.
  *
  * Mise à jour
  *   Toute modification (arrivée, pénalité, décision de jury, manche effacée)
@@ -54,16 +55,12 @@
  *   ouvert. Les lignes déjà affichées sont mises à jour sans être recréées,
  *   sinon leur animation d'entrée repartirait à chaque correction.
  *
- * Bandeau des bateaux en course
- *   Dès qu'un bateau est sur l'eau, un bandeau apparaît en bas avec, côte à
- *   côte, son dossard, son nom, son chrono qui tourne et son cumul de
- *   pénalités. Il disparaît quand la rivière est vide. Le tableau au-dessus
- *   rétrécit d'autant, sa hauteur de ligne étant calculée ici.
- *
- *   Ce bandeau se rend SÉPARÉMENT du classement : <on_course> arrive à 10 Hz,
- *   et redessiner le tableau à cette cadence relancerait ses animations en
- *   boucle. Les cartes sont réutilisées d'une trame à l'autre pour la même
- *   raison.
+ * Bandeau du bas
+ *   Quatre tuiles de même taille : le dernier arrivé de l'épreuve (temps,
+ *   place, pénalités), les bateaux sur l'eau, puis les prochains partants
+ *   avec leur heure et le compte à rebours. Il se rend SÉPARÉMENT du
+ *   classement : <on_course> arrive à 10 Hz, et ses emplacements sont
+ *   réutilisés d'une trame à l'autre.
  *
  * Source des données :
  *   <race_load>    nom de la compétition, lieu, phase
@@ -76,7 +73,8 @@
  * Paramètres d'URL :
  *   max=8             nombre de lignes affichées en tout (défaut : 8)
  *   fixes=3           dont combien restent figées en haut (défaut : 3)
- *   delay=8000        durée d'affichage d'une page en ms (défaut : 8000)
+ *   vitesse=40        défilement de la suite, en px/s (défaut : 40)
+ *   pause=4000        arrêt en haut et en bas de la suite, en ms (défaut : 4000)
  *   epreuve=K1H       fige l'épreuve au lieu de suivre la dernière terminée
  *   encours=1         suit l'épreuve en cours de chronométrage
  *   terminee=1        dernière épreuve TERMINÉE plutôt que dernière courue
@@ -84,11 +82,16 @@
  *   titre=...         remplace le nom de compétition venu de competFFCK
  *   lieu=...          remplace le lieu
  *   length_identity=26 longueur max du nom (défaut : 26)
- *   no_nation         masque la colonne nation même si elle est renseignée
- *   max_course=6      nombre max de bateaux dans le bandeau (défaut : 6)
+ *   no_nation         masque la colonne du club (ou de la nation)
+ *   nation            la nation (drapeau) à la place du club, pour une
+ *                     compétition internationale
+ *   tuiles=4          emplacements du bandeau du bas, toujours de même taille :
+ *                     dernier arrivé, bateaux en course, prochains partants
+ *   delai_glisse=1000 attente entre une arrivée et le glissement des tuiles, en ms
  *   no_course         supprime le bandeau des bateaux en course
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
- *   anim=0            désactive les animations
+ *   anim=1            active les animations (défaut : aucune, tout apparaît
+ *                     d'un coup ; anim=0 reste accepté)
  *   style=classique   habillage d'origine, fond uni (défaut : photo)
  *   fond=mewen        photo de fond, prise dans img/fonds/<nom>.jpg
  */
@@ -124,8 +127,9 @@ function OnCommandEpreuveLoad(objJSON)
 	const avant = wsMain.epreuve;
 	wsMain.epreuve = wsMain.epreuveForcee !== '' ? wsMain.epreuveForcee : ChoisirEpreuve();
 
-	// Changement d'épreuve : on repart de la première page, avec animation.
+	// Changement d'épreuve : la piste repart du haut.
 	Render(avant !== wsMain.epreuve);
+	RenderCourse();
 }
 
 /**
@@ -168,15 +172,47 @@ function OnFlowOnCourse(objJSON)
 	if (typeof objJSON.epreuve === 'string')
 		wsMain.epreuveChrono = objJSON.epreuve;
 
+	// Heure de competFFCK : sert au compte à rebours des prochains partants.
+	const clock = adv.toNumber(objJSON.clock);
+	if (clock !== null && clock > 0)
+	{
+		wsMain.clock = clock;
+		wsMain.clockRecu = Date.now();
+	}
+
 	wsMain.onCourse = rows;
+
+	// L'épreuve suit les bateaux sur l'eau : un départ dans une nouvelle
+	// épreuve change l'en-tête et le classement tout de suite.
+	if (wsMain.epreuveForcee === '' && typeof canoe.GetTableRanking() === 'object' && canoe.GetTableRanking() !== null)
+	{
+		const epreuve = ChoisirEpreuve();
+		if (epreuve !== wsMain.epreuve)
+		{
+			wsMain.epreuve = epreuve;
+			Render(true);
+		}
+	}
+
 	RenderCourse();
 }
 
 function OnBroadcastBibTime(objJSON)
 {
-	// passage >= 1 : un intermédiaire, il ne change pas le classement.
+	// passage >= 1 : un intermédiaire. Il ne change pas le classement, mais
+	// s'affiche sur la tuile du bateau.
 	if (parseInt(objJSON.passage) >= 1)
+	{
+		const b = String(objJSON.bib);
+		const inters = wsMain.inters.get(b) || {};
+		inters[parseInt(objJSON.passage)] = {
+			time : adv.toNumber(objJSON.time_chrono),
+			diff : objJSON.diff_categ !== undefined ? adv.toNumber(objJSON.diff_categ) : null,
+		};
+		wsMain.inters.set(b, inters);
+		RenderCourse();
 		return;
+	}
 
 	/*
 	 * Le bateau a franchi la ligne : on le sort du bandeau tout de suite.
@@ -184,6 +220,17 @@ function OnBroadcastBibTime(objJSON)
 	 * l'antenne, et indéfiniment si le flux se tait juste après.
 	 */
 	const bib = String(objJSON.bib);
+
+	// Il devient tout de suite le dernier arrivé, avec le chrono de la trame,
+	// en attendant le classement à jour (pénalités, place).
+	wsMain.arriveRecent = { bib : bib, time : adv.toNumber(objJSON.time_chrono) };
+
+	// Les tuiles ne bougent pas tout de suite : l'arrivant passe en « Arrivée »
+	// sur place, puis tout glisse une seconde après.
+	wsMain.gelTuiles = Date.now() + wsMain.delaiGlisse;
+	window.setTimeout(RenderCourse, wsMain.delaiGlisse + 30);
+	wsMain.inters.delete(bib);
+
 	const avant = wsMain.onCourse.length;
 	wsMain.onCourse = wsMain.onCourse.filter(function(r) { return r.bib !== bib; });
 	if (wsMain.onCourse.length !== avant)
@@ -201,8 +248,10 @@ function OnBroadcastRunErase(objJSON)
 {
 	// La manche est refaite : plus aucune épreuve n'est terminée.
 	wsMain.epreuve = '';
-	wsMain.page = 0;
+	RemonterPiste();
 	wsMain.onCourse = [];
+	wsMain.arriveRecent = null;
+	wsMain.inters.clear();
 	RenderCourse();
 	ReloadEpreuve();
 }
@@ -266,6 +315,23 @@ function ChoisirEpreuve()
 	const cats = ReleverCategories();
 
 	/*
+	 * Un bateau sur l'eau : son épreuve, même sans classé encore. L'en-tête
+	 * suit la course ; avant la première arrivée, l'écran d'attente dit qu'on
+	 * attend le premier compétiteur. (Hors ?terminee=1, qui ne montre que des
+	 * épreuves finies.)
+	 */
+	if (!wsMain.preferTerminee)
+	{
+		const enCourse = EpreuveSurLeau();
+		if (enCourse !== '')
+		{
+			const e = cats.get(enCourse);
+			document.body.classList.toggle('provisoire', e !== undefined && e.traites < e.total);
+			return enCourse;
+		}
+	}
+
+	/*
 	 * ?encours=1 : on suit le chronométrage, mais seulement une fois que
 	 * l'épreuve a un classé. Basculer dès le premier départ viderait l'écran
 	 * entre la fin d'une épreuve et la première arrivée de la suivante.
@@ -292,6 +358,14 @@ function ChoisirEpreuve()
 				derniere = categ;
 			}
 		});
+
+		// Aucun résultat encore : l'épreuve du prochain partant (compte à rebours).
+		if (derniere === '')
+		{
+			const p = Prochains(1)[0];
+			if (p)
+				derniere = p.epreuve;
+		}
 
 		const e = cats.get(derniere);
 		document.body.classList.toggle('provisoire', e !== undefined && e.traites < e.total);
@@ -325,6 +399,23 @@ function ChoisirEpreuve()
 	document.body.classList.toggle('provisoire', terminee === '' && partielle !== '');
 
 	return terminee !== '' ? terminee : partielle;
+}
+
+/** L'épreuve du bateau sur l'eau parti le premier, '' si la rivière est vide. */
+function EpreuveSurLeau()
+{
+	const tRanking = canoe.GetTableRanking();
+	if (typeof tRanking !== 'object' || tRanking === null)
+		return '';
+
+	const tries = wsMain.onCourse.slice().sort(function(a, b) { return b.time - a.time; });
+	for (const r of tries)
+	{
+		const row = canoe.GetRankingBibIndex(tRanking, parseInt(r.bib));
+		if (row >= 0)
+			return tRanking.GetCell('Code_categorie', row);
+	}
+	return '';
 }
 
 /******************** extraction du classement ********************/
@@ -377,6 +468,7 @@ function GetClassement()
 			bib : String(tRanking.GetCell('Dossard', row)),
 			name : tRanking.GetCell('Bateau', row),
 			nation : tRanking.GetCell('Code_nation', row),
+			club : tRanking.GetCell('Club', row),
 			time : tps,
 			pena : GetPena(tRanking, row, course_phase),
 		};
@@ -495,17 +587,31 @@ function SyncLigne(el, r, premier, ouvreLaRotation)
 	el.querySelector('.c_dossard').textContent = r.bib;
 	el.querySelector('.c_nom').textContent = TronquerNom(r.name);
 
+	// Le club, comme sur tv_duo et tv_departs ; la nation et son drapeau
+	// seulement avec ?nation (compétition internationale).
 	const elNation = el.querySelector('.c_nation');
-	if (r.nation !== '')
-		elNation.innerHTML = "<img src='./img/Flags/" + r.nation + ".png' alt='' />"
-			+ '<span>' + r.nation + '</span>';
+	if (wsMain.avecNation && r.nation !== '')
+	{
+		elNation.innerHTML = "<img src='./img/Flags/" + encodeURIComponent(r.nation) + ".png' alt='' /><span></span>";
+		elNation.querySelector('span').textContent = r.nation;
+	}
+	else if (!wsMain.avecNation && r.club !== '')
+	{
+		elNation.innerHTML = '<span class="club"></span>';
+		elNation.querySelector('span').textContent = r.club;
+	}
 	else
+	{
 		elNation.innerHTML = '';
+	}
 
+	// Pénalités en pastille, aux couleurs des portes de tv_duo : jaune quand
+	// ce ne sont que des touches (2), rouge dès qu'une porte est manquée (50).
 	const elPena = el.querySelector('.c_pena');
 	if (canoe.GetNbPorte() > 0)
 	{
-		elPena.textContent = String(r.pena);
+		elPena.innerHTML = '<span class="pastille"></span>';
+		elPena.firstChild.textContent = r.pena > 0 ? '+' + r.pena : '0';
 		elPena.classList.toggle('chargee', r.pena > 0 && r.pena < 50);
 		elPena.classList.toggle('eliminatoire', r.pena >= 50);
 	}
@@ -536,28 +642,21 @@ function CreerLigne()
 }
 
 /**
- * Dessine la page courante.
+ * Dessine le classement.
  *
- * `remonter` remet le défilement à la première page — au changement
- * d'épreuve. Une simple correction de résultat ne doit pas faire sauter le
- * spectateur au début du classement.
- */
-/**
- * Dessine la page courante.
+ * Les `fixes` premiers restent en haut en permanence — ce sont eux que le
+ * spectateur cherche. La suite est une piste qui DÉFILE en continu dans une
+ * fenêtre de `max - fixes` lignes : pause en haut, défilement lent, pause en
+ * bas, fondu, et retour en haut (voir Defiler). Une arrivée est encadrée à sa
+ * place, sans interrompre le défilement.
  *
- * Le classement est coupé en deux : les `fixes` premiers restent en haut en
- * permanence — ce sont eux que le spectateur cherche — et seule la queue
- * défile, par fenêtres de `max - fixes` lignes. Faire tourner le podium avec
- * le reste obligerait à attendre le bon tour pour savoir qui mène.
- *
- * `remonter` remet le défilement au début de la queue, au changement
- * d'épreuve. Une simple correction de résultat ne doit pas faire sauter le
- * spectateur au début du classement.
+ * `remonter` ramène la piste en haut, au changement d'épreuve. Une simple
+ * correction de résultat ne doit pas faire sauter le spectateur au début.
  */
 function Render(remonter)
 {
 	if (remonter)
-		wsMain.page = 0;
+		RemonterPiste();
 
 	const tout = wsMain.epreuve === '' ? [] : GetClassement();
 
@@ -565,134 +664,199 @@ function Render(remonter)
 	document.getElementById('epreuve_nom').textContent =
 		typeof Categorie_name === 'function' ? Categorie_name(wsMain.epreuve) : wsMain.epreuve;
 
+	// En bas : combien de bateaux de l'épreuve doivent encore arriver. Mis à
+	// jour avant tout, y compris quand l'épreuve n'a encore aucun résultat.
+	const e = wsMain.epreuve !== '' ? ReleverCategories().get(wsMain.epreuve) : undefined;
+	const reste = e ? e.total - e.traites : 0;
+	document.body.classList.toggle('pagine', e !== undefined);
+	document.getElementById('pagination').textContent = reste > 0
+		? (reste === 1 ? 'Encore 1 bateau à arriver' : 'Encore ' + reste + ' bateaux à arriver')
+		: 'Épreuve terminée';
+
+	const corps = document.getElementById('corps');
 	if (tout.length === 0)
 	{
-		document.getElementById('corps').innerHTML = '';
-		document.body.classList.remove('pagine');
+		corps.innerHTML = '';
 		return;
 	}
 
-	// Colonne nation : inutile sur un championnat de France, où elle est vide
-	// pour tout le monde. On la replie plutôt que d'aligner des cases vides.
-	const avecNation = !wsMain.noNation && tout.some(function(r) { return r.nation !== ''; });
-	document.body.classList.toggle('sans-nation', !avecNation);
+	// Colonne du club (ou de la nation avec ?nation) : repliée si vide pour tous.
+	const avecColonne = !wsMain.noNation && tout.some(function(r) {
+		return wsMain.avecNation ? r.nation !== '' : r.club !== '';
+	});
+	document.body.classList.toggle('sans-nation', !avecColonne);
 
 	const nbFixes = Math.min(wsMain.fixes, tout.length);
 	const tete = tout.slice(0, nbFixes);
 	const queue = tout.slice(nbFixes);
-
-	/*
-	 * Chaque fenêtre est pleine : les `max - fixes` suivants (4 à 8, puis 9 à
-	 * 13…), seule la dernière est complétée par des lignes vides. Répartir la
-	 * queue en fenêtres égales donnait 4-5-6 puis 7-8-9 pour six bateaux :
-	 * l'écran montrait moins de monde qu'il ne pouvait.
-	 */
 	const fenetre = Math.max(1, wsMain.max - nbFixes);
-	const nbPages = Math.max(1, Math.ceil(queue.length / fenetre));
-	const parPage = queue.length > 0 ? fenetre : 0;
 
-	if (wsMain.page >= nbPages)
-		wsMain.page = 0;
-
-	/*
-	 * Un bateau vient d'arriver : on amène la fenêtre qui le contient et on
-	 * l'encadre. S'il est déjà dans les fixes, il n'y a rien à faire défiler.
-	 * Le défilement est gelé tant que l'encadrement dure (voir Programmer),
-	 * sinon l'arrivée disparaîtrait avant d'avoir été lue.
-	 */
+	// Un bateau vient d'arriver : il est encadré, et la piste vient à lui.
 	if (wsMain.bibArrive !== null)
 	{
-		const cible = tout.findIndex(function(r) { return r.bib === wsMain.bibArrive; });
-		if (cible >= 0)
+		if (tout.some(function(r) { return r.bib === wsMain.bibArrive; }))
 		{
-			if (cible >= nbFixes && parPage > 0)
-				wsMain.page = Math.floor((cible - nbFixes) / parPage);
-
 			wsMain.vedette = wsMain.bibArrive;
 			wsMain.vedetteFin = Date.now() + wsMain.vedetteDuree;
-
-			if (wsMain.pageTimer !== null)
-			{
-				window.clearTimeout(wsMain.pageTimer);
-				wsMain.pageTimer = null;
-			}
-
-			// Un rendu de plus à l'expiration, pour retirer l'encadrement et
-			// relancer le défilement même si rien d'autre ne se passe.
+			// Un rendu de plus à l'expiration, pour retirer l'encadrement.
 			window.setTimeout(function() { Render(false); }, wsMain.vedetteDuree + 50);
 		}
-
 		wsMain.bibArrive = null;
 	}
 
 	if (wsMain.vedette !== null && Date.now() >= wsMain.vedetteFin)
 		wsMain.vedette = null;
 
-	const debut = wsMain.page * parPage;
-	const page = tete.concat(queue.slice(debut, debut + parPage));
+	// Structure : la tête figée, un filet, puis la fenêtre et sa piste.
+	if (!document.getElementById('piste'))
+		corps.innerHTML = '<div id="tete"></div><div id="filet"></div><div id="defile"><div id="piste"></div></div>';
+
+	SyncBloc(document.getElementById('tete'), tete, tout[0]);
 
 	/*
-	 * Complément à la taille de fenêtre : le bloc du bas garde toujours le
-	 * même nombre de lignes, même quand la dernière fenêtre est incomplète.
-	 * Une épreuve qui tient entièrement dans la tête n'a pas de queue : on
-	 * n'invente pas cinq lignes vides sous un classement de trois bateaux.
+	 * Une queue plus courte que la fenêtre est complétée de lignes vides : le
+	 * bloc garde sa silhouette. Une épreuve qui tient dans la tête n'a pas de
+	 * queue, on n'invente pas de lignes sous trois bateaux.
 	 */
+	const piste = queue.slice();
 	if (queue.length > 0)
 	{
-		while (page.length < nbFixes + fenetre)
-			page.push(null);
+		while (piste.length < fenetre)
+			piste.push(null);
 	}
+	SyncBloc(document.getElementById('piste'), piste, tout[0]);
 
-	const avecFilet = nbFixes > 0 && queue.length > 0;
+	const avecQueue = queue.length > 0;
+	document.getElementById('filet').hidden = !(nbFixes > 0 && avecQueue);
 
-	document.body.classList.toggle('pagine', nbPages > 1);
-	document.getElementById('pagination').textContent =
-		(wsMain.page + 1) + ' / ' + nbPages + ' — ' + tout.length + ' bateaux';
+	const defile = document.getElementById('defile');
+	defile.hidden = !avecQueue;
+	defile.style.height = avecQueue ? (fenetre * PasLigne() - 4) + 'px' : '0';
 
-	const corps = document.getElementById('corps');
-	const existantes = corps.children;
 
-	/*
-	 * Mise à jour sur place : tant que la ligne n° i montre déjà ce dossard,
-	 * on ne touche qu'à son contenu. Recréer le noeud relancerait l'animation
-	 * d'entrée, et tout le classement clignoterait à chaque pénalité saisie.
-	 */
-	for (let i = 0; i < page.length; i++)
+	Defiler();
+}
+
+/**
+ * Met un bloc de lignes à jour sur place : tant que la ligne n° i existe, on
+ * ne touche qu'à son contenu. Recréer les noeuds ferait clignoter le
+ * classement à chaque pénalité saisie.
+ */
+function SyncBloc(bloc, lignes, premier)
+{
+	for (let i = 0; i < lignes.length; i++)
 	{
-		let el = existantes[i];
+		let el = bloc.children[i];
 		if (el === undefined)
 		{
 			el = CreerLigne();
-			corps.appendChild(el);
+			bloc.appendChild(el);
 		}
-
-		// Un filet sépare le bloc figé de la partie qui tourne, sinon on lit
-		// les huit lignes comme un classement continu de 1 à 8.
-		SyncLigne(el, page[i], tout[0], avecFilet && i === nbFixes);
+		SyncLigne(el, lignes[i], premier, false);
 	}
 
-	while (corps.children.length > page.length)
-		corps.removeChild(corps.lastChild);
-
-	Programmer(nbPages);
+	while (bloc.children.length > lignes.length)
+		bloc.removeChild(bloc.lastChild);
 }
 
-/** Enchaîne la page suivante. Le minuteur n'est pas relancé par une simple mise à jour. */
-function Programmer(nbPages)
+/** Hauteur d'une ligne et de son intervalle, en pixels de la scène. */
+function PasLigne()
 {
-	if (wsMain.pageTimer !== null || nbPages <= 1)
+	const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--res-ligne-h')) || 46;
+	return h + 4;
+}
+
+/******************** défilement de la piste ********************/
+
+/*
+ * La piste avance à `vitesse` px/s. Un cycle : `pause` ms en haut, le
+ * défilement jusqu'à la dernière ligne, `pause` ms en bas, puis un fondu qui
+ * la ramène en haut. Animée par requestAnimationFrame : le mouvement reste
+ * régulier quoi que fasse le flux de données.
+ */
+const FONDU_MS = 300;
+
+function RemonterPiste()
+{
+	wsMain.def = { pos : 0, phase : 'haut', depuis : performance.now(), dernier : performance.now() };
+	const piste = document.getElementById('piste');
+	if (piste)
+	{
+		piste.style.transform = 'translateY(0)';
+		piste.classList.remove('efface');
+	}
+}
+
+/** Lance la boucle si elle ne tourne pas déjà. */
+function Defiler()
+{
+	if (wsMain.defBoucle)
 		return;
 
-	// Gelé tant qu'une arrivée est encadrée : c'est tout l'intérêt de l'avoir
-	// amenée à l'écran.
-	if (wsMain.vedette !== null)
-		return;
+	wsMain.defBoucle = true;
+	window.requestAnimationFrame(PasDefilement);
+}
 
-	wsMain.pageTimer = setTimeout(function() {
-		wsMain.pageTimer = null;
-		wsMain.page++;
-		Render(false);
-	}, wsMain.pageDelay);
+function PasDefilement(t)
+{
+	const piste = document.getElementById('piste');
+	const defile = document.getElementById('defile');
+	if (!piste || !defile || defile.hidden)
+	{
+		wsMain.defBoucle = false;
+		return;
+	}
+
+	const d = wsMain.def;
+	const dt = Math.min(100, t - d.dernier);
+	d.dernier = t;
+
+	const max = Math.max(0, piste.scrollHeight - defile.clientHeight);
+
+	// Une arrivée ne fait pas sauter la piste : sa ligne est encadrée là où
+	// elle est, et le défilement automatique continue.
+	if (max <= 0)
+	{
+		d.pos = 0;
+		d.phase = 'haut';
+		d.depuis = t;
+	}
+	else if (d.phase === 'haut')
+	{
+		d.pos = 0;
+		if (t - d.depuis > wsMain.pause)
+			d.phase = 'defile';
+	}
+	else if (d.phase === 'defile')
+	{
+		d.pos = Math.min(max, d.pos + wsMain.vitesse * dt / 1000);
+		if (d.pos >= max)
+		{
+			d.phase = 'bas';
+			d.depuis = t;
+		}
+	}
+	else if (d.phase === 'bas')
+	{
+		d.pos = max;
+		if (t - d.depuis > wsMain.pause)
+		{
+			d.phase = 'fondu';
+			d.depuis = t;
+			piste.classList.add('efface');
+		}
+	}
+	else if (d.phase === 'fondu' && t - d.depuis > FONDU_MS)
+	{
+		// Invisible : on remonte d'un coup, et la piste réapparaît en haut.
+		d.pos = 0;
+		d.phase = 'haut';
+		d.depuis = t;
+		piste.classList.remove('efface');
+	}
+
+	piste.style.transform = 'translateY(' + (-d.pos).toFixed(1) + 'px)';
+	window.requestAnimationFrame(PasDefilement);
 }
 
 /******************** bandeau des bateaux en course ********************/
@@ -721,86 +885,425 @@ function CreerCarte()
 	const el = document.createElement('div');
 	el.className = 'coureur';
 	el.innerHTML =
-		'<div class="c_corps">' +
+		'<div class="c_tuile"><div class="c_corps">' +
 			'<div class="c_bib"></div>' +
-			'<div class="c_nom"></div>' +
+			'<div class="c_nom"><span class="c_etat"></span><span class="c_qui"></span></div>' +
 			'<div class="c_chrono"></div>' +
-			'<div class="c_pena"></div>' +
-		'</div>';
+			'<div class="c_droite"><div class="c_inter"></div><div class="c_pena"></div><div class="c_place"></div></div>' +
+		'</div></div>';
 
 	return el;
 }
 
 /**
- * Dessine le bandeau.
- *
- * Appelée à chaque trame <on_course>, soit ~10 fois par seconde : les cartes
- * déjà à l'écran sont mises à jour, jamais recréées, sinon leur animation
- * d'entrée repartirait à chaque trame et le bandeau clignoterait.
+ * Le dernier arrivé de l'épreuve affichée : la plus tardive des arrivées
+ * (départ + chrono), lue dans le classement.
  */
+function DernierArrive()
+{
+	const tRanking = canoe.GetTableRanking();
+	if (typeof tRanking !== 'object' || tRanking === null || wsMain.epreuve === '')
+		return null;
+
+	const cp = canoe.GetCodeCoursePhase();
+	let meilleur = null;
+	let finMax = -1;
+
+	for (let row = 0; row < tRanking.GetNbRows(); row++)
+	{
+		if (tRanking.GetCell('Code_categorie', row) != wsMain.epreuve)
+			continue;
+		if (String(tRanking.GetCell('Tps' + cp, row)) === '')
+			continue;
+
+		const fin = tRanking.GetCellInt('Heure_depart' + cp, row, 0) + Math.max(0, tRanking.GetCellInt('Tps_chrono' + cp, row, 0));
+		if (fin > finMax)
+		{
+			finMax = fin;
+			const rank = parseInt(tRanking.GetCellRank('Cltc' + cp, row, 0));
+			meilleur = {
+				bib : String(tRanking.GetCell('Dossard', row)),
+				name : tRanking.GetCell('Bateau', row),
+				time : tRanking.GetCellInt('Tps' + cp, row, adv.chrono.KO),
+				pena : GetPena(tRanking, row, cp),
+				rank : rank > 0 ? rank : 0,
+			};
+		}
+	}
+
+	// Arrivée toute récente, pas encore dans le classement : on la montre déjà.
+	const recent = wsMain.arriveRecent;
+	if (recent && (!meilleur || meilleur.bib !== recent.bib))
+	{
+		const row = canoe.GetRankingBibIndex(tRanking, parseInt(recent.bib));
+		if (row >= 0 && String(tRanking.GetCell('Tps' + cp, row)) === '')
+		{
+			return {
+				bib : recent.bib,
+				name : tRanking.GetCell('Bateau', row),
+				time : recent.time,
+				pena : GetPena(tRanking, row, cp),
+				rank : 0,
+			};
+		}
+	}
+
+	return meilleur;
+}
+
+/**
+ * Le dernier intermédiaire passé par un bateau : reçu par <bib_time>, à
+ * défaut lu dans le classement. L'écart est celui de competFFCK s'il l'envoie,
+ * sinon calculé sur le meilleur temps de l'épreuve à cet intermédiaire.
+ */
+function DernierInter(bib)
+{
+	const tRanking = canoe.GetTableRanking();
+	if (typeof tRanking !== 'object' || tRanking === null)
+		return null;
+
+	const row = canoe.GetRankingBibIndex(tRanking, parseInt(bib));
+	if (row < 0)
+		return null;
+
+	const cp = canoe.GetCodeCoursePhase();
+	const epreuve = tRanking.GetCell('Code_categorie', row);
+	const recus = wsMain.inters.get(bib) || {};
+
+	for (let k = canoe.GetNbInter(); k >= 1; k--)
+	{
+		const col = 'Tps_chrono' + cp + '_inter' + k;
+		const aCol = tRanking.GetIndexColumn(col) >= 0;
+		const time = recus[k] ? recus[k].time : (aCol ? tRanking.GetCellInt(col, row, 0) : 0);
+		if (!(time >= adv.chrono.OK))
+			continue;
+
+		let diff = recus[k] ? recus[k].diff : null;
+		if ((diff === null || isNaN(diff)) && aCol)
+		{
+			let best = 0;
+			for (let r = 0; r < tRanking.GetNbRows(); r++)
+			{
+				if (r === row || tRanking.GetCell('Code_categorie', r) != epreuve)
+					continue;
+				const t = tRanking.GetCellInt(col, r, 0);
+				if (t >= adv.chrono.OK && (best === 0 || t < best))
+					best = t;
+			}
+			diff = best > 0 ? time - best : null;
+		}
+
+		return { k : k, time : time, diff : diff };
+	}
+
+	return null;
+}
+
+/** Les prochains partants : ni résultat ni chrono, dans l'ordre des heures de départ. */
+function Prochains(nb)
+{
+	const tRanking = canoe.GetTableRanking();
+	if (nb <= 0 || typeof tRanking !== 'object' || tRanking === null)
+		return [];
+
+	const cp = canoe.GetCodeCoursePhase();
+	const surLeau = new Set(wsMain.onCourse.map(function(r) { return r.bib; }));
+	const out = [];
+
+	for (let row = 0; row < tRanking.GetNbRows(); row++)
+	{
+		if (String(tRanking.GetCell('Tps' + cp, row)) !== '')
+			continue;
+
+		const bib = String(tRanking.GetCell('Dossard', row));
+		const heure = tRanking.GetCellInt('Heure_depart' + cp, row, 0);
+		if (surLeau.has(bib) || heure <= 0)
+			continue;
+
+		// Heure passée de plus de 2 min sans départ : forfait pas encore saisi.
+		if (wsMain.clock > 0 && heure < HeureCompet() - 120000)
+			continue;
+
+		out.push({ bib : bib, heure : heure, name : tRanking.GetCell('Bateau', row),
+		           epreuve : tRanking.GetCell('Code_categorie', row) });
+	}
+
+	out.sort(function(a, b) { return a.heure - b.heure || parseInt(a.bib) - parseInt(b.bib); });
+	return out.slice(0, nb);
+}
+
+/** L'heure de competFFCK maintenant (ms depuis minuit), extrapolée depuis la dernière trame. */
+function HeureCompet()
+{
+	return wsMain.clock + (Date.now() - wsMain.clockRecu);
+}
+
+function FormatHeure(ms)
+{
+	const s = Math.floor(ms / 1000);
+	const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+	return pad(Math.floor(s / 3600) % 24) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60);
+}
+
+/**
+ * Le bandeau du bas : toujours `tuiles` emplacements de même taille.
+ *   1. le dernier arrivé de l'épreuve, avec son temps, sa place et ses
+ *      pénalités : on n'a pas à le chercher dans le classement qui défile ;
+ *   2. les bateaux sur l'eau, le premier parti d'abord, chrono qui tourne et
+ *      dernier intermédiaire ;
+ *   3. les places restantes : les prochains partants, heure et compte à rebours.
+ *
+ * Une tuile par dossard, posée à son emplacement : quand la première s'en va,
+ * elle sort par la gauche, les autres glissent d'un cran et la nouvelle entre
+ * par la droite (transition CSS sur translateX). Un bateau qui arrive garde sa
+ * tuile, qui passe d'« en course » à « arrivée » sur place ; le glissement
+ * part `delai_glisse` ms plus tard (1 s par défaut).
+ *
+ * Appelée à chaque trame <on_course>, ~10 fois par seconde : seuls le contenu
+ * et la position des tuiles changent.
+ */
+const TUILE_ECART = 16;
+
 function RenderCourse()
 {
 	const bandeau = document.getElementById('encourse');
-	const liste = wsMain.showCourse ? wsMain.onCourse.slice(0, wsMain.maxCourse) : [];
 	const fmt = GetFmt();
+	let tuiles = [];
 
-	const vus = new Set();
-
-	for (let i = 0; i < liste.length; i++)
+	if (wsMain.showCourse)
 	{
-		const r = liste[i];
-		const id = 'course_' + r.bib;
-		vus.add(id);
+		const arrive = DernierArrive();
+		const enCourse = wsMain.onCourse.slice().sort(function(a, b) { return b.time - a.time; });
 
-		let el = document.getElementById(id);
-		if (el === null)
+		if (arrive && !enCourse.some(function(r) { return r.bib === arrive.bib; }))
+			tuiles.push({ type : 'arrive', r : arrive });
+
+		enCourse.slice(0, wsMain.nbTuiles - tuiles.length).forEach(function(r) {
+			tuiles.push({ type : 'course', r : r });
+		});
+
+		Prochains(wsMain.nbTuiles - tuiles.length).forEach(function(r, k) {
+			tuiles.push({ type : 'prochain', r : r, premier : k === 0 });
+		});
+	}
+
+	/*
+	 * Juste après une arrivée, on garde l'ordre précédent une seconde : chaque
+	 * tuile reste à sa place avec son contenu à jour (l'arrivant affiche déjà
+	 * son temps), puis le glissement part d'un bloc.
+	 */
+	if (Date.now() < wsMain.gelTuiles && wsMain.dernieresTuiles.length > 0)
+	{
+		const fraiches = tuiles;
+		tuiles = wsMain.dernieresTuiles.map(function(ancienne) {
+			return fraiches.find(function(t) { return t.r.bib === ancienne.r.bib; }) || ancienne;
+		});
+	}
+	else
+	{
+		wsMain.dernieresTuiles = tuiles;
+	}
+
+	const largeur = (1728 - TUILE_ECART * (wsMain.nbTuiles - 1)) / wsMain.nbTuiles;
+	const pas = largeur + TUILE_ECART;
+	const vues = new Set();
+
+	tuiles.forEach(function(t, i) {
+		const r = t.r;
+		vues.add(r.bib);
+
+		let el = wsMain.tuiles.get(r.bib);
+		if (!el)
 		{
+			// Nouvelle tuile : elle part de la droite du bandeau et glisse en place.
 			el = CreerCarte();
-			el.id = id;
+			el.style.width = largeur + 'px';
+			el.style.transform = 'translateX(' + (wsMain.nbTuiles * pas) + 'px)';
 			bandeau.appendChild(el);
+			wsMain.tuiles.set(r.bib, el);
+			void el.offsetWidth;
 		}
 
-		el.classList.remove('sortant');
-		el.style.order = i;
+		const pos = 'translateX(' + (i * pas) + 'px)';
+		if (el.style.transform !== pos)
+			el.style.transform = pos;
 
-		const info = GetCoureur(r.bib);
-		el.querySelector('.c_bib').textContent = r.bib;
-		el.querySelector('.c_nom').textContent = info ? TronquerNom(info.name) : '';
-		el.querySelector('.c_chrono').textContent = adv.GetChrono(r.time, fmt);
+		el.className = 'coureur ' + t.type + (t.premier ? ' premier' : '');
+		SyncTuile(el, t, fmt);
+	});
 
-		const elPena = el.querySelector('.c_pena');
-		const pena = info ? info.pena : 0;
-		elPena.textContent = '+' + pena;
-		elPena.classList.toggle('vide', pena <= 0);
-	}
+	// Les tuiles qui ne sont plus à montrer sortent par la gauche.
+	wsMain.tuiles.forEach(function(el, bib) {
+		if (vues.has(bib))
+			return;
 
-	// Les bateaux qui viennent de quitter le flux : on les sort en douceur
-	// plutôt que de les faire disparaître d'un coup.
-	const cartes = bandeau.children;
-	for (let i = cartes.length - 1; i >= 0; i--)
-	{
-		const el = cartes[i];
-		if (vus.has(el.id) || el.classList.contains('sortant'))
-			continue;
+		wsMain.tuiles.delete(bib);
+		el.classList.add('sort');
+		el.style.transform = 'translateX(' + (-pas) + 'px)';
+		window.setTimeout(function() { el.remove(); }, 1200);
+	});
 
-		el.classList.add('sortant');
-		window.setTimeout(function() {
-			if (el.parentNode && el.classList.contains('sortant'))
-				el.parentNode.removeChild(el);
-		}, 350);
-	}
+	RenderAttente();
 
 	/*
 	 * L'apparition du bandeau change la hauteur utile du tableau : on le
 	 * redessine, mais uniquement sur la bascule, pas à chaque trame.
 	 */
 	const avant = document.body.classList.contains('en-course');
-	const apres = liste.length > 0;
+	const apres = tuiles.length > 0;
 	if (avant !== apres)
 	{
 		document.body.classList.toggle('en-course', apres);
 		Render(false);
 	}
+}
+
+/** Contenu d'une tuile selon son type : arrivée, en course, prochain départ. */
+function SyncTuile(el, t, fmt)
+{
+	const r = t.r;
+	const elPena = el.querySelector('.c_pena');
+	const elPlace = el.querySelector('.c_place');
+	const elInter = el.querySelector('.c_inter');
+	let etat = '';
+	let chrono = '';
+	let pena = 0;
+	let place = '';
+	let inter = null;
+
+	if (t.type === 'arrive')
+	{
+		etat = 'Arrivée';
+		chrono = adv.GetChrono(r.time, fmt);
+		pena = r.pena;
+		place = r.rank > 0 ? r.rank + (r.rank === 1 ? 'er' : 'e') : '';
+		elPlace.className = 'c_place' + (r.rank > 0 && r.rank <= 3 ? ' p' + r.rank : '');
+	}
+	else if (t.type === 'course')
+	{
+		const info = GetCoureur(r.bib);
+		etat = 'En course';
+		chrono = adv.GetChrono(r.time, fmt);
+		pena = info ? info.pena : 0;
+		r.name = info ? info.name : '';
+		inter = DernierInter(r.bib);
+		elPlace.className = 'c_place';
+	}
+	else
+	{
+		// Le prochain : « Au départ » et son compte à rebours ; les suivants :
+		// « À suivre » et leur heure de départ.
+		if (t.premier)
+		{
+			const reste = wsMain.clock > 0 ? r.heure - HeureCompet() : 0;
+			etat = 'Au départ';
+			if (reste > 0)
+			{
+				const sec = Math.ceil(reste / 1000);
+				chrono = 'dans ' + Math.floor(sec / 60) + ':' + (sec % 60 < 10 ? '0' : '') + (sec % 60);
+			}
+			else
+			{
+				chrono = FormatHeure(r.heure);
+			}
+		}
+		else
+		{
+			etat = 'À suivre';
+			chrono = FormatHeure(r.heure);
+		}
+		elPlace.className = 'c_place';
+	}
+
+	SetTexteSiChange(el.querySelector('.c_bib'), r.bib);
+	SetTexteSiChange(el.querySelector('.c_etat'), etat);
+	SetTexteSiChange(el.querySelector('.c_qui'), TronquerNom(r.name || ''));
+	SetTexteSiChange(el.querySelector('.c_chrono'), chrono);
+
+	// Dernier intermédiaire : son numéro et l'écart au meilleur de l'épreuve.
+	if (inter)
+	{
+		const ecart = inter.diff !== null && !isNaN(inter.diff) && inter.diff !== 0
+			? adv.GetChronoDiff(inter.diff, 'XSCC') : adv.GetChrono(inter.time, fmt);
+		SetTexteSiChange(elInter, 'I' + inter.k + ' ' + ecart);
+		elInter.className = 'c_inter' + (inter.diff < 0 ? ' avance' : inter.diff > 0 ? ' retard' : '');
+	}
+	else
+	{
+		SetTexteSiChange(elInter, '');
+		elInter.className = 'c_inter';
+	}
+
+	SetTexteSiChange(elPena, '+' + pena);
+	elPena.classList.toggle('vide', t.type === 'prochain' || pena <= 0);
+	elPena.classList.toggle('eliminatoire', pena >= 50);
+	SetTexteSiChange(elPlace, place);
+}
+
+function SetTexteSiChange(el, txt)
+{
+	if (el.textContent !== txt)
+		el.textContent = txt;
+}
+
+/**
+ * Écran d'accueil, tant qu'aucun classement n'est à montrer : le compte à
+ * rebours jusqu'au premier départ, avec l'épreuve, le partant et l'heure.
+ * Sans l'heure de competFFCK (aucune trame encore), l'heure du départ seule.
+ * Une fois le premier parti : « en attente de l'arrivée du premier
+ * compétiteur », sans compte à rebours pour le suivant.
+ */
+function RenderAttente()
+{
+	if (!document.body.classList.contains('vide'))
+		return;
+
+	const p = Prochains(1)[0];
+	let titre = 'En attente des premiers résultats';
+	let reste = '';
+	let info = '';
+
+	// Le premier est parti : on attend son arrivée, pas le départ du suivant.
+	if (wsMain.onCourse.length > 0)
+	{
+		titre = 'En attente de l\'arrivée du premier compétiteur';
+		const premier = wsMain.onCourse.slice().sort(function(a, b) { return b.time - a.time; })[0];
+		const c = GetCoureur(premier.bib);
+		info = c ? c.name + ' en course' : '';
+	}
+	else if (p)
+	{
+		const nomEpreuve = typeof Categorie_name === 'function' ? Categorie_name(p.epreuve) : p.epreuve;
+		info = (nomEpreuve || p.epreuve) + ' — ' + p.name + ' · départ ' + FormatHeure(p.heure);
+
+		const ms = wsMain.clock > 0 ? p.heure - HeureCompet() : null;
+		if (ms === null)
+		{
+			titre = 'Premier départ à';
+			reste = FormatHeure(p.heure);
+		}
+		else if (ms > 0)
+		{
+			const sec = Math.ceil(ms / 1000);
+			const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+			const h = Math.floor(sec / 3600);
+			titre = 'Premier départ dans';
+			reste = (h > 0 ? pad(h) + ':' : '') + pad(Math.floor(sec / 60) % 60) + ':' + pad(sec % 60);
+		}
+		else
+		{
+			titre = 'Départ imminent';
+		}
+	}
+
+	const set = function(id, txt) {
+		const el = document.getElementById(id);
+		if (el.textContent !== txt)
+			el.textContent = txt;
+	};
+	set('attente_titre', titre);
+	set('attente_reste', reste);
+	set('attente_info', info);
 }
 
 /******************** initialisation ********************/
@@ -816,18 +1319,15 @@ function Init()
 	wsMain.lang = 'fr';
 	wsMain.max = Math.max(1, num('max', 8));
 	wsMain.fixes = Math.max(0, num('fixes', 3));
-	/*
-	 * Surtout pas wsMain.delay : ws.Context s'en sert pour la diffusion
-	 * differee (adv/ws.js:24 et :314). Y ecrire la duree d'une page ferait
-	 * retarder CHAQUE trame recue d'autant.
-	 */
-	wsMain.pageDelay = num('delay', 8000);
 	wsMain.lengthIdentity = num('length_identity', 26);
 	wsMain.epreuveForcee = urlParams.has('epreuve') ? urlParams.get('epreuve') : '';
 	wsMain.epreuve = '';
 	wsMain.titre = urlParams.has('titre') ? urlParams.get('titre') : '';
 	wsMain.lieu = urlParams.has('lieu') ? urlParams.get('lieu') : '';
 	wsMain.noNation = urlParams.has('no_nation');
+	wsMain.avecNation = urlParams.has('nation');
+	if (!wsMain.avecNation)
+		document.querySelector('#entete .c_nation').textContent = 'Club';
 	wsMain.suivreEnCours = urlParams.get('encours') === '1';
 	wsMain.preferTerminee = urlParams.get('terminee') === '1';
 	wsMain.epreuveChrono = '';
@@ -836,15 +1336,26 @@ function Init()
 	wsMain.vedette = null;
 	wsMain.vedetteFin = 0;
 	wsMain.showCourse = !urlParams.has('no_course');
-	wsMain.maxCourse = Math.max(1, num('max_course', 6));
+	wsMain.nbTuiles = Math.max(1, Math.min(6, num('tuiles', num('max_course', 4))));
+	wsMain.tuiles = new Map();		// dossard -> tuile du bandeau
+	wsMain.dernieresTuiles = [];	// dernier ordre affiché, gardé pendant le gel
+	wsMain.gelTuiles = 0;
+	wsMain.delaiGlisse = num('delai_glisse', 1000);
+	wsMain.inters = new Map();		// dossard -> { n : { time, diff } }
+	wsMain.arriveRecent = null;
+	wsMain.clock = 0;
+	wsMain.clockRecu = 0;
 	wsMain.onCourse = [];
 	wsMain.fmtChrono = urlParams.has('fmt') ? urlParams.get('fmt') : '';
 
-	wsMain.page = 0;
-	wsMain.pageTimer = null;
 	wsMain.reloadTimer = null;
+	wsMain.vitesse = Math.max(5, num('vitesse', 40));		// px/s de la piste
+	wsMain.pause = num('pause', 4000);						// ms en haut et en bas
+	wsMain.defBoucle = false;
+	RemonterPiste();
 
-	if (urlParams.get('anim') === '0')
+	// Sans animation par défaut : l'écran change d'un coup. ?anim=1 les rend.
+	if (urlParams.get('anim') !== '1')
 		document.body.classList.add('no-anim');
 
 	ChoisirHabillage(urlParams);

@@ -165,10 +165,15 @@ html, body
 	   plus posee ici, le titre peut prendre toute la bande sombre. */
 	width: 900px;
 
-	font-size: 38px;
-	font-weight: bold;
-	letter-spacing: 0.05em;
+	/*
+	 * Comme sur tv_duo : le nom de la compétition est un rappel, pas une
+	 * information. Petit, maigre, en retrait, il tient en entier même aussi
+	 * long que « Championnats de France Elite Slalom & Kayak-Cross ».
+	 */
+	font-size: 24px;
+	letter-spacing: 0.10em;
 	text-transform: uppercase;
+	color: rgba(220, 232, 251, 0.80);
 	line-height: 78px;
 
 	white-space: nowrap;
@@ -192,6 +197,7 @@ html, body
 #lieu
 {
 	font-size: 25px;
+	font-weight: bold;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
 	color: var(--ffck-sky);
@@ -273,7 +279,7 @@ body.provisoire #provisoire
 .ligne
 {
 	display: grid;
-	grid-template-columns: 104px 118px 1fr 180px 120px 230px 190px;
+	grid-template-columns: 104px 118px 1fr 380px 120px 230px 190px;
 	align-items: center;
 
 	height: var(--res-ligne-h);
@@ -391,10 +397,47 @@ body.provisoire #provisoire
 	font-variant-numeric: tabular-nums;
 }
 
-/* Une pénalité non nulle doit sauter aux yeux : c'est ce qui explique un
-   classement qui ne suit pas l'ordre des chronos. */
-.ligne.res .c_pena.chargee { color: #ff6b6b; }
-.ligne.res .c_pena.eliminatoire { color: #ff3131; }
+/*
+ * Une pénalité non nulle doit sauter aux yeux : c'est ce qui explique un
+ * classement qui ne suit pas l'ordre des chronos. Pastille aux couleurs des
+ * portes de tv_duo : jaune pour des touches (+2, +4…), rouge dès qu'une porte
+ * est manquée (+50). Sans pénalité : un 0 discret.
+ */
+/* La cellule laisse toute sa largeur à la pastille : sans cela le navigateur
+   la coupe et ajoute des points de suspension. */
+.ligne.res .c_pena
+{
+	padding: 0;
+	overflow: visible;
+	text-overflow: clip;
+}
+
+.ligne.res .c_pena .pastille
+{
+	display: inline-block;
+	min-width: 2.2em;
+	padding: 2px 10px 0;
+	color: #8fa6cc;
+	font-size: calc(var(--res-ligne-h) * 0.50);
+}
+
+.ligne.res .c_pena.chargee .pastille      { background: #FFD21F; color: #2a2300; }
+.ligne.res .c_pena.eliminatoire .pastille { background: #E8202A; color: white; }
+
+/* Le club, à la place de la nation : comme sur tv_duo et tv_departs. */
+.ligne.res .c_nation
+{
+	min-width: 0;
+}
+
+.ligne.res .c_nation .club
+{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
 
 .ligne.res .c_temps
 {
@@ -448,6 +491,37 @@ body.provisoire #provisoire
 	background: linear-gradient(180deg,
 		rgba(54, 128, 255, 0.16) 0%,
 		rgba(9, 122, 255, 0.10) 100%);
+}
+
+/******************** défilement de la suite ********************/
+
+/*
+ * Sous les premiers, figés, la suite du classement est une piste qui défile
+ * dans une fenêtre de hauteur fixe (posée par le JS). Le filet sépare les
+ * deux blocs : sans lui, on lirait un classement continu.
+ */
+#filet
+{
+	height: 2px;
+	margin: 6px 0 8px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, rgba(9, 122, 255, 0) 100%);
+}
+
+#defile
+{
+	overflow: hidden;
+}
+
+#piste
+{
+	will-change: transform;
+	transition: opacity 0.3s ease;
+}
+
+/* Arrivée en bas : fondu, la piste remonte invisible, puis réapparaît. */
+#piste.efface
+{
+	opacity: 0;
 }
 
 /******************** pied ********************/
@@ -532,11 +606,41 @@ body.pagine #pagination
 
 #attente_titre
 {
-	font-size: 46px;
+	font-size: 40px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #c9dbf7;
+}
+
+/* Le compte à rebours jusqu'au premier départ. */
+#attente_reste
+{
+	margin: 10px 0 24px;
+	font-size: 220px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	color: white;
+}
+
+#attente_reste:empty
+{
+	display: none;
+}
+
+/* Sans compte à rebours (premier parti), la ligne d'info ne colle pas au titre. */
+#attente_reste:empty + #attente_info
+{
+	margin-top: 28px;
+}
+
+#attente_info
+{
+	font-size: 36px;
 	font-weight: bold;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: white;
+	color: var(--ffck-sky);
 }
 
 /* --- le dessin --- */
@@ -1027,7 +1131,8 @@ body.no-anim #attente_dessin *
 
 body.vide #attente  { display: block; }
 body.vide #tableau  { display: none; }
-body.vide #epreuve  { display: none; }
+/* L'épreuve reste en haut sur l'écran d'attente : on sait ce qu'on attend. */
+body.vide #epreuve_nom:empty { display: none; }
 
 /******************** animations ********************/
 
@@ -1082,10 +1187,9 @@ body.sans-nation .ligne .c_nation
 /******************** bandeau des bateaux en course ********************/
 
 /*
- * Apparaît en bas dès qu'un bateau est sur l'eau, disparaît quand il n'y en a
- * plus. Le tableau au-dessus rétrécit d'autant : sa hauteur de ligne est
- * calculée en JavaScript, qui tient compte de la présence du bandeau — rien ne
- * se chevauche jamais, quel que soit le nombre de lignes affichées.
+ * Quatre tuiles de même taille (?tuiles=) : le dernier arrivé, les bateaux sur
+ * l'eau, puis les prochains partants. La hauteur de ligne du tableau tient
+ * compte du bandeau — rien ne se chevauche jamais.
  */
 #encourse
 {
@@ -1096,33 +1200,61 @@ body.sans-nation .ligne .c_nation
 	height: 130px;
 
 	display: none;
-	gap: 16px;
 }
 
 body.en-course #encourse
 {
-	display: flex;
+	display: block;
 }
 
-/* Le biseau de la charte, avec le contenu redressé à l'intérieur. */
+/*
+ * Le biseau de la charte, avec le contenu redressé à l'intérieur. Chaque
+ * tuile est posée à son emplacement par le JS (`left`) : quand la première
+ * s'en va, elle sort par la gauche et les autres glissent d'un cran.
+ */
 .coureur
 {
-	flex: 1 1 0;
-	min-width: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+
+	/* Posée par le JS en translateX : un glissement fluide, calculé par la
+	   carte graphique, sans recalculer la mise en page à chaque image. */
+	transition: transform 1.1s cubic-bezier(0.45, 0, 0.2, 1), opacity 0.8s ease;
+	will-change: transform;
+}
+
+/* Le fond biseauté, à l'intérieur : la tuile elle-même ne fait que glisser. */
+.coureur .c_tuile
+{
+	height: 100%;
 	overflow: hidden;
 
 	transform: skewX(var(--biseau));
 	background: linear-gradient(160deg, #18216F 0%, #0B1050 100%);
 	border-bottom: 5px solid var(--ffck-blue);
 	box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
-
-	animation: coureur-entre 0.45s ease-out both;
 }
 
-.coureur.sortant
+.coureur.sort
 {
-	animation: coureur-sort 0.35s ease-in both;
+	opacity: 0;
 }
+
+/* Dernier intermédiaire : numéro et écart au meilleur de l'épreuve. */
+.coureur .c_inter
+{
+	padding: 4px 8px 2px;
+	background: rgba(255, 255, 255, 0.14);
+	font-size: 20px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+.coureur .c_inter:empty   { display: none; }
+.coureur .c_inter.avance  { background: #1f9d4a; }
+.coureur .c_inter.retard  { background: #c62b2b; }
 
 .coureur .c_corps
 {
@@ -1134,10 +1266,133 @@ body.en-course #encourse
 	grid-template-rows: 1fr 1fr;
 	grid-template-areas:
 		"bib nom    nom"
-		"bib chrono pena";
+		"bib chrono droite";
 	align-items: center;
 
 	padding-right: 26px;
+}
+
+/* Emplacement libre : il garde sa place, les tuiles ne changent pas de taille. */
+.coureur.libre
+{
+	visibility: hidden;
+}
+
+/* « Arrivée », « En course », « Départ 10:05:00 » au-dessus du nom. */
+.coureur .c_etat
+{
+	display: block;
+	font-size: 15px;
+	font-weight: normal;
+	letter-spacing: 0.16em;
+	color: #c9dbf7;
+}
+
+.coureur .c_qui
+{
+	display: block;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+
+	/* Le nom, mis en valeur : blanc et plus grand que l'état au-dessus. */
+	font-size: 27px;
+	color: white;
+}
+
+.coureur .c_droite
+{
+	grid-area: droite;
+	align-self: start;
+	justify-self: end;
+
+	/* Intermédiaire, pénalités et place sur une seule ligne, quoi qu'il arrive. */
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 6px;
+	white-space: nowrap;
+}
+
+/* Place du dernier arrivé, aux couleurs du podium. */
+.coureur .c_place
+{
+	padding: 4px 10px 2px;
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+	font-size: 22px;
+	font-weight: bold;
+}
+
+.coureur .c_place:empty { display: none; }
+.coureur .c_place.p1 { background: linear-gradient(180deg, #f7dc63 0%, var(--or) 100%); color: #3a2c00; }
+.coureur .c_place.p2 { background: linear-gradient(180deg, #e6ecf2 0%, var(--argent) 100%); color: #26303a; }
+.coureur .c_place.p3 { background: linear-gradient(180deg, #e0a860 0%, var(--bronze) 100%); color: #33200a; }
+
+/* Le dernier arrivé : dossard en or, temps figé en jaune. */
+.coureur.arrive .c_tuile
+{
+	border-bottom-color: #ffd24a;
+}
+
+.coureur.arrive .c_bib
+{
+	background: linear-gradient(180deg, #f7dc63 0%, var(--or) 100%);
+	color: #3a2c00;
+}
+
+.coureur.arrive .c_chrono
+{
+	color: #ffe58a;
+}
+
+/*
+ * Trois familles de tuiles, lisibles d'un coup d'œil sans quitter la charte :
+ *   - en course : bleu vif plein, c'est ce qui se passe maintenant ;
+ *   - arrivé : le même bleu, liseré et dossard or ;
+ *   - au départ / à suivre : verre sombre translucide, contour fin bleu ciel,
+ *     dossard en creux. Ils ne courent pas encore : la tuile s'efface.
+ */
+.coureur.course .c_tuile
+{
+	background: linear-gradient(160deg, #2a5fe8 0%, #1a2fa8 55%, #141f80 100%);
+	border-bottom-color: var(--ffck-blue-light);
+}
+
+.coureur.prochain .c_tuile
+{
+	background: rgba(6, 10, 40, 0.55);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	border: 2px solid rgba(98, 155, 241, 0.35);
+	box-shadow: none;
+}
+
+/* Le prochain à partir : le contour s'affirme, il est le suivant à l'image. */
+.coureur.prochain.premier .c_tuile
+{
+	border-color: rgba(98, 155, 241, 0.85);
+}
+
+.coureur.prochain .c_bib
+{
+	background: transparent;
+	border-right: 2px solid rgba(98, 155, 241, 0.35);
+	color: var(--ffck-sky);
+}
+
+.coureur.prochain .c_etat
+{
+	color: var(--ffck-sky);
+}
+
+.coureur.prochain .c_qui
+{
+	color: #dce8fb;
+}
+
+.coureur.prochain .c_chrono
+{
+	font-size: 24px;
+	color: var(--ffck-sky);
 }
 
 .coureur .c_bib
@@ -1161,6 +1416,7 @@ body.en-course #encourse
 {
 	grid-area: nom;
 	align-self: end;
+	min-width: 0;
 
 	font-size: 23px;
 	font-weight: bold;
@@ -1178,8 +1434,9 @@ body.en-course #encourse
 {
 	grid-area: chrono;
 	align-self: start;
+	white-space: nowrap;
 
-	font-size: 44px;
+	font-size: 40px;
 	font-weight: bold;
 	font-variant-numeric: tabular-nums;
 	line-height: 1;
@@ -1191,16 +1448,20 @@ body.en-course #encourse
  */
 .coureur .c_pena
 {
-	grid-area: pena;
-	align-self: start;
-	justify-self: end;
+	padding: 4px 10px 2px;
+	/* Jaune pour des touches, rouge dès qu'une porte est manquée (tv_duo). */
+	background: #FFD21F;
+	color: #2a2300;
 
-	padding: 3px 16px;
-	background: linear-gradient(180deg, #c20201 0%, #770101 100%);
-
-	font-size: 26px;
+	font-size: 22px;
 	font-weight: bold;
 	font-variant-numeric: tabular-nums;
+}
+
+.coureur .c_pena.eliminatoire
+{
+	background: #E8202A;
+	color: white;
 }
 
 .coureur .c_pena.vide
@@ -1525,7 +1786,7 @@ body.theme-photo .ligne.res.vedette
 }
 
 /* Bandeau des bateaux en course : même verre que le tableau. */
-body.theme-photo .coureur
+body.theme-photo .coureur.arrive .c_tuile
 {
 	background: linear-gradient(160deg, rgba(24, 33, 111, 0.82) 0%, rgba(11, 16, 80, 0.72) 100%);
 	-webkit-backdrop-filter: blur(14px) saturate(1.3);

@@ -305,11 +305,10 @@ body.ancre-bas #leaders
 {
 	flex: 0 0 auto;
 
-	background: linear-gradient(180deg,
-		var(--leaders-pena-top) 0%,
-		var(--leaders-pena-mid) 50%,
-		var(--leaders-pena-bot) 100%);
-	color: white;
+	/* Couleurs des portes de tv_duo : jaune pour des touches (+2, +4…),
+	   rouge dès qu'une porte est manquée (+50). */
+	background: #FFD21F;
+	color: #2a2300;
 
 	padding-left: 10px;
 	padding-right: 10px;
@@ -317,6 +316,12 @@ body.ancre-bas #leaders
 	font-variant-numeric: tabular-nums;
 	text-align: center;
 	min-width: 2.6em;
+}
+
+.leader .pena.eliminatoire
+{
+	background: #E8202A;
+	color: white;
 }
 
 .leader .time

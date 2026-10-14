@@ -1,5 +1,153 @@
 # canoe-wslive
 
+## Jour J — régie TV en local, serveur WebSocket distant
+
+Les pages tournent sur ce Mac (`npm run serve`), les données viennent du
+competFFCK du serveur de course. **Pas `npm start`** : il lance aussi un faux
+serveur avec une course simulée.
+
+### 1. Préparer (une fois)
+
+```bash
+cd ~/Documents/Dev/canoe-wslive
+git pull && npm install
+
+# le générique est hors dépôt : le copier à côté des pages
+cp france-elite/planning/Generique_CdF_Elite_2026_TV.mp4 ws_live/canoe/video/generique.mp4
+
+# l'adresse du serveur de course (à adapter sur place)
+export SERVEUR=192.168.1.52
+
+# competFFCK répond-il ?
+nc -vz $SERVEUR 8080
+```
+
+### 2. Lancer le serveur local (à laisser tourner)
+
+```bash
+npm run serve        # http://localhost:3000, sans bouchon
+```
+
+Le port 3000 doit être libre : arrêter le bouchon (`npm start`, `node mock/server.js…`)
+s'il tourne. `npm run serve -- --port 3100` sinon, et adapter les adresses.
+
+### 3. La régie de la demi-journée
+
+Une source navigateur OBS **1920 × 1080**, « Contrôler l'audio via OBS »
+coché (son du générique), avec l'adresse de la demi-journée. Pour la voir dans
+le navigateur avant : `open "<adresse>"`.
+
+| demi-journée | horaires | adresse de la source OBS |
+|---|---|---|
+| vendredi 16 matin — qualifs manche 1 | 9h00 → 12h18 | `http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-matin&ws=SERVEUR:8080` |
+| vendredi 16 après-midi — qualifs manche 2 | 14h00 → 15h20 | `http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-apres-midi&ws=SERVEUR:8080` |
+| samedi 17 matin — kayak-cross contre-la-montre | 10h15 → 11h38 | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-matin&ws=SERVEUR:8080` |
+| samedi 17 après-midi — kayak-cross séries | 14h00 → 17h00 *(à confirmer)* | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=SERVEUR:8080&kx=http://SERVEUR_KX/gestion_kcross_series&kx_competition=CODE` |
+| dimanche 18 matin — demi-finales | 9h00 → 13h03 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=SERVEUR:8080` |
+| dimanche 18 après-midi — finales | 14h00 → 15h46 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=SERVEUR:8080` |
+
+Remplacer `SERVEUR` par l'adresse du serveur de course (ex. `192.168.1.52`).
+Samedi après-midi : `SERVEUR_KX` = la machine qui sert competCrossFFCK
+(`gestion_kcross_series`), `CODE` = son code de compétition ; ne pas ouvrir
+`video_control.html` en même temps, la régie pilote l'incrustation.
+
+Depuis le terminal, les mêmes adresses avec la variable :
+
+```bash
+open "http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-matin&ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-apres-midi&ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_regie.html?scenario=samedi-matin&ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=$SERVEUR:8080&kx=http://$SERVEUR_KX/gestion_kcross_series&kx_competition=$CODE_KX"
+open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=$SERVEUR:8080"
+```
+
+### 4. Vérifier au lancement
+
+- **quelques secondes de rose** : à l'antenne, les caméras seules, l'incrustation
+  chroma (`#CC00CC`) marche ;
+- **pastille en haut à droite** : verte 5 s = connecté au serveur ; rouge qui
+  pulse = pas de liaison (vérifier `SERVEUR`, le câble, `nc -vz $SERVEUR 8080`) ;
+- avant l'heure : le compte à rebours ; à H − 5 min : le générique.
+
+Ensuite, ne plus y toucher : la régie suit l'horloge et la course seule, et un
+rechargement la remet au bon endroit.
+
+### En cas de souci
+
+| symptôme | quoi faire |
+|---|---|
+| page vide, pastille rouge | mauvaise adresse : rouvrir **une fois** avec le bon `&ws=SERVEUR:8080` (il est mémorisé par le navigateur) |
+| rien ne passe sur le câble alors que le Wi-Fi est actif | voir [docs/SERVEUR_DISTANT.md](docs/SERVEUR_DISTANT.md) : `npm run relay`, puis `&ws=localhost:8081` |
+| pas de générique | `ws_live/canoe/video/generique.mp4` manque (le serveur local le signale au démarrage) |
+| générique muet | « Contrôler l'audio via OBS » sur la source ; `&son=0` le coupe volontairement |
+| vérifier ce que calcule la régie | ajouter `&debug=1` **hors antenne** : heure, scène, bateaux sur l'eau |
+| répéter la veille | `node mock/server.js --scenario vendredi-matin --speed 4`, puis `&repetition=1&ws=localhost:8080` (voir « Régie automatique » plus bas) |
+
+
+## Jour J — écrans TV fixes, sur place (sans régie)
+
+Des pages plein écran qui suivent la course seules, pour les écrans du public,
+du jury ou du speaker. Aucune n'a besoin d'être touchée ; un rechargement les
+remet à jour. Mêmes variables que plus haut.
+
+### Slalom et contre-la-montre kayak-cross (competFFCK)
+
+Servies par ce Mac (`npm run serve`), ou directement par le serveur de course
+s'il héberge `ws_live` : remplacer `http://localhost:3000` par
+`http://SERVEUR/ws_live` et retirer `&ws=…`.
+
+| écran | adresse |
+|---|---|
+| classement plein écran de la dernière épreuve courue (3 premiers figés, la suite défile) | `http://localhost:3000/canoe/tv_results.html?ws=SERVEUR:8080` |
+| classement de l'épreuve en cours de chronométrage | `http://localhost:3000/canoe/tv_results.html?encours=1&ws=SERVEUR:8080` |
+| classement d'une épreuve précise | `http://localhost:3000/canoe/tv_results.html?epreuve=K1H&ws=SERVEUR:8080` |
+| liste de départ de l'épreuve en cours ou à venir | `http://localhost:3000/canoe/tv_departs.html?ws=SERVEUR:8080` |
+| liste de départ d'une épreuve précise | `http://localhost:3000/canoe/tv_departs.html?epreuve=K1D&ws=SERVEUR:8080` |
+| live complet (toutes épreuves, chronos, pénalités) | `http://localhost:3000/canoe/live.html?ws=SERVEUR:8080` |
+
+Codes d'épreuve : `INV`, `K1H`, `K1D`, `C1H`, `C1D` en slalom ; `XK1INV`,
+`XK1H`, `XK1D` au contre-la-montre de kayak-cross.
+
+```bash
+open "http://localhost:3000/canoe/tv_results.html?ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_results.html?encours=1&ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/tv_departs.html?ws=$SERVEUR:8080"
+open "http://localhost:3000/canoe/live.html?ws=$SERVEUR:8080"
+```
+
+### Kayak-cross, les séries (competCrossFFCK)
+
+Servies par la machine de competCrossFFCK (`SERVEUR_KX`), avec son code de
+compétition (`CODE`).
+
+| écran | adresse |
+|---|---|
+| **écran TV du site** : progression de la journée, branche du tableau, série en cours et suivante | `http://SERVEUR_KX/gestion_kcross_series/video/ecran_tv.html?competition=CODE` |
+| tableau des phases finales complet | `http://SERVEUR_KX/gestion_kcross_series/video/video_tableau.html?competition=CODE&force=1&vue=complet` |
+| live des séries | `http://SERVEUR_KX/gestion_kcross_series/live.html?competition=CODE` |
+| écran du speaker | `http://SERVEUR_KX/gestion_kcross_series/speaker.html?competition=CODE` |
+| classement du contre-la-montre | `http://SERVEUR_KX/gestion_kcross_series/classement-time-trial.html?competition=CODE` |
+
+`ecran_tv.html` garde une série validée à l'écran 20 s avec son tableau
+(`&maintien=30` pour changer). `video_tableau.html` a un fond transparent :
+c'est une page d'incrustation, à poser sur un fond dans OBS si besoin.
+
+```bash
+export SERVEUR_KX=192.168.1.52     # la machine de competCrossFFCK
+export CODE_KX=1234                # son code de compétition
+open "http://$SERVEUR_KX/gestion_kcross_series/video/ecran_tv.html?competition=$CODE_KX"
+open "http://$SERVEUR_KX/gestion_kcross_series/video/video_tableau.html?competition=$CODE_KX&force=1&vue=complet"
+open "http://$SERVEUR_KX/gestion_kcross_series/live.html?competition=$CODE_KX"
+open "http://$SERVEUR_KX/gestion_kcross_series/speaker.html?competition=$CODE_KX"
+open "http://$SERVEUR_KX/gestion_kcross_series/classement-time-trial.html?competition=$CODE_KX"
+```
+
+En répétition avec le bouchon kayak-cross (`npm run kcross`) : `SERVEUR_KX=localhost:3001`,
+sans `/gestion_kcross_series`, `CODE_KX=900`.
+---
+
+
 Front live **competFFCK** (`ws_live`) avec un **bouchon de serveur** qui permet
 de développer et de tester sans competFFCK.exe, sans Laragon et sans base MySQL
 contenant une compétition lancée.
@@ -549,7 +697,8 @@ competFFCK (`france-elite/planning/`, hors dépôt).
 |---|---|
 | `vendredi-matin` | qualifications manche 1 : INV, K1H, K1D, C1H, C1D (9h00 → 12h18) |
 | `vendredi-apres-midi` | qualifications manche 2 : K1H, K1D, C1H, C1D (14h00 → 15h20) |
-| `samedi-matin` | kayak-cross : XK1INV, XK1H, XK1D (10h15 → 11h38) |
+| `samedi-matin` | kayak-cross, contre-la-montre : XK1INV, XK1H, XK1D (10h15 → 11h38) |
+| `samedi-apres-midi` | kayak-cross, séries (competCrossFFCK) : horaires estimés 14h00 → 17h00, à confirmer |
 | `dimanche-matin` | demi-finales : INV, K1H, K1D, C1H, C1D (9h00 → 13h03) |
 | `dimanche-apres-midi` | finales : K1H, K1D, C1H, C1D (14h00 → 15h46) |
 | `test` | petite répétition (3 catégories courtes, 08h50 → 09h22) : `npm run regie` |
@@ -617,6 +766,41 @@ passe muet plutôt que pas du tout.
 | `repetition=1` | — | le jour du scénario devient aujourd'hui : la régie suit l'horloge du bouchon |
 | `bg=0` | couleur de clé | fond transparent |
 | `debug=1` | — | heure, scène et bateaux sur l'eau en bas à gauche (jamais à l'antenne) |
+
+### Kayak-cross : les séries
+
+Les séries ne passent pas par competFFCK mais par competCrossFFCK
+(`gestion_kcross_series`, API PHP). Une catégorie `vue: 'kcross'` change trois
+choses :
+
+- l'écran de course est l'incrustation de l'application,
+  `video/video_incrustation.html`, sur les caméras ;
+- elle est pilotée sans opérateur par **`video/video_pilote.html`**, nouvelle
+  page de `gestion_kcross_series` que la régie charge masquée : série sur
+  l'eau → live, série validée → ses résultats 20 s, puis le tableau des phases
+  finales 12 s (si le format en a un) et la rampe de la série suivante. Même
+  charge utile que `video_control.html` ; ne pas ouvrir celle-ci en même temps,
+  ou couper le pilote (`kx_pilote=0`) pour piloter à la main ;
+- la régie suit les séries sur `api_get_next_heats.php` (sur l'eau, commencé,
+  fini) et l'heure du serveur competCrossFFCK.
+- entre deux blocs de séries (1/8 Dames → 1/8 Hommes → 1/4 Dames…) : les
+  résultats de la dernière série dans l'incrustation (`kx_maintien`, 20 s),
+  puis le titre du bloc suivant en plein écran (« Kayak Homme — Huitièmes de
+  finale — 8 séries », 10 s), puis le tableau des phases finales et la rampe.
+  Le pilote décale son tableau de la durée du titre (`?titre=`, passé par la
+  régie). Comptés en heure du serveur depuis la validation de la série ; une
+  série qui part plus tôt coupe l'enchaînement. Le titre d'ouverture annonce
+  aussi le premier bloc.
+
+| paramètre | défaut | rôle |
+|---|---|---|
+| `kx=http://hote/chemin` | `http://<cet hôte>:3001` (le bouchon) | le serveur competCrossFFCK, dossier `gestion_kcross_series` |
+| `kx_competition=…` | celui du scénario, sinon `900` | le code de compétition |
+| `kx_pilote=0` | pilote actif | laisse l'incrustation à `video_control.html` |
+
+Répétition : `npm run kcross` (bouchon kayak-cross, port 3001), couper sa
+régie automatique dans son panneau (le pilote de la régie prend la main), puis
+`tv_regie.html?scenario=samedi-apres-midi&maintenant=2026-10-17T14:05:00`.
 
 ### Répéter une demi-journée avec le bouchon
 
