@@ -1,0 +1,243 @@
+/*
+ * Dalles LED du kayak cross (dalle.html), 4 dalles de 128 px de large pour 1
+ * de haut : 512 x 128. Même parti que ws_live/canoe/tv_dalle : fond noir (LED
+ * éteinte), aplats francs, gros caractères gras, aucun dégradé.
+ *
+ * Au pixel près : toutes les tailles sont des --uN, N centièmes de la hauteur
+ * de la dalle arrondis au pixel entier par le JS (--u25 vaut 32px sur 128).
+ */
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../fonts/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--dames: #E8467C;
+	--hommes: #2F8CFF;
+	--flt: #FFD21F;
+	--ral: #FF1E1E;
+	--qualif: #19C34A;
+	--or: #FFC400;
+	--argent: #C8D2DC;
+	--bronze: #D08A40;
+	--nuit: #07103A;
+	--bande: #15308F;
+	--bande-qualif: #08582A;
+	--bande-elimine: #0B1747;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: #000;
+	color: #fff;
+	font-family: Calibri, 'Carlito', 'Arial Narrow', Arial, sans-serif;
+	font-weight: bold;
+}
+
+.dalle
+{
+	position: absolute;
+	overflow: hidden;
+	/* Fond bleu nuit, bandes bleu roi par couloir : plus gai que le noir, et
+	   le blanc, le jaune et les couleurs des couloirs y restent francs. */
+	background: var(--nuit);
+	display: grid;
+	grid-template-columns: var(--u56) minmax(0, 1fr);
+	column-gap: var(--u2);
+}
+
+.dalle.vide > *
+{
+	visibility: hidden;
+}
+
+/*
+ * La tête, sur toute la hauteur à gauche : le tour, Dames / Hommes, la série,
+ * dans la couleur de la catégorie.
+ */
+.kx-tete
+{
+	display: grid;
+	grid-template-rows: var(--u38) var(--u22) minmax(0, 1fr);
+	align-items: center;
+	justify-items: center;
+	padding: 0 var(--u2);
+	background: #444;
+	line-height: 1;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.dalle.dames  .kx-tete { background: var(--dames); }
+.dalle.hommes .kx-tete { background: var(--hommes); }
+
+.kx-tour  { font-size: var(--u34); }
+.kx-genre { font-size: var(--u18); }
+.kx-serie { font-size: var(--u30); }
+
+/* Finale : pas de série, le mot seul au milieu de la tête. */
+.kx-serie:empty { display: none; }
+
+/* Toute la largeur de la tête, texte centré ; « Finale » rétrécit pour y tenir. */
+.kx-tete > span
+{
+	justify-self: stretch;
+	min-width: 0;
+	text-align: center;
+	overflow: hidden;
+}
+
+/*
+ * Les 4 couloirs, un quart de la hauteur chacun : une bande de couleur, et
+ * 1 pixel de fond dessous pour les séparer.
+ *   couleur du couloir | nom | zones du parcours | place
+ */
+.kx-lignes
+{
+	min-width: 0;
+	display: grid;
+	grid-template-rows: repeat(4, var(--u25));
+}
+
+.kx-ligne
+{
+	display: grid;
+	/* Colonnes fixes : les noms partent tous du même pixel, les zones et les
+	   places s'empilent exactement les unes sous les autres. */
+	grid-template-columns: var(--u22) minmax(0, 1fr) auto var(--u25);
+	align-items: stretch;
+	min-height: 0;
+	padding-bottom: 1px;
+	background: var(--bande);
+	background-clip: content-box;
+}
+
+/* Chacun dans sa colonne, même quand une case est vide. */
+.kx-lane  { grid-column: 1; }
+.kx-nom   { grid-column: 2; }
+.kx-pena  { grid-column: 3; }
+.kx-place { grid-column: 4; }
+
+.kx-ligne.absente
+{
+	background: none;
+}
+
+.kx-ligne.absente > *
+{
+	visibility: hidden;
+}
+
+/* La couleur du couloir (celle du casque et du dossard), et sa lettre. */
+.kx-lane
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: var(--u21);
+	line-height: 1;
+}
+
+.kx-lane.lane-R { background: #FF2D2D; }
+.kx-lane.lane-V { background: #22C44F; }
+.kx-lane.lane-B { background: #3D8BFF; }
+.kx-lane.lane-J { background: #FFD400; color: #000; }
+
+.kx-ligne.vide .kx-lane { opacity: 0.45; }
+
+.kx-nom
+{
+	min-width: 0;
+	align-self: center;
+	padding: 0 var(--u4);
+	font-size: var(--u21);
+	line-height: 1;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+/*
+ * Les zones du parcours, une case chacune : sombre tant qu'elle n'est pas
+ * jugée, verte sans pénalité, jaune FLT, rouge RAL avec la zone écrite dedans
+ * (S départ, numéro de porte, R esquimautage).
+ */
+.kx-pena
+{
+	display: flex;
+	gap: 1px;
+	padding: var(--u2) var(--u3) var(--u2) 0;
+}
+
+.kx-pena > span
+{
+	width: var(--u14);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.14);
+	font-size: var(--u18);
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.kx-pena > .ok  { background: var(--qualif); }
+.kx-pena > .flt { background: var(--flt); color: #000; }
+.kx-pena > .ral { background: var(--ral); color: #fff; }
+
+.kx-pena > .kx-statut
+{
+	width: auto;
+	padding: 0 var(--u4);
+	background: #fff;
+	color: #000;
+}
+
+/* L'ordre d'arrivée, puis la place : un carré tout à droite. */
+.kx-place
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: var(--u22);
+	line-height: 1;
+}
+
+.kx-place:empty
+{
+	visibility: hidden;
+}
+
+.kx-ligne.arrive .kx-place { background: #fff; color: #000; }
+
+/*
+ * Résultats.
+ *   Qualifiés : bande verte, place en pastille vert vif.
+ *   Éliminés  : bande à peine plus claire que le fond, texte bleu gris, zones
+ *               éteintes ; la place reste lisible sans pastille.
+ *   Finale    : bande teintée or, argent, bronze, place à la couleur de la médaille.
+ */
+.kx-ligne.qualifie                { background: var(--bande-qualif); }
+.kx-ligne.qualifie .kx-place      { background: #2BE06A; color: #000; }
+
+.kx-ligne.elimine                 { background: var(--bande-elimine); }
+.kx-ligne.elimine .kx-nom,
+.kx-ligne.elimine .kx-place       { color: #8C9AD0; }
+.kx-ligne.elimine .kx-pena > span { opacity: 0.5; }
+.kx-ligne.elimine .kx-lane        { opacity: 0.5; }
+
+.kx-ligne.p1 { background: #7A5C00; }
+.kx-ligne.p2 { background: #4E5A6B; }
+.kx-ligne.p3 { background: #6B3F14; }
+.kx-ligne.p1 .kx-place { background: var(--or); color: #000; }
+.kx-ligne.p2 .kx-place { background: var(--argent); color: #000; }
+.kx-ligne.p3 .kx-place { background: var(--bronze); color: #000; }

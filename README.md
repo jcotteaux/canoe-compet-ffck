@@ -148,6 +148,7 @@ compétition (`CODE`).
 | écran | adresse |
 |---|---|
 | **écran TV du site** : progression de la journée, branche du tableau, série en cours et suivante | `http://SERVEUR_KX/gestion_kcross_series/video/ecran_tv.html?competition=CODE` |
+| **dalles LED extérieures** (4 de large × 1 de haut) : la série en cours, couloirs, pénalités, puis le classement | `http://SERVEUR_KX/gestion_kcross_series/video/dalle.html?competition=CODE` |
 | tableau des phases finales complet | `http://SERVEUR_KX/gestion_kcross_series/video/video_tableau.html?competition=CODE&force=1&vue=complet` |
 | live des séries | `http://SERVEUR_KX/gestion_kcross_series/live.html?competition=CODE` |
 | écran du speaker | `http://SERVEUR_KX/gestion_kcross_series/speaker.html?competition=CODE` |
@@ -157,10 +158,19 @@ compétition (`CODE`).
 (`&maintien=30` pour changer). `video_tableau.html` a un fond transparent :
 c'est une page d'incrustation, à poser sur un fond dans OBS si besoin.
 
+`dalle.html` est l'équivalent kayak-cross de `tv_dalle.html`, pour les mêmes
+dalles (zone `512x128+0+0`, la copie dessous ; `&zone=`, `&copies=` comme
+pour `tv_dalle`). À gauche le tour, Dames / Hommes et la série ; une ligne
+par couloir : couleur et dossard, nom, pénalités (« FLT P2 » en jaune, « RAL
+S » en rouge, DNS / DNF / DSQ en blanc), ordre d'arrivée. Une fois la série
+validée, le classement reste 20 s (`&maintien=`) : qualifiés en vert, éliminés
+grisés, podium en finale.
+
 ```bash
 export SERVEUR_KX=192.168.1.52     # la machine de competCrossFFCK
 export CODE_KX=1234                # son code de compétition
 open "http://$SERVEUR_KX/gestion_kcross_series/video/ecran_tv.html?competition=$CODE_KX"
+open "http://$SERVEUR_KX/gestion_kcross_series/video/dalle.html?competition=$CODE_KX"
 open "http://$SERVEUR_KX/gestion_kcross_series/video/video_tableau.html?competition=$CODE_KX&force=1&vue=complet"
 open "http://$SERVEUR_KX/gestion_kcross_series/live.html?competition=$CODE_KX"
 open "http://$SERVEUR_KX/gestion_kcross_series/speaker.html?competition=$CODE_KX"
