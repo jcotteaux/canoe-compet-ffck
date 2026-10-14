@@ -53,6 +53,8 @@ distribution officielle par zips datés.
 npm start                  # slalom 18 portes, 2 inters (par défaut)
 npm run descente           # descente sprint
 npm run international      # niveau INT : affichage nations + drapeaux
+npm run elite              # slalom élite à 24 portes (Championnats de France, Cesson-Sévigné)
+npm run regie              # répétition de tv_regie.html?scenario=test (3 catégories, 08h50 → 09h22)
 
 node mock/server.js --fixture descente-sprint --speed 10
 node mock/server.js --record captures/ma-session.jsonl
@@ -74,7 +76,7 @@ de rupture.
 
 `live.html`, `monitor_race.html`, `tv_inrace.html`, `tv_oncourse.html`,
 `tv_leaders.html`, `tv_podium.html`, `tv_startlist.html`, `tv_ranking.html`,
-`jugement.html`, `inrace.php`.
+`tv_duo.html`, `jugement.html`, `inrace.php`.
 
 macOS ne fournit plus PHP : `mock/php-lite.js` évalue le petit sous-ensemble
 utilisé par les gabarits (`define`, `echo`, `$_GET`, un `if`). Cela couvre
@@ -465,6 +467,179 @@ toutes les trames** (`ws.js`, `onmessage_command_delay`). Y écrire une durée
 métier paralyse la page : c'est ce qui est arrivé en écrivant la durée
 d'affichage du podium dans `wsMain.delay`, et la page ne recevait plus rien
 pendant 15 s. Un test le vérifie désormais.
+
+## Nouvelle page : habillage autour de deux vidéos
+
+`canoe/tv_duo.html` — un écran 1920×1080 complet, opaque, percé de deux
+fenêtres pour les caméras : les quarts haut gauche et bas droit, là où la macro
+« Duo » de `canoe-atem` pose les deux fenêtres du SuperSource (taille 0,50,
+centrées en −8,00 / +4,50 et +8,00 / −4,50, sans recadrage). Les fenêtres
+sont transparentes (sources vidéo placées sous la page dans OBS), ou de la
+couleur de clé `#CC00CC` avec `?bg=1` quand c'est l'ATEM qui incruste.
+
+- **En haut à droite** : classement de l'épreuve en cours, avec « En direct »,
+  le nom de l'épreuve, le logo FFCK et celui du club. Les 3 premiers restent figés et la
+  suite défile, comme dans `tv_results`. Un arrivant est encadré.
+- **En bas à gauche** : une carte par bateau en course (3 au plus), avec le
+  dossard, le nom, le club, la grille des portes (vert 0, jaune 2, rouge 50,
+  vide si la porte n'est pas encore jugée), les temps intermédiaires et leur
+  écart au meilleur de l'épreuve, le cumul de pénalités et le chrono qui tourne.
+  Les cartes forment une pile de hauteur fixe (3 lignes) qui montre les 3
+  derniers partis, dans l'ordre des départs : avec les dossards 2, 3 et 4 sur
+  l'eau, le 2 est en haut et le 4 en bas. Un nouveau partant entre par le bas.
+  À l'arrivée, la carte garde sa ligne avec le temps, les intermédiaires et la
+  place, puis s'en va vers le haut, et les suivantes remontent en glissant.
+- **Prochains départs** : les lignes libres de la pile, sous les bateaux en
+  course, montrent les prochains partants avec leur heure de départ et le
+  compte à rebours. Quand l'un part, sa ligne devient sa carte, sur place.
+- Le partenaire technique est en petit, dans l'en-tête des bateaux en course.
+
+L'écart à un intermédiaire est celui que competFFCK envoie (`diff_categ`). S'il
+ne l'envoie pas, la page le calcule sur le meilleur temps de l'épreuve à cet
+intermédiaire, d'après le classement.
+
+L'épreuve affichée est celle des bateaux sur l'eau. Quand la rivière est vide,
+c'est celle du flux `<on_course>`, et à défaut la dernière épreuve courue.
+
+| paramètre | défaut | rôle |
+|---|---|---|
+| `v1=0,0,960,540` | idem | fenêtre vidéo 1 : x, y, largeur, hauteur en pixels 1080p |
+| `v2=960,540,960,540` | idem | fenêtre vidéo 2 |
+| `bg=1` | transparent | fenêtres en couleur de clé pour l'ATEM |
+| `epreuve=K1H` | suit la course | fige l'épreuve du classement |
+| `max=8` / `fixes=3` | 8 / 3 | lignes du classement, dont figées en haut |
+| `delay=8000` | 8000 | durée d'une page du classement en ms |
+| `max_course=3` | 3 | lignes de la pile des bateaux en course (1 à 3) : les derniers partis |
+| `delay_inter=6000` | 6000 | mise en couleur d'un intermédiaire qui vient de tomber, en ms |
+| `prochains=3` | 3 | nombre maximal de prochains partants dans les lignes libres (0 = aucun) |
+| `delay_finish=8000` | 8000 | maintien d'un arrivant en ms |
+| `time_pena=1` | sans | chrono tournant avec les pénalités |
+| `titre=…` / `lieu=…` | competFFCK | remplacent le nom et le lieu |
+| `no_logo` / `no_ffck` / `no_partenaire` | affichés | masquent le logo du club / de la FFCK / le partenaire |
+| `anim=0` | animé | tout apparaît d'un coup |
+
+Les fenêtres se déplacent par `v1` et `v2`, mais les blocs d'information sont
+dessinés pour la disposition par défaut : en déplaçant beaucoup une fenêtre, on
+peut la faire passer sur un bloc.
+
+## Nouvelle page : liste de départ
+
+`canoe/tv_departs.html` — la liste de départ plein écran d'une épreuve, dans
+l'habillage de `tv_results` (elle charge `tv_results.css` et n'y ajoute que
+ses colonnes : ordre, heure, dossard, nom, club). Elle remplace
+`tv_startlist` dans la régie.
+
+Sans `?epreuve=`, elle montre l'épreuve du bateau sur l'eau, à défaut celle du
+prochain partant. Le prochain à partir est encadré, un bateau sur l'eau porte
+« En course », un bateau qui a un résultat est estompé. Elle défile par pages
+et s'ouvre sur celle du prochain partant. La colonne nation n'apparaît que si
+elle distingue quelqu'un (`?nation` la force, `?no_nation` la retire).
+
+Autres paramètres, comme `tv_results` : `max=10`, `delay=8000`, `titre`,
+`lieu`, `length_identity`, `style=classique`, `fond=`, `anim=0`.
+
+## Nouvelle page : régie automatique d'une demi-journée
+
+`canoe/tv_regie.html?scenario=<id>` enchaîne seule tous les écrans d'une
+demi-journée, sans que personne n'y touche. Les scénarios sont dans
+`canoe/js/regie_scenarios.js`, repris des tableaux de bord des horaires
+competFFCK (`france-elite/planning/`, hors dépôt).
+
+| scénario | contenu |
+|---|---|
+| `vendredi-matin` | qualifications manche 1 : INV, K1H, K1D, C1H, C1D (9h00 → 12h18) |
+| `vendredi-apres-midi` | qualifications manche 2 : K1H, K1D, C1H, C1D (14h00 → 15h20) |
+| `samedi-matin` | kayak-cross : XK1INV, XK1H, XK1D (10h15 → 11h38) |
+| `dimanche-matin` | demi-finales : INV, K1H, K1D, C1H, C1D (9h00 → 13h03) |
+| `dimanche-apres-midi` | finales : K1H, K1D, C1H, C1D (14h00 → 15h46) |
+| `test` | petite répétition (3 catégories courtes, 08h50 → 09h22) : `npm run regie` |
+
+Déroulé :
+
+| moment | à l'écran |
+|---|---|
+| lancement | quelques secondes de couleur de clé : à l'antenne, les caméras seules (l'incrustation marche) |
+| jusqu'à H − 5 min | compte à rebours plein écran jusqu'au premier départ |
+| H − 5 min | le générique vidéo |
+| après le générique | les caméras pour le présentateur : son nom en bas à gauche (il entre 3 s après le générique, reste 10 s), le compte à rebours en bas à droite |
+| H − 30 s | le nom de la catégorie en plein écran (10 s), puis sa liste de départ (`tv_departs`) jusqu'au premier départ |
+| premier départ | l'écran de course |
+| fin d'une catégorie | son classement (`tv_results`), le titre de la suivante, sa liste de départ, la course 1 min avant son départ |
+| après la dernière | son classement, puis les caméras |
+
+L'écran de course est `tv_duo` quand les départs sont espacés de moins de
+2 min (plusieurs bateaux sur l'eau), `tv_inrace` sinon. L'intervalle se déduit
+de l'horaire : (fin − départ) / (nombre − 1). Une catégorie peut l'imposer
+(`vue`).
+
+**Aucun état n'est gardé** : la scène est recalculée 4 fois par seconde depuis
+l'heure et les données de course. Recharger la page la remet au bon endroit.
+Blindage :
+
+- un bateau sur l'eau impose l'écran de course, quoi que dise l'horaire ;
+- une catégorie commencée garde l'écran de course entre deux bateaux ;
+- une catégorie est finie quand tous ses bateaux ont un résultat, ou quand
+  personne n'est sur l'eau 3 min après son dernier départ (un forfait non
+  saisi ne bloque pas la suite) ; les enchaînements partent de sa dernière
+  arrivée, pas de l'horaire ;
+- l'heure est celle de competFFCK (flux `<on_course>`), sinon celle du poste ;
+- les écrans sont chargés une fois dans des cadres et ne font que s'afficher
+  ou se masquer ; chacun garde sa connexion et sa reprise après coupure ;
+- les changements passent par un rideau de bandes obliques qui porte les
+  logos FFCK et du club, sans fondu (incrustation chroma) ; la scène change
+  à mi-course, quand la bande marine couvre l'image ; une erreur de calcul
+  garde l'écran en cours ;
+- le générique est calé sur l'heure (H − 5 min) : recharger la page pendant
+  qu'il passe le reprend où il en est ; une vidéo absente ou illisible est
+  sautée, le présentateur prend sa place ;
+- une icône en haut à droite dit l'état de la liaison avec le serveur
+  WebSocket (utile avec un serveur distant) : rouge tant qu'elle est coupée,
+  verte 5 s quand elle s'établit ou revient, puis plus rien.
+
+Le générique est lu dans `canoe/video/generique.mp4`, **hors dépôt** (66 Mo) :
+le copier sur le serveur de course avec le reste de `ws_live`. Le son est
+demandé ; dans OBS, cocher « Contrôler l'audio via OBS » sur la source
+navigateur. Un navigateur qui refuse la lecture automatique avec le son le
+passe muet plutôt que pas du tout.
+
+| paramètre | défaut | rôle |
+|---|---|---|
+| `scenario=…` | — | le scénario |
+| `rose=5` | 5 | durée de la couleur de clé au lancement, en s |
+| `resultats=45` / `titre=10` | 45 / 10 | durée du classement et du titre de catégorie, en s |
+| `avance=60` | 60 | catégories suivantes : l'écran de course arrive tant de s avant leur premier départ |
+| `generique_avant=300` | 300 | le générique part tant de s avant le premier départ |
+| `speaker_delai=3` / `speaker_duree=10` | 3 / 10 | nom du présentateur : entrée après le générique, durée |
+| `departs_avant=30` | 30 | la liste de départ arrive tant de s avant le premier départ (le présentateur parle jusque-là) |
+| `generique=video/generique.mp4` | idem | le générique ; `0` = sans |
+| `son=0` | avec le son | générique muet |
+| `maintenant=2026-10-16T08:54:00` | heure du poste | simule l'heure (répétition sans competFFCK) |
+| `repetition=1` | — | le jour du scénario devient aujourd'hui : la régie suit l'horloge du bouchon |
+| `bg=0` | couleur de clé | fond transparent |
+| `debug=1` | — | heure, scène et bateaux sur l'eau en bas à gauche (jamais à l'antenne) |
+
+### Répéter une demi-journée avec le bouchon
+
+Chaque scénario a sa fixture `regie-<id>`, générée depuis
+`regie_scenarios.js` par `npm run fixtures` : mêmes catégories, mêmes heures,
+même nombre de bateaux, quelques pénalités en slalom. La course simulée
+démarre **10 min avant le premier départ** : 5 min de compte à rebours, puis
+le générique et le présentateur.
+
+```bash
+node mock/server.js --scenario vendredi-matin --speed 10
+```
+
+puis « Démarrer » dans le panneau (`/mock/`), où la vitesse se change en
+cours de route (×1 à ×60), et la régie sur
+`/canoe/tv_regie.html?scenario=vendredi-matin&repetition=1`. Avec
+`repetition=1`, la régie mesure la vitesse du bouchon et rallonge d'autant
+les durées de ses scènes : le présentateur reste ses 15 s réelles, le titre
+ses 10 s, le classement ses 45 s, quelle que soit l'accélération. En
+contrepartie, au-delà de ×4 le classement d'une catégorie déborde sur le
+départ de la suivante (4 min d'écart au programme) : le premier départ coupe
+alors l'enchaînement et la régie passe à la course. ×1 à ×4 pour regarder les
+transitions, ×10 et plus pour parcourir la demi-journée.
 
 ## Tests de non-régression
 

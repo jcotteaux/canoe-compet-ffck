@@ -1,0 +1,1004 @@
+/*
+ * Habillage plein écran autour de deux vidéos (tv_duo.html).
+ *
+ * Même charte que tv_results : marine #09006D, indigo #1D1580, bleu #097AFF,
+ * biseau à -20 deg, Calibri. Tout est calé sur 1920x1080 :
+ *
+ *   ┌───────────────────┬───────────────────┐
+ *   │ vidéo 1           │ classement        │  1004..1872 x 40..516
+ *   │ 0,0  960 x 540    │                   │
+ *   ├───────────────────┼───────────────────┤
+ *   │ en course         │ vidéo 2           │
+ *   │ 48..920           │ 960,540 960 x 540 │
+ *   │ x 572..1040       │                   │
+ *   └───────────────────┴───────────────────┘
+ *
+ * Les deux fenêtres sont celles de la macro « Duo » de canoe-atem : deux
+ * fenêtres SuperSource de taille 0,50, une par quart, sans recadrage. Elles se
+ * déplacent par ?v1= et ?v2= ; les blocs d'information restent à leur place,
+ * ils sont dessinés pour la disposition par défaut.
+ */
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--ffck-navy: #09006D;
+	--ffck-indigo: #1D1580;
+	--ffck-blue: #097AFF;
+	--ffck-blue-light: #3680FF;
+	--ffck-sky: #629BF1;
+
+	--fond-haut: #05081F;
+	--fond-bas: #0A1145;
+
+	--or: #d4af37;
+	--argent: #aab4bf;
+	--bronze: #b5793a;
+
+	/* Couleur de clé commune à toutes les pages tv_* (voir tv_oncourse.css). */
+	--chroma-key: #CC00CC;
+
+	--direct: #E0213A;
+
+	--porte-0: #22B14C;
+	--porte-2: #FFD21F;
+	--porte-50: #E8202A;
+
+	--duo-scale: 1;
+	--biseau: -20deg;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	/* Transparent : les fenêtres laissent voir les vidéos placées dessous. */
+	background: transparent;
+	color: white;
+	font-family: Calibri, 'Carlito', 'Trebuchet MS', Arial, sans-serif;
+}
+
+/* ?bg=1 : l'ATEM incruste, les fenêtres prennent la couleur de clé. */
+body.chroma
+{
+	background: var(--chroma-key);
+}
+
+#scene
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	width: 1920px;
+	height: 1080px;
+	margin: -540px 0 0 -960px;
+
+	transform: scale(var(--duo-scale));
+	transform-origin: center center;
+	overflow: hidden;
+}
+
+/******************** fond percé ********************/
+
+#fond
+{
+	position: absolute;
+	inset: 0;
+
+	background:
+		radial-gradient(ellipse 70% 60% at 100% 0%,
+			rgba(9, 122, 255, 0.28) 0%,
+			rgba(9, 122, 255, 0) 70%),
+		radial-gradient(ellipse 60% 70% at 0% 100%,
+			rgba(54, 128, 255, 0.20) 0%,
+			rgba(54, 128, 255, 0) 70%),
+		linear-gradient(160deg,
+			var(--fond-haut) 0%,
+			var(--fond-bas) 55%,
+			#060B2C 100%);
+}
+
+/* Bandes obliques de la charte, en décor derrière les blocs. */
+.bande
+{
+	position: absolute;
+	transform: skewX(var(--biseau));
+}
+
+#bande_haut
+{
+	left: 1010px;
+	top: 0;
+	width: 1000px;
+	height: 18px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+}
+
+#bande_bas
+{
+	left: -60px;
+	top: 1062px;
+	width: 620px;
+	height: 18px;
+	background: linear-gradient(90deg, var(--ffck-indigo) 0%, var(--ffck-blue) 100%);
+}
+
+/* Filet autour de chaque vidéo, posé à l'extérieur : il ne mord pas l'image. */
+.cadre
+{
+	position: absolute;
+	box-sizing: content-box;
+	margin: -4px 0 0 -4px;
+	border: 4px solid var(--ffck-blue);
+	box-shadow: 0 0 28px rgba(9, 122, 255, 0.45);
+	pointer-events: none;
+}
+
+/******************** classement ********************/
+
+#classement
+{
+	position: absolute;
+	left: 1004px;
+	top: 40px;
+	width: 868px;
+	height: 476px;
+}
+
+#cl_entete
+{
+	position: relative;
+	height: 84px;
+	margin-bottom: 6px;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+/* Le bandeau de l'en-tête déborde jusqu'au bord droit de l'écran. */
+#cl_entete::before
+{
+	content: '';
+	position: absolute;
+	left: -14px;
+	right: -80px;
+	top: 0;
+	bottom: 0;
+	transform: skewX(var(--biseau));
+	background: linear-gradient(90deg, var(--ffck-navy) 0%, var(--ffck-indigo) 100%);
+	border-left: 8px solid var(--ffck-blue);
+}
+
+#cl_titres
+{
+	position: relative;
+	padding-left: 22px;
+	min-width: 0;
+}
+
+#direct
+{
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+
+	padding: 2px 12px 1px 10px;
+	background: var(--direct);
+
+	font-size: 17px;
+	font-weight: bold;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	line-height: 22px;
+}
+
+#direct .point
+{
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: white;
+	animation: direct-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes direct-pulse
+{
+	0%, 100% { opacity: 1; }
+	50%      { opacity: 0.25; }
+}
+
+#epreuve_nom
+{
+	margin-top: 4px;
+	max-width: 560px;
+
+	font-size: 38px;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	line-height: 42px;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#logos
+{
+	position: relative;
+	flex: 0 0 auto;
+
+	display: flex;
+	align-items: center;
+	gap: 18px;
+}
+
+#logo_ffck
+{
+	width: 96px;
+	height: 70px;
+	background: url('../img/tv_duo/ffck.png') no-repeat center / contain;
+}
+
+body.sans-ffck #logo_ffck
+{
+	display: none;
+}
+
+#logo_club
+{
+	position: relative;
+	width: 150px;
+	height: 78px;
+	flex: 0 0 auto;
+	margin-right: 0;
+
+	background: url('../img/tv_duo/logo_club.png') no-repeat center / contain;
+}
+
+body.sans-logo #logo_club
+{
+	display: none;
+}
+
+.ligne
+{
+	display: grid;
+	grid-template-columns: 60px 72px 1fr 64px 150px 120px;
+	align-items: center;
+
+	height: 40px;
+	margin-bottom: 3px;
+}
+
+#cl_colonnes
+{
+	height: 28px;
+	margin-bottom: 3px;
+
+	font-size: 16px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+#cl_colonnes > div
+{
+	padding: 0 10px;
+}
+
+#cl_colonnes .c_rang,
+#cl_colonnes .c_dossard,
+#cl_colonnes .c_pena
+{
+	text-align: center;
+}
+
+#cl_colonnes .c_temps,
+#cl_colonnes .c_ecart
+{
+	text-align: right;
+}
+
+.ligne.res
+{
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.92) 0%,
+		rgba(16, 10, 96, 0.82) 55%,
+		rgba(9, 18, 78, 0.70) 100%);
+
+	font-size: 24px;
+}
+
+.ligne.res > div
+{
+	padding: 0 10px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.ligne.res .c_rang
+{
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	padding: 0;
+	font-size: 26px;
+	font-weight: bold;
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+}
+
+.ligne.res.p1 .c_rang { background: linear-gradient(180deg, #f7dc63 0%, var(--or) 100%); color: #3a2c00; }
+.ligne.res.p2 .c_rang { background: linear-gradient(180deg, #e6ecf2 0%, var(--argent) 100%); color: #26303a; }
+.ligne.res.p3 .c_rang { background: linear-gradient(180deg, #e0a860 0%, var(--bronze) 100%); color: #33200a; }
+
+.ligne.res .c_dossard
+{
+	text-align: center;
+	font-weight: bold;
+	color: var(--ffck-sky);
+}
+
+.ligne.res .c_nom
+{
+	font-weight: bold;
+	letter-spacing: 0.015em;
+}
+
+.ligne.res .c_pena
+{
+	text-align: center;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+.ligne.res .c_pena.chargee { color: #ff6b6b; }
+.ligne.res .c_pena.eliminatoire { color: #ff3131; }
+
+.ligne.res .c_temps
+{
+	text-align: right;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	font-size: 26px;
+}
+
+.ligne.res .c_ecart
+{
+	text-align: right;
+	font-weight: bold;
+	font-style: italic;
+	font-variant-numeric: tabular-nums;
+	font-size: 21px;
+	color: #bcd4f2;
+}
+
+.ligne.res.hc .c_rang
+{
+	background: linear-gradient(180deg, #4a5570 0%, #2f3852 100%);
+	font-size: 18px;
+}
+
+.ligne.res.hc .c_temps
+{
+	color: #92a4c0;
+	font-size: 21px;
+}
+
+/* Filet entre les trois premiers, figés, et la partie qui défile. */
+.ligne.res.ouvre-rotation
+{
+	margin-top: 10px;
+	position: relative;
+}
+
+.ligne.res.ouvre-rotation::before
+{
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: -7px;
+	height: 2px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, rgba(9, 122, 255, 0) 100%);
+}
+
+.ligne.res.place-vide
+{
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.30) 0%,
+		rgba(16, 10, 96, 0.22) 55%,
+		rgba(9, 18, 78, 0.10) 100%);
+}
+
+.ligne.res.place-vide .c_rang
+{
+	background: rgba(54, 128, 255, 0.14);
+}
+
+/* Un arrivant : sa ligne est encadrée le temps qu'on la lise. */
+.ligne.res.vedette
+{
+	box-shadow: inset 0 0 0 3px #ffd24a;
+	animation: vedette 1s ease-in-out infinite alternate;
+}
+
+@keyframes vedette
+{
+	from { box-shadow: inset 0 0 0 3px rgba(255, 210, 74, 1); }
+	to   { box-shadow: inset 0 0 0 3px rgba(255, 210, 74, 0.35); }
+}
+
+#cl_attente
+{
+	display: none;
+	padding: 60px 0 0 22px;
+
+	font-size: 26px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+body.cl-vide #cl_attente  { display: block; }
+body.cl-vide #cl_colonnes { visibility: hidden; }
+
+#pagination
+{
+	position: absolute;
+	right: 0;
+	top: 482px;
+	display: none;
+
+	font-size: 16px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+body.pagine #pagination { display: block; }
+
+/******************** bateaux en course ********************/
+
+#encourse
+{
+	position: absolute;
+	left: 48px;
+	top: 572px;
+	width: 872px;
+	height: 468px;
+}
+
+#ec_entete
+{
+	height: 34px;
+	margin-bottom: 10px;
+
+	display: flex;
+	align-items: baseline;
+	gap: 22px;
+
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+/*
+ * Le nom de la compétition est un rappel, pas une information : petit, maigre,
+ * en retrait. Il tient ainsi en entier sur une ligne, même aussi long que
+ * « Championnats de France Elite Slalom & Kayak-Cross ».
+ */
+#titre
+{
+	min-width: 0;
+	font-size: 18px;
+	letter-spacing: 0.10em;
+	text-transform: uppercase;
+	color: rgba(220, 232, 251, 0.72);
+
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#lieu
+{
+	flex: 0 0 auto;
+	font-size: 18px;
+	font-weight: bold;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+/* Pile de hauteur fixe (posée par le JS) : les cartes y sont en absolu. */
+#cartes
+{
+	position: relative;
+}
+
+.carte
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 196px;
+
+	/* La carte glisse d'une ligne quand celle du dessus s'en va. */
+	transition: top 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+	            transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+	            opacity 0.45s ease;
+
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.94) 0%,
+		rgba(16, 10, 96, 0.86) 60%,
+		rgba(9, 18, 78, 0.74) 100%);
+	border-left: 8px solid var(--ffck-blue);
+}
+
+/* Un nouveau partant entre par le bas. */
+.carte.entree
+{
+	animation: carte-in-bas 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes carte-in-bas
+{
+	from { transform: translateY(50px); opacity: 0; }
+	to   { transform: none; opacity: 1; }
+}
+
+/* Sortie d'un arrivant : il s'en va vers le haut. */
+.carte.sortie
+{
+	transform: translateY(-70px);
+	opacity: 0;
+}
+
+@keyframes carte-in
+{
+	from { transform: translateX(-40px); opacity: 0; }
+	to   { transform: none; opacity: 1; }
+}
+
+.carte.arrivee
+{
+	border-left-color: #ffd24a;
+}
+
+.k_ident
+{
+	display: grid;
+	grid-template-columns: 96px 1fr auto;
+	align-items: center;
+	height: 66px;
+}
+
+.k_bib
+{
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	font-size: 38px;
+	font-weight: bold;
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+}
+
+.k_nom
+{
+	padding: 0 18px;
+
+	font-size: 40px;
+	font-weight: bold;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.k_club
+{
+	max-width: 260px;
+	padding-right: 18px;
+
+	font-size: 19px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Une case par porte, en ordre de parcours. */
+.k_portes
+{
+	display: flex;
+	gap: 4px;
+	height: 46px;
+	margin: 8px 14px 0;
+}
+
+.porte
+{
+	flex: 1 1 0;
+	min-width: 0;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	background: rgba(255, 255, 255, 0.16);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+
+	font-size: 22px;
+	font-weight: bold;
+	transition: background-color 0.25s;
+}
+
+.porte.p0  { background: var(--porte-0);  box-shadow: none; }
+.porte.p2  { background: var(--porte-2);  box-shadow: none; color: #2a2300; }
+.porte.p50 { background: var(--porte-50); box-shadow: none; color: white; }
+
+.k_bas
+{
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	height: 70px;
+	padding: 0 14px;
+}
+
+.k_etat
+{
+	font-size: 18px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+.carte.arrivee .k_etat
+{
+	color: #ffd24a;
+	font-weight: bold;
+}
+
+/* Dès le premier intermédiaire, ses pastilles prennent la place du libellé. */
+.carte.avec-inter .k_etat
+{
+	display: none;
+}
+
+.k_inters
+{
+	display: flex;
+	gap: 8px;
+	min-width: 0;
+}
+
+/* Un intermédiaire : son numéro, son temps, son écart au meilleur de l'épreuve. */
+.k_i
+{
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	padding: 5px 10px 3px;
+
+	white-space: nowrap;
+	font-size: 21px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	background: rgba(255, 255, 255, 0.10);
+	transition: background-color 0.4s;
+}
+
+.k_i .i_lbl
+{
+	font-size: 16px;
+	letter-spacing: 0.08em;
+	color: var(--ffck-sky);
+}
+
+.k_i .i_diff
+{
+	font-style: italic;
+	font-size: 19px;
+}
+
+.k_i.avance .i_diff { color: #4fe08a; }
+.k_i.retard .i_diff { color: #ff7a7a; }
+
+/* Il vient de tomber : en couleur pleine quelques secondes. */
+.k_i.frais        { background: rgba(255, 255, 255, 0.24); }
+.k_i.frais.avance { background: #1f9d4a; }
+.k_i.frais.retard { background: #c62b2b; }
+.k_i.frais .i_lbl,
+.k_i.frais .i_diff { color: white; }
+
+.k_pena
+{
+	margin-left: auto;
+	min-width: 64px;
+	padding: 4px 10px 2px;
+
+	text-align: center;
+	font-size: 28px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	background: rgba(34, 177, 76, 0.85);
+}
+
+.k_pena.chargee      { background: var(--porte-2); color: #2a2300; }
+.k_pena.eliminatoire { background: var(--porte-50); }
+
+.k_chrono
+{
+	min-width: 230px;
+	text-align: right;
+
+	font-size: 58px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+.carte.arrivee .k_chrono
+{
+	color: #ffe58a;
+}
+
+.k_rang
+{
+	display: none;
+	min-width: 76px;
+	padding: 6px 10px 3px;
+
+	text-align: center;
+	font-size: 32px;
+	font-weight: bold;
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+}
+
+.k_rang.visible { display: block; }
+.k_rang.p1 { background: linear-gradient(180deg, #f7dc63 0%, var(--or) 100%); color: #3a2c00; }
+.k_rang.p2 { background: linear-gradient(180deg, #e6ecf2 0%, var(--argent) 100%); color: #26303a; }
+.k_rang.p3 { background: linear-gradient(180deg, #e0a860 0%, var(--bronze) 100%); color: #33200a; }
+
+#ec_attente
+{
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 120px;
+
+	font-size: 26px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+body.riviere-vide #ec_attente { display: block; }
+
+/******************** prochains départs ********************/
+
+/*
+ * Ligne d'attente de la pile : même hauteur qu'une carte, plus discrète. Quand
+ * le bateau part, sa carte la remplace sur place.
+ */
+.carte.attente
+{
+	display: grid;
+	grid-template-columns: 170px 84px 1fr auto;
+	align-items: center;
+
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.62) 0%,
+		rgba(16, 10, 96, 0.50) 60%,
+		rgba(9, 18, 78, 0.36) 100%);
+	border-left-color: rgba(98, 155, 241, 0.45);
+}
+
+.carte.sortie-attente
+{
+	opacity: 0;
+}
+
+/* Sa carte remplace la ligne d'attente : simple fondu, sans déplacement. */
+.carte.entree-place
+{
+	animation: carte-fondu 0.35s ease-out;
+}
+
+@keyframes carte-fondu
+{
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+.p_heure
+{
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	font-size: 32px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	background: rgba(54, 128, 255, 0.22);
+}
+
+.p_bib
+{
+	text-align: center;
+	font-size: 32px;
+	font-weight: bold;
+	color: var(--ffck-sky);
+}
+
+.p_qui
+{
+	min-width: 0;
+	padding-right: 12px;
+}
+
+.p_nom
+{
+	font-size: 32px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.p_club
+{
+	font-size: 17px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.p_droite
+{
+	padding-right: 18px;
+	text-align: right;
+}
+
+.p_rebours
+{
+	font-size: 26px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+.p_epreuve
+{
+	font-size: 16px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #ffd24a;
+}
+
+.p_lbl
+{
+	font-size: 14px;
+	font-weight: normal;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: #c9dbf7;
+}
+
+/* Le premier à partir : heure en bleu plein, il est le prochain à l'image. */
+.carte.attente.premier .p_heure
+{
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+}
+
+.carte.attente.premier
+{
+	border-left-color: var(--ffck-blue);
+}
+
+/******************** cartes de la pile ********************/
+
+/*
+ * Trois cartes dans le quart, toujours à cette taille : la pile garde la même
+ * hauteur qu'il y ait un, deux ou trois bateaux. CARTE_H dans tv_duo.js.
+ */
+#encourse .carte       { height: 134px; }
+#encourse .k_ident     { height: 46px; }
+#encourse .k_bib       { font-size: 30px; }
+#encourse .k_nom       { font-size: 30px; padding: 0 14px; }
+#encourse .k_club      { font-size: 16px; }
+#encourse .k_portes    { height: 30px; margin-top: 5px; gap: 3px; }
+#encourse .porte       { font-size: 17px; }
+#encourse .k_bas       { height: 53px; gap: 12px; }
+#encourse .k_etat      { font-size: 15px; }
+#encourse .k_i         { font-size: 18px; padding: 3px 8px 2px; gap: 6px; }
+#encourse .k_i .i_lbl  { font-size: 14px; }
+#encourse .k_i .i_diff { font-size: 16px; }
+#encourse .k_pena      { font-size: 22px; min-width: 52px; padding: 3px 8px 1px; }
+#encourse .k_chrono    { font-size: 42px; min-width: 170px; }
+#encourse .k_rang      { font-size: 24px; min-width: 60px; padding: 4px 8px 2px; }
+
+/******************** partenaire technique ********************/
+
+/* Sous les bateaux en course, au ras du quart : le coin bas droit de l'écran
+   est pris par la vidéo 2, et l'en-tête garde toute sa largeur pour le titre. */
+#partenaire
+{
+	position: absolute;
+	right: 0;
+	top: 474px;
+	height: 26px;
+
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	font-size: 13px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(220, 232, 251, 0.75);
+}
+
+/* Le SVG dessine en currentColor : on s'en sert de masque pour le teinter. */
+#logo_partenaire
+{
+	width: 110px;
+	height: 24px;
+	background: rgba(255, 255, 255, 0.9);
+	-webkit-mask: url('../img/tv_duo/archireport.svg') no-repeat left center / contain;
+	mask: url('../img/tv_duo/archireport.svg') no-repeat left center / contain;
+}
+
+body.sans-partenaire #partenaire
+{
+	display: none;
+}
+
+/******************** sans animation ********************/
+
+body.no-anim *,
+body.no-anim *::before,
+body.no-anim *::after
+{
+	animation: none !important;
+	transition: none !important;
+}

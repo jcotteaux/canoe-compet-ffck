@@ -1,0 +1,750 @@
+{
+  "id": "regie-samedi-matin",
+  "label": "Régie samedi-matin — Kayak-Cross — contre-la-montre",
+  "speed": 1,
+  "first_start": "10:15:00",
+  "clock_start": "10:05:00",
+  "start_interval_s": 60,
+  "nb_inter": 2,
+  "nb_porte": 0,
+  "competition": {
+    "Code_competition": 3422,
+    "Nom": "Championnats de France Elite Kayak-Cross",
+    "Code_activite": "SLA",
+    "Code_niveau": "NAT",
+    "Date_debut": "2026-10-17",
+    "Lieu": "Cesson-Sévigné"
+  },
+  "course": {
+    "Code_course": 1,
+    "Libelle": "Cesson-Sévigné"
+  },
+  "phase": {
+    "Code_phase": 1,
+    "Libelle": "Kayak-Cross — contre-la-montre"
+  },
+  "epreuves": [
+    {
+      "code": "XK1INV",
+      "libelle": "Invités",
+      "etat": "1",
+      "offsetMs": 0
+    },
+    {
+      "code": "XK1H",
+      "libelle": "Kayak Homme",
+      "etat": "1",
+      "offsetMs": 3000
+    },
+    {
+      "code": "XK1D",
+      "libelle": "Kayak Dame",
+      "etat": "1",
+      "offsetMs": 6000
+    }
+  ],
+  "boats": [
+    {
+      "bib": 1,
+      "epreuve": "XK1INV",
+      "nom": "CHEVALIER Arthur",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 62796,
+      "hour_start": "10:15:00"
+    },
+    {
+      "bib": 2,
+      "epreuve": "XK1INV",
+      "nom": "RIVIERE Hugo",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 63141,
+      "hour_start": "10:16:00"
+    },
+    {
+      "bib": 3,
+      "epreuve": "XK1INV",
+      "nom": "VASSEUR Quentin",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 62974,
+      "hour_start": "10:17:00"
+    },
+    {
+      "bib": 4,
+      "epreuve": "XK1INV",
+      "nom": "GAUDIN Nolan",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 62404,
+      "hour_start": "10:18:00"
+    },
+    {
+      "bib": 5,
+      "epreuve": "XK1INV",
+      "nom": "LEMOINE Antoine",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 63434,
+      "hour_start": "10:19:00"
+    },
+    {
+      "bib": 6,
+      "epreuve": "XK1INV",
+      "nom": "ROYER Gabin",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 67912,
+      "hour_start": "10:20:00"
+    },
+    {
+      "bib": 7,
+      "epreuve": "XK1INV",
+      "nom": "GUILLET Théo",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 61619,
+      "hour_start": "10:21:00"
+    },
+    {
+      "bib": 8,
+      "epreuve": "XK1INV",
+      "nom": "HEBERT Baptiste",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 61240,
+      "hour_start": "10:22:00"
+    },
+    {
+      "bib": 9,
+      "epreuve": "XK1INV",
+      "nom": "BLANCHARD Mathis",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 61107,
+      "hour_start": "10:23:00"
+    },
+    {
+      "bib": 10,
+      "epreuve": "XK1INV",
+      "nom": "LEROY Maxime",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 58013,
+      "hour_start": "10:24:00"
+    },
+    {
+      "bib": 11,
+      "epreuve": "XK1INV",
+      "nom": "FAURE Enzo",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 62289,
+      "hour_start": "10:25:00"
+    },
+    {
+      "bib": 12,
+      "epreuve": "XK1INV",
+      "nom": "MARCHAND Lucas",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 62927,
+      "hour_start": "10:26:00"
+    },
+    {
+      "bib": 13,
+      "epreuve": "XK1INV",
+      "nom": "AUBERT Arthur",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 63378,
+      "hour_start": "10:27:00"
+    },
+    {
+      "bib": 14,
+      "epreuve": "XK1INV",
+      "nom": "BARBIER Hugo",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 60928,
+      "hour_start": "10:28:00"
+    },
+    {
+      "bib": 15,
+      "epreuve": "XK1INV",
+      "nom": "MASSON Quentin",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 64598,
+      "hour_start": "10:29:00"
+    },
+    {
+      "bib": 16,
+      "epreuve": "XK1H",
+      "nom": "CHEVALIER Arthur",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 62800,
+      "hour_start": "10:33:00"
+    },
+    {
+      "bib": 17,
+      "epreuve": "XK1H",
+      "nom": "RIVIERE Hugo",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 64048,
+      "hour_start": "10:34:00"
+    },
+    {
+      "bib": 18,
+      "epreuve": "XK1H",
+      "nom": "VASSEUR Quentin",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 59822,
+      "hour_start": "10:35:00"
+    },
+    {
+      "bib": 19,
+      "epreuve": "XK1H",
+      "nom": "GAUDIN Nolan",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 62774,
+      "hour_start": "10:36:00"
+    },
+    {
+      "bib": 20,
+      "epreuve": "XK1H",
+      "nom": "LEMOINE Antoine",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 60099,
+      "hour_start": "10:37:00"
+    },
+    {
+      "bib": 21,
+      "epreuve": "XK1H",
+      "nom": "ROYER Gabin",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 65389,
+      "hour_start": "10:38:00"
+    },
+    {
+      "bib": 22,
+      "epreuve": "XK1H",
+      "nom": "GUILLET Théo",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 65929,
+      "hour_start": "10:39:00"
+    },
+    {
+      "bib": 23,
+      "epreuve": "XK1H",
+      "nom": "HEBERT Baptiste",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 60402,
+      "hour_start": "10:40:00"
+    },
+    {
+      "bib": 24,
+      "epreuve": "XK1H",
+      "nom": "BLANCHARD Mathis",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 66194,
+      "hour_start": "10:41:00"
+    },
+    {
+      "bib": 25,
+      "epreuve": "XK1H",
+      "nom": "LEROY Maxime",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 58587,
+      "hour_start": "10:42:00"
+    },
+    {
+      "bib": 26,
+      "epreuve": "XK1H",
+      "nom": "FAURE Enzo",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 66826,
+      "hour_start": "10:43:00"
+    },
+    {
+      "bib": 27,
+      "epreuve": "XK1H",
+      "nom": "MARCHAND Lucas",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 59776,
+      "hour_start": "10:44:00"
+    },
+    {
+      "bib": 28,
+      "epreuve": "XK1H",
+      "nom": "AUBERT Arthur",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 63147,
+      "hour_start": "10:45:00"
+    },
+    {
+      "bib": 29,
+      "epreuve": "XK1H",
+      "nom": "BARBIER Hugo",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 60447,
+      "hour_start": "10:46:00"
+    },
+    {
+      "bib": 30,
+      "epreuve": "XK1H",
+      "nom": "MASSON Quentin",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 66881,
+      "hour_start": "10:47:00"
+    },
+    {
+      "bib": 31,
+      "epreuve": "XK1H",
+      "nom": "DELAUNAY Nolan",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 67883,
+      "hour_start": "10:48:00"
+    },
+    {
+      "bib": 32,
+      "epreuve": "XK1H",
+      "nom": "NEVEU Antoine",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 64624,
+      "hour_start": "10:49:00"
+    },
+    {
+      "bib": 33,
+      "epreuve": "XK1H",
+      "nom": "BONNET Gabin",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 63568,
+      "hour_start": "10:50:00"
+    },
+    {
+      "bib": 34,
+      "epreuve": "XK1H",
+      "nom": "PICHON Théo",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 59578,
+      "hour_start": "10:51:00"
+    },
+    {
+      "bib": 35,
+      "epreuve": "XK1H",
+      "nom": "PERRIN Baptiste",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 58654,
+      "hour_start": "10:52:00"
+    },
+    {
+      "bib": 36,
+      "epreuve": "XK1H",
+      "nom": "COLIN Mathis",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 65012,
+      "hour_start": "10:53:00"
+    },
+    {
+      "bib": 37,
+      "epreuve": "XK1H",
+      "nom": "ROUSSEL Maxime",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 65746,
+      "hour_start": "10:54:00"
+    },
+    {
+      "bib": 38,
+      "epreuve": "XK1H",
+      "nom": "DUMAS Enzo",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 61802,
+      "hour_start": "10:55:00"
+    },
+    {
+      "bib": 39,
+      "epreuve": "XK1H",
+      "nom": "MERCIER Lucas",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 67207,
+      "hour_start": "10:56:00"
+    },
+    {
+      "bib": 40,
+      "epreuve": "XK1H",
+      "nom": "CHEVALIER Arthur",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 64241,
+      "hour_start": "10:57:00"
+    },
+    {
+      "bib": 41,
+      "epreuve": "XK1H",
+      "nom": "RIVIERE Hugo",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 58624,
+      "hour_start": "10:58:00"
+    },
+    {
+      "bib": 42,
+      "epreuve": "XK1H",
+      "nom": "VASSEUR Quentin",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 63613,
+      "hour_start": "10:59:00"
+    },
+    {
+      "bib": 43,
+      "epreuve": "XK1H",
+      "nom": "GAUDIN Nolan",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 60304,
+      "hour_start": "11:00:00"
+    },
+    {
+      "bib": 44,
+      "epreuve": "XK1H",
+      "nom": "LEMOINE Antoine",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 58482,
+      "hour_start": "11:01:00"
+    },
+    {
+      "bib": 45,
+      "epreuve": "XK1H",
+      "nom": "ROYER Gabin",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 67658,
+      "hour_start": "11:02:00"
+    },
+    {
+      "bib": 46,
+      "epreuve": "XK1H",
+      "nom": "GUILLET Théo",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 59905,
+      "hour_start": "11:03:00"
+    },
+    {
+      "bib": 47,
+      "epreuve": "XK1H",
+      "nom": "HEBERT Baptiste",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 66322,
+      "hour_start": "11:04:00"
+    },
+    {
+      "bib": 48,
+      "epreuve": "XK1H",
+      "nom": "BLANCHARD Mathis",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 59361,
+      "hour_start": "11:05:00"
+    },
+    {
+      "bib": 49,
+      "epreuve": "XK1H",
+      "nom": "LEROY Maxime",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 67903,
+      "hour_start": "11:06:00"
+    },
+    {
+      "bib": 50,
+      "epreuve": "XK1D",
+      "nom": "CHEVALIER Louise",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 62804,
+      "hour_start": "11:10:00"
+    },
+    {
+      "bib": 51,
+      "epreuve": "XK1D",
+      "nom": "RIVIERE Anaïs",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 64955,
+      "hour_start": "11:11:00"
+    },
+    {
+      "bib": 52,
+      "epreuve": "XK1D",
+      "nom": "VASSEUR Sarah",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 66669,
+      "hour_start": "11:12:00"
+    },
+    {
+      "bib": 53,
+      "epreuve": "XK1D",
+      "nom": "GAUDIN Clara",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 63145,
+      "hour_start": "11:13:00"
+    },
+    {
+      "bib": 54,
+      "epreuve": "XK1D",
+      "nom": "LEMOINE Chloé",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 66763,
+      "hour_start": "11:14:00"
+    },
+    {
+      "bib": 55,
+      "epreuve": "XK1D",
+      "nom": "ROYER Manon",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 62866,
+      "hour_start": "11:15:00"
+    },
+    {
+      "bib": 56,
+      "epreuve": "XK1D",
+      "nom": "GUILLET Marion",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 60240,
+      "hour_start": "11:16:00"
+    },
+    {
+      "bib": 57,
+      "epreuve": "XK1D",
+      "nom": "HEBERT Émilie",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 59564,
+      "hour_start": "11:17:00"
+    },
+    {
+      "bib": 58,
+      "epreuve": "XK1D",
+      "nom": "BLANCHARD Jeanne",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 61282,
+      "hour_start": "11:18:00"
+    },
+    {
+      "bib": 59,
+      "epreuve": "XK1D",
+      "nom": "LEROY Alice",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 59162,
+      "hour_start": "11:19:00"
+    },
+    {
+      "bib": 60,
+      "epreuve": "XK1D",
+      "nom": "FAURE Léa",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 61363,
+      "hour_start": "11:20:00"
+    },
+    {
+      "bib": 61,
+      "epreuve": "XK1D",
+      "nom": "MARCHAND Camille",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 66624,
+      "hour_start": "11:21:00"
+    },
+    {
+      "bib": 62,
+      "epreuve": "XK1D",
+      "nom": "AUBERT Louise",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 62916,
+      "hour_start": "11:22:00"
+    },
+    {
+      "bib": 63,
+      "epreuve": "XK1D",
+      "nom": "BARBIER Anaïs",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 59965,
+      "hour_start": "11:23:00"
+    },
+    {
+      "bib": 64,
+      "epreuve": "XK1D",
+      "nom": "MASSON Sarah",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 59165,
+      "hour_start": "11:24:00"
+    },
+    {
+      "bib": 65,
+      "epreuve": "XK1D",
+      "nom": "DELAUNAY Clara",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 62543,
+      "hour_start": "11:25:00"
+    },
+    {
+      "bib": 66,
+      "epreuve": "XK1D",
+      "nom": "NEVEU Chloé",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 66155,
+      "hour_start": "11:26:00"
+    },
+    {
+      "bib": 67,
+      "epreuve": "XK1D",
+      "nom": "BONNET Manon",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 63720,
+      "hour_start": "11:27:00"
+    },
+    {
+      "bib": 68,
+      "epreuve": "XK1D",
+      "nom": "PICHON Marion",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 62564,
+      "hour_start": "11:28:00"
+    },
+    {
+      "bib": 69,
+      "epreuve": "XK1D",
+      "nom": "PERRIN Émilie",
+      "club": "Canoë Club Vallée Ubaye",
+      "nation": "FRA",
+      "ref_time_ms": 67522,
+      "hour_start": "11:29:00"
+    },
+    {
+      "bib": 70,
+      "epreuve": "XK1D",
+      "nom": "COLIN Jeanne",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 61923,
+      "hour_start": "11:30:00"
+    },
+    {
+      "bib": 71,
+      "epreuve": "XK1D",
+      "nom": "ROUSSEL Alice",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 61374,
+      "hour_start": "11:31:00"
+    },
+    {
+      "bib": 72,
+      "epreuve": "XK1D",
+      "nom": "DUMAS Léa",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 58504,
+      "hour_start": "11:32:00"
+    },
+    {
+      "bib": 73,
+      "epreuve": "XK1D",
+      "nom": "MERCIER Camille",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 67924,
+      "hour_start": "11:33:00"
+    },
+    {
+      "bib": 74,
+      "epreuve": "XK1D",
+      "nom": "CHEVALIER Louise",
+      "club": "CK Saint-Pierre",
+      "nation": "FRA",
+      "ref_time_ms": 65415,
+      "hour_start": "11:34:00"
+    },
+    {
+      "bib": 75,
+      "epreuve": "XK1D",
+      "nom": "RIVIERE Anaïs",
+      "club": "ACA Aviron Canoë",
+      "nation": "FRA",
+      "ref_time_ms": 63042,
+      "hour_start": "11:35:00"
+    },
+    {
+      "bib": 76,
+      "epreuve": "XK1D",
+      "nom": "VASSEUR Sarah",
+      "club": "US Ivry CK",
+      "nation": "FRA",
+      "ref_time_ms": 59607,
+      "hour_start": "11:36:00"
+    },
+    {
+      "bib": 77,
+      "epreuve": "XK1D",
+      "nom": "GAUDIN Clara",
+      "club": "Sablé CK",
+      "nation": "FRA",
+      "ref_time_ms": 67975,
+      "hour_start": "11:37:00"
+    },
+    {
+      "bib": 78,
+      "epreuve": "XK1D",
+      "nom": "LEMOINE Chloé",
+      "club": "CK Pau-Béarn",
+      "nation": "FRA",
+      "ref_time_ms": 66581,
+      "hour_start": "11:38:00"
+    }
+  ]
+}

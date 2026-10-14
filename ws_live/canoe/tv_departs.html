@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Départs</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<!-- Même habillage que tv_results : seules les colonnes changent. -->
+	<link href="./css/tv_results.css?v11" rel="stylesheet">
+	<link href="./css/tv_departs.css?v2" rel="stylesheet">
+</head>
+
+<!--
+	Liste de départ plein écran d'une épreuve, 1920 x 1080, dans la charte de
+	tv_results. Voir js/tv_departs.js.
+-->
+<body>
+	<div id="fond"></div>
+	<div id="voile"></div>
+
+	<div id="scene">
+		<div class="bande" id="bande_haut_sombre"></div>
+		<div class="bande" id="bande_haut_vive"></div>
+		<div class="bande" id="bande_bas_vive"></div>
+		<div class="bande" id="bande_bas_sombre"></div>
+
+		<div id="titre"></div>
+
+		<div id="sous_titre">
+			<span id="lieu"></span>
+			<span id="mention">Liste de départ</span>
+		</div>
+
+		<div id="epreuve"><span id="epreuve_nom"></span></div>
+
+		<div id="tableau">
+			<div class="ligne" id="entete">
+				<div class="c_rang">Ordre</div>
+				<div class="c_heure">Départ</div>
+				<div class="c_dossard">Dos.</div>
+				<div class="c_nom">Nom</div>
+				<div class="c_club">Club</div>
+				<div class="c_nation">Nat.</div>
+			</div>
+			<div id="corps"></div>
+		</div>
+
+		<div id="attente">
+			<div id="attente_titre">Liste de départ à venir</div>
+		</div>
+
+		<div id="pagination"></div>
+		<div id="logo_ffck"></div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v3"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js"></script>
+	<script src="./js/tv_departs.js?v2"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

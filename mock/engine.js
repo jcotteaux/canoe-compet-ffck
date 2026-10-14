@@ -37,7 +37,9 @@ class Engine extends EventEmitter {
     const firstStart = P.parseClock(f.first_start || '10:00:00');
     const interval = (f.start_interval_s || 60) * 1000;
 
-    this.clock = firstStart - 30000; // on démarre 30 s avant le premier départ
+    // On démarre 30 s avant le premier départ, ou à `clock_start` si la
+    // fixture le précise (répétition de régie : compte à rebours, présentateur).
+    this.clock = f.clock_start ? P.parseClock(f.clock_start) : firstStart - 30000;
     this.currentEpreuve = f.epreuves[0].code;
 
     // ordre de départ : par épreuve puis par dossard, comme une vraie liste de départ
@@ -131,6 +133,14 @@ class Engine extends EventEmitter {
             this.addPenalty(b.bib, porte, value);
           }
         }
+      }
+
+      // Les juges valident aussi les portes passées sans faute, au fil du
+      // parcours : competFFCK envoie alors un <penalty_add> à '0'.
+      for (let p = 1; p <= this.nbPorte; p++) {
+        const prevue = this.penaPlan && b.pena_plan && b.pena_plan[p] !== undefined;
+        const at = (b.ref_time_ms * p) / (this.nbPorte + 1) + 1500;
+        if (!prevue && b.pena[p] === undefined && elapsed >= at) this.addPenalty(b.bib, p, 0);
       }
 
       for (let n = 1; n <= this.nbInter; n++) {

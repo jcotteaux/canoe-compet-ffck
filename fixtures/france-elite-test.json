@@ -1,0 +1,138 @@
+{
+  "id": "france-elite-test",
+  "label": "Répétition régie France Elite (3 catégories)",
+  "speed": 4,
+  "first_start": "09:00:00",
+  "clock_start": "08:50:00",
+  "start_interval_s": 60,
+  "nb_inter": 2,
+  "nb_porte": 24,
+  "competition": {
+    "Code_competition": 3413,
+    "Nom": "Championnat de France Slalom Elite",
+    "Code_activite": "SLA",
+    "Code_niveau": "NAT",
+    "Date_debut": "2026-10-16",
+    "Lieu": "Cesson-Sévigné"
+  },
+  "course": {
+    "Code_course": 1,
+    "Libelle": "Cesson-Sévigné"
+  },
+  "phase": {
+    "Code_phase": 1,
+    "Libelle": "Qualification Manche 1"
+  },
+  "epreuves": [
+    {
+      "code": "INV",
+      "libelle": "Invités",
+      "etat": "1",
+      "offsetMs": 0
+    },
+    {
+      "code": "K1H",
+      "libelle": "Kayak homme",
+      "etat": "1",
+      "offsetMs": 0
+    },
+    {
+      "code": "K1D",
+      "libelle": "Kayak dame",
+      "etat": "1",
+      "offsetMs": 6000
+    }
+  ],
+  "boats": [
+    {
+      "bib": 1,
+      "epreuve": "INV",
+      "nom": "CHEVALIER Arthur",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 97318,
+      "hour_start": "09:00:00"
+    },
+    {
+      "bib": 2,
+      "epreuve": "INV",
+      "nom": "RIVIERE Hugo",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 103855,
+      "hour_start": "09:01:00"
+    },
+    {
+      "bib": 3,
+      "epreuve": "INV",
+      "nom": "VASSEUR Quentin",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 93618,
+      "hour_start": "09:02:00"
+    },
+    {
+      "bib": 4,
+      "epreuve": "K1H",
+      "nom": "CHEVALIER Arthur",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 97323,
+      "hour_start": "09:07:00"
+    },
+    {
+      "bib": 5,
+      "epreuve": "K1H",
+      "nom": "RIVIERE Hugo",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 92943,
+      "hour_start": "09:08:00"
+    },
+    {
+      "bib": 6,
+      "epreuve": "K1H",
+      "nom": "VASSEUR Quentin",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 101835,
+      "hour_start": "09:09:00"
+    },
+    {
+      "bib": 7,
+      "epreuve": "K1H",
+      "nom": "GAUDIN Nolan",
+      "club": "CK Metz",
+      "nation": "FRA",
+      "ref_time_ms": 103975,
+      "hour_start": "09:10:00"
+    },
+    {
+      "bib": 8,
+      "epreuve": "K1D",
+      "nom": "CHEVALIER Louise",
+      "club": "ASCPA Tours",
+      "nation": "FRA",
+      "ref_time_ms": 103318,
+      "hour_start": "09:15:00"
+    },
+    {
+      "bib": 9,
+      "epreuve": "K1D",
+      "nom": "RIVIERE Anaïs",
+      "club": "Annecy CK",
+      "nation": "FRA",
+      "ref_time_ms": 109855,
+      "hour_start": "09:17:00"
+    },
+    {
+      "bib": 10,
+      "epreuve": "K1D",
+      "nom": "VASSEUR Sarah",
+      "club": "CKC Argentat",
+      "nation": "FRA",
+      "ref_time_ms": 99618,
+      "hour_start": "09:19:00"
+    }
+  ]
+}

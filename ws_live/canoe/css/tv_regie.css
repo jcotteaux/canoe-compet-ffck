@@ -1,0 +1,677 @@
+/*
+ * Régie automatique (tv_regie.html).
+ *
+ * Charte des autres écrans TV : marine #09006D, indigo #1D1580, bleu #097AFF,
+ * biseau -20 deg, Calibri. Aucune animation en fondu : la page passe dans
+ * l'incrustation chroma de l'ATEM, et une couche à moitié transparente sur la
+ * couleur de clé donnerait un voile violet. Tout entre et sort par glissement
+ * ou par masque.
+ */
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--ffck-navy: #09006D;
+	--ffck-indigo: #1D1580;
+	--ffck-blue: #097AFF;
+	--ffck-blue-light: #3680FF;
+	--ffck-sky: #629BF1;
+
+	--fond-haut: #05081F;
+	--fond-bas: #0A1145;
+
+	/* Couleur de clé commune à toutes les pages tv_* (voir tv_oncourse.css). */
+	--chroma-key: #CC00CC;
+
+	--regie-scale: 1;
+	--biseau: -20deg;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	background: transparent;
+	color: white;
+	font-family: Calibri, 'Carlito', 'Trebuchet MS', Arial, sans-serif;
+}
+
+/* Couleur de clé par défaut : partout où rien n'est dessiné, les caméras. */
+body.chroma
+{
+	background: var(--chroma-key);
+}
+
+#scene
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 1920px;
+	height: 1080px;
+	margin: -540px 0 0 -960px;
+
+	transform: scale(var(--regie-scale));
+	transform-origin: center center;
+	overflow: hidden;
+}
+
+/******************** couches ********************/
+
+/* Une seule couche visible. Les masquées restent chargées : leurs cadres
+   gardent leur connexion et sont prêts à l'instant. */
+.couche
+{
+	position: absolute;
+	inset: 0;
+	visibility: hidden;
+}
+
+.couche.visible
+{
+	visibility: visible;
+}
+
+.cadre iframe
+{
+	position: absolute;
+	inset: 0;
+	width: 1920px;
+	height: 1080px;
+	border: 0;
+	background: transparent;
+}
+
+/* Écrans maison opaques (compte à rebours, titre). */
+.maison
+{
+	background:
+		radial-gradient(ellipse 80% 70% at 15% 0%,
+			rgba(9, 122, 255, 0.30) 0%,
+			rgba(9, 122, 255, 0) 65%),
+		linear-gradient(160deg, var(--fond-haut) 0%, var(--fond-bas) 55%, #060B2C 100%);
+	overflow: hidden;
+}
+
+.bande
+{
+	position: absolute;
+	transform: skewX(var(--biseau));
+}
+
+.logos
+{
+	position: absolute;
+	right: 120px;
+	top: 70px;
+	display: flex;
+	align-items: center;
+	gap: 30px;
+}
+
+.logo_ffck
+{
+	width: 150px;
+	height: 110px;
+	background: url('../img/tv_duo/ffck.png') no-repeat center / contain;
+}
+
+.logo_club
+{
+	width: 210px;
+	height: 120px;
+	background: url('../img/tv_duo/logo_club.png') no-repeat center / contain;
+}
+
+/******************** compte à rebours ********************/
+
+#cp_bande1
+{
+	left: -80px;
+	top: 250px;
+	width: 1300px;
+	height: 14px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+}
+
+#cp_bande2
+{
+	left: 900px;
+	top: 1000px;
+	width: 1200px;
+	height: 40px;
+	background: linear-gradient(90deg, var(--ffck-navy) 0%, var(--ffck-indigo) 100%);
+}
+
+#cp_titre
+{
+	position: absolute;
+	left: 140px;
+	top: 120px;
+	width: 1200px;
+
+	font-size: 52px;
+	font-weight: bold;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	line-height: 1.05;
+}
+
+#cp_phase
+{
+	position: absolute;
+	left: 140px;
+	top: 290px;
+
+	font-size: 34px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+#cp_lbl
+{
+	position: absolute;
+	left: 140px;
+	top: 470px;
+
+	font-size: 30px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: #c9dbf7;
+}
+
+#cp_reste
+{
+	position: absolute;
+	left: 130px;
+	top: 510px;
+
+	font-size: 230px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+#cp_cat
+{
+	position: absolute;
+	left: 140px;
+	top: 790px;
+
+	font-size: 34px;
+	font-weight: bold;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+#cp_date
+{
+	position: absolute;
+	left: 140px;
+	top: 850px;
+
+	font-size: 28px;
+	letter-spacing: 0.10em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+/******************** présentateur ********************/
+
+/*
+ * Bas d'écran sur les caméras. Entrée sans fondu : la barre s'étire depuis la
+ * gauche, puis le nom et la fonction montent derrière un masque.
+ */
+#sp_bloc
+{
+	position: absolute;
+	left: 140px;
+	bottom: 150px;
+	width: 900px;
+	height: 150px;
+}
+
+#sp_barre
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100px;
+
+	/* Opaque jusqu'au bout : une barre translucide sur la couleur de clé
+	   donnerait un voile violet à l'incrustation. */
+	background: linear-gradient(90deg, var(--ffck-navy) 0%, var(--ffck-indigo) 100%);
+	border-left: 12px solid var(--ffck-blue);
+	transform-origin: left center;
+	transform: scaleX(0);
+}
+
+#sp_nom_masque
+{
+	position: absolute;
+	left: 44px;
+	top: 0;
+	height: 100px;
+	overflow: hidden;
+}
+
+#sp_nom
+{
+	font-size: 62px;
+	font-weight: bold;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	line-height: 100px;
+	white-space: nowrap;
+	transform: translateY(110%);
+}
+
+#sp_role_masque
+{
+	position: absolute;
+	left: 0;
+	top: 100px;
+	height: 50px;
+	overflow: hidden;
+}
+
+#sp_role
+{
+	height: 50px;
+	padding: 0 26px 0 44px;
+
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+	font-size: 30px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	line-height: 52px;
+	white-space: nowrap;
+	transform: translateY(-110%);
+}
+
+/* Entrée (.nom) : la barre s'étire, le nom monte, la fonction descend.
+   Sortie (.nom-sort) : l'inverse, la barre se replie vers la gauche. */
+#speaker.nom #sp_barre { animation: sp-barre 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#speaker.nom #sp_nom   { animation: monte 0.5s 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#speaker.nom #sp_role  { animation: descend 0.45s 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+#speaker.nom-sort #sp_barre { transform: scaleX(1); animation: sp-barre-sort 0.5s 0.3s cubic-bezier(0.6, 0, 0.8, 0.2) forwards; }
+#speaker.nom-sort #sp_nom   { transform: none; animation: nom-sort 0.35s cubic-bezier(0.6, 0, 0.8, 0.2) forwards; }
+#speaker.nom-sort #sp_role  { transform: none; animation: role-sort 0.3s cubic-bezier(0.6, 0, 0.8, 0.2) forwards; }
+
+@keyframes sp-barre      { to { transform: scaleX(1); } }
+@keyframes sp-barre-sort { to { transform: scaleX(0); } }
+@keyframes monte         { to { transform: none; } }
+@keyframes descend       { to { transform: none; } }
+@keyframes nom-sort      { to { transform: translateY(110%); } }
+@keyframes role-sort     { to { transform: translateY(-110%); } }
+
+/*
+ * Compte à rebours en bas à droite pendant que le présentateur parle : un
+ * rappel discret, sur une ligne, qui lui laisse l'image. Opaque (chroma),
+ * entrée par la droite.
+ */
+#sp_compte
+{
+	position: absolute;
+	right: 96px;
+	bottom: 70px;
+
+	display: flex;
+	align-items: baseline;
+	gap: 14px;
+	padding: 8px 20px 6px 22px;
+
+	background: var(--ffck-navy);
+	border-right: 6px solid var(--ffck-blue);
+
+	transform: translateX(700px);
+}
+
+#speaker.visible #sp_compte
+{
+	animation: compte-entre 0.55s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes compte-entre { to { transform: none; } }
+
+#sp_lbl
+{
+	font-size: 16px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+#sp_reste
+{
+	font-size: 34px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+#sp_cat
+{
+	font-size: 16px;
+	letter-spacing: 0.10em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+/******************** titre de catégorie ********************/
+
+#ti_bande1
+{
+	left: -100px;
+	top: 330px;
+	width: 1500px;
+	height: 300px;
+	background: linear-gradient(90deg, var(--ffck-navy) 0%, var(--ffck-indigo) 100%);
+	border-right: 16px solid var(--ffck-blue);
+	transform: skewX(var(--biseau)) translateX(-1700px);
+}
+
+#ti_bande2
+{
+	left: 1200px;
+	top: 660px;
+	width: 900px;
+	height: 26px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+	transform: skewX(var(--biseau)) translateX(1100px);
+}
+
+#ti_titre
+{
+	position: absolute;
+	left: 140px;
+	top: 150px;
+
+	font-size: 34px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #c9dbf7;
+}
+
+#ti_cat_masque
+{
+	position: absolute;
+	left: 130px;
+	top: 360px;
+	height: 240px;
+	overflow: hidden;
+}
+
+#ti_cat
+{
+	font-size: 190px;
+	font-weight: bold;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	line-height: 240px;
+	white-space: nowrap;
+	transform: translateY(105%);
+}
+
+#ti_phase
+{
+	position: absolute;
+	left: 140px;
+	top: 720px;
+
+	font-size: 44px;
+	font-weight: bold;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+	transform: translateX(-1400px);
+}
+
+#ti_info
+{
+	position: absolute;
+	left: 140px;
+	top: 790px;
+
+	font-size: 32px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	transform: translateX(-1400px);
+}
+
+#titre.joue #ti_bande1 { animation: glisse 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#titre.joue #ti_bande2 { animation: glisse 0.6s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#titre.joue #ti_cat    { animation: monte 0.55s 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#titre.joue #ti_phase  { animation: glisse-x 0.5s 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#titre.joue #ti_info   { animation: glisse-x 0.5s 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+@keyframes glisse   { to { transform: skewX(var(--biseau)) translateX(0); } }
+@keyframes glisse-x { to { transform: none; } }
+
+/******************** générique ********************/
+
+#generique
+{
+	background: #000;
+}
+
+#gen_video
+{
+	position: absolute;
+	inset: 0;
+	width: 1920px;
+	height: 1080px;
+	object-fit: cover;
+	background: #000;
+}
+
+/******************** rideau ********************/
+
+/*
+ * Quatre bandes obliques, de la droite (qui entre la première) vers la gauche :
+ * un filet clair, une bande bleue, la grande bande marine qui porte les logos,
+ * et un filet ciel qui ferme le passage. Elles partent l'une après l'autre,
+ * ce qui étire le mouvement comme un balayage de caméra.
+ *
+ * La marine fait 2600 px : posée à -260, elle couvre toute l'image malgré le
+ * biseau (±204 px sur 1120 de haut). Elle y reste de 40 à 60 % du passage,
+ * et c'est au milieu, à 50 %, que le JS change de scène (RIDEAU_DUREE).
+ * Aucun fondu : la page passe dans l'incrustation chroma.
+ */
+#rideau
+{
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 10;
+}
+
+#rideau .r
+{
+	position: absolute;
+	top: -20px;
+	bottom: -20px;
+	transform: skewX(var(--biseau)) translateX(-3400px);
+}
+
+#rideau .r_fin    { left: -70px;  width: 70px;   background: var(--ffck-sky); }
+#rideau .r_marine { left: 0;      width: 2600px;
+	background:
+		linear-gradient(90deg, rgba(9, 122, 255, 0.35) 0%, rgba(9, 122, 255, 0) 18%),
+		linear-gradient(90deg, var(--ffck-navy) 0%, var(--ffck-indigo) 55%, var(--ffck-navy) 100%); }
+#rideau .r_bleu   { left: 2600px; width: 110px;  background: var(--ffck-blue); }
+#rideau .r_clair  { left: 2710px; width: 46px;   background: var(--ffck-blue-light); }
+
+#rideau.passe .r_clair  { animation: rideau 1.2s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
+#rideau.passe .r_bleu   { animation: rideau 1.2s 0.012s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
+#rideau.passe .r_marine { animation: rideau 1.2s 0.024s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
+#rideau.passe .r_fin    { animation: rideau 1.2s 0.04s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
+
+@keyframes rideau
+{
+	0%   { transform: skewX(var(--biseau)) translateX(-3400px); }
+	40%  { transform: skewX(var(--biseau)) translateX(-260px); }
+	60%  { transform: skewX(var(--biseau)) translateX(-260px); }
+	100% { transform: skewX(var(--biseau)) translateX(2500px); }
+}
+
+/*
+ * Les logos, au centre de l'écran quand la marine le couvre (960 + 260 dans
+ * la bande), redressés du biseau. Ils glissent un peu moins vite que la bande
+ * pendant la pause : un léger effet de profondeur.
+ */
+#rideau .r_logos
+{
+	position: absolute;
+	left: 1220px;
+	top: 50%;
+	display: flex;
+	align-items: center;
+	gap: 44px;
+	transform: translate(-50%, -50%) skewX(20deg);
+}
+
+#rideau.passe .r_logos { animation: rideau-logos 1.2s 0.024s linear forwards; }
+
+@keyframes rideau-logos
+{
+	0%, 38% { transform: translate(-50%, -50%) skewX(20deg) translateX(90px) scale(0.92); }
+	62%     { transform: translate(-50%, -50%) skewX(20deg) translateX(-90px) scale(1); }
+	100%    { transform: translate(-50%, -50%) skewX(20deg) translateX(-90px) scale(1); }
+}
+
+#rideau .logo_ffck { width: 190px; height: 140px; }
+#rideau .logo_club { width: 250px; height: 150px; }
+
+#rideau .r_sep
+{
+	width: 4px;
+	height: 110px;
+	background: var(--ffck-blue);
+}
+
+/******************** liaison serveur ********************/
+
+/*
+ * Pastille en haut à droite, au-dessus de tout, rideau compris. Elle entre et
+ * sort en glissant depuis le bord droit (pas de fondu : chroma).
+ */
+#liaison
+{
+	position: absolute;
+	top: 24px;
+	right: 24px;
+	width: 36px;
+	height: 36px;
+	z-index: 30;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.40);
+
+	transform: translateX(100px);
+	transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s;
+}
+
+#liaison.ok,
+#liaison.coupee
+{
+	transform: none;
+}
+
+#liaison.ok     { background: #1f9d4a; }
+#liaison.coupee { background: #d3202e; animation: liaison-pouls 1.4s ease-in-out infinite; }
+
+@keyframes liaison-pouls
+{
+	0%, 100% { transform: scale(1); }
+	50%      { transform: scale(1.12); }
+}
+
+#liaison svg
+{
+	width: 22px;
+	height: 22px;
+	fill: none;
+	stroke: white;
+	stroke-width: 2.6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	display: none;
+}
+
+#liaison.ok .i_ok,
+#liaison.coupee .i_ko
+{
+	display: block;
+}
+
+#liaison .barre
+{
+	stroke-width: 3;
+}
+
+/******************** divers ********************/
+
+#erreur
+{
+	display: none;
+	position: absolute;
+	left: 100px;
+	top: 100px;
+	right: 100px;
+	padding: 30px;
+	background: #300;
+	font-size: 32px;
+}
+
+body[data-scene="erreur"] #erreur { display: block; }
+
+#debug
+{
+	display: none;
+	position: absolute;
+	left: 20px;
+	bottom: 14px;
+	padding: 6px 12px;
+	z-index: 20;
+
+	background: rgba(0, 0, 0, 0.75);
+	font-size: 20px;
+	font-family: Menlo, monospace;
+}
+
+body.debug #debug { display: block; }
+
+body.no-anim *,
+body.no-anim *::before,
+body.no-anim *::after
+{
+	animation-duration: 0s !important;
+	animation-delay: 0s !important;
+	transition: none !important;
+}

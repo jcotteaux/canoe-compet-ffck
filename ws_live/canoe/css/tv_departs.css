@@ -1,0 +1,87 @@
+/*
+ * Liste de départ (tv_departs.html) : s'ajoute à tv_results.css, dont elle
+ * reprend l'habillage entier. Ne change que les colonnes et les états de
+ * ligne propres à un départ.
+ */
+
+/* Ordre, heure, dossard, nom, club, nation. */
+.ligne
+{
+	grid-template-columns: 104px 170px 110px 1fr 440px 180px;
+}
+
+body.sans-nation .ligne
+{
+	grid-template-columns: 104px 170px 110px 1fr 440px;
+}
+
+#entete .c_heure,
+#entete .c_dossard
+{
+	text-align: center;
+}
+
+.ligne.res .c_heure
+{
+	text-align: center;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	font-size: calc(var(--res-ligne-h) * 0.56);
+}
+
+.ligne.res .c_club
+{
+	font-size: calc(var(--res-ligne-h) * 0.44);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+/* « Liste de départ — phase », à côté du lieu : la mention est toujours là. */
+#mention
+{
+	font-size: 22px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #dce8fb;
+}
+
+/* Le prochain à partir : encadré, heure en bleu plein. */
+.ligne.res.prochain
+{
+	box-shadow: inset 0 0 0 3px var(--ffck-blue-light);
+}
+
+.ligne.res.prochain .c_heure
+{
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Sur l'eau : « En course », en vert. */
+.ligne.res.sur-leau .c_heure
+{
+	color: #4fe08a;
+	font-size: calc(var(--res-ligne-h) * 0.36);
+	letter-spacing: 0.03em;
+	text-overflow: clip;
+	text-transform: uppercase;
+}
+
+/* Déjà passé : estompé, il reste lisible pour qui cherche un nom. Sur les
+   cellules et pas sur la ligne : l'animation d'entrée de la ligne finit sur
+   opacity 1 et l'emporterait. */
+.ligne.res.fait > div
+{
+	opacity: 0.45;
+}
+
+/* Rien à montrer : un seul titre, sans le dessin animé de tv_results. */
+#attente,
+body.theme-photo #attente
+{
+	top: 440px;
+}

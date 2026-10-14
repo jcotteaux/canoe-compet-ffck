@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Duo</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_duo.css?v8" rel="stylesheet">
+</head>
+
+<!--
+	Habillage plein écran 1920 x 1080 autour de deux vidéos.
+	  - deux fenêtres laissées vides (transparentes, ou couleur de clé avec ?bg=1)
+	    pour les caméras : les quarts haut gauche et bas droit, là où la macro
+	    « Duo » de l'ATEM pose les deux fenêtres du SuperSource ;
+	  - en haut à droite : classement de l'épreuve en cours, 3 premiers figés ;
+	  - en bas à gauche : les bateaux en course, chrono et pénalités porte par porte.
+-->
+<body>
+	<div id="scene">
+		<!-- Le fond est percé aux emplacements des vidéos (clip-path posé par le JS). -->
+		<div id="fond">
+			<div class="bande" id="bande_haut"></div>
+			<div class="bande" id="bande_bas"></div>
+		</div>
+
+		<div class="cadre" id="cadre1"></div>
+		<div class="cadre" id="cadre2"></div>
+
+		<div id="classement">
+			<div id="cl_entete">
+				<div id="cl_titres">
+					<div id="direct"><span class="point"></span>En direct</div>
+					<div id="epreuve_nom"></div>
+				</div>
+				<div id="logos">
+					<div id="logo_ffck" role="img" aria-label="FFCK"></div>
+					<div id="logo_club" role="img" aria-label="Cesson-Sévigné Poissons volants"></div>
+				</div>
+			</div>
+			<div class="ligne" id="cl_colonnes">
+				<div class="c_rang">Clt</div>
+				<div class="c_dossard">Dos.</div>
+				<div class="c_nom">Nom</div>
+				<div class="c_pena">Pén.</div>
+				<div class="c_temps">Temps</div>
+				<div class="c_ecart">Écart</div>
+			</div>
+			<div id="corps"></div>
+			<div id="cl_attente">En attente des premiers arrivants</div>
+			<div id="pagination"></div>
+		</div>
+
+		<div id="encourse">
+			<div id="ec_entete">
+				<span id="titre"></span>
+				<span id="lieu"></span>
+				<div id="partenaire">
+					<span>Partenaire technique</span>
+					<div id="logo_partenaire" role="img" aria-label="Archireport"></div>
+				</div>
+			</div>
+			<div id="cartes"></div>
+			<div id="ec_attente">En attente du prochain départ</div>
+		</div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v3"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js"></script>
+	<script src="./js/tv_duo.js?v8"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

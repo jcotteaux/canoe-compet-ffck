@@ -8,6 +8,8 @@
     "descente": "node mock/server.js --fixture descente-sprint",
     "slalom": "node mock/server.js --fixture slalom-finale",
     "international": "node mock/server.js --fixture descente-internationale",
+    "elite": "node mock/server.js --fixture slalom-24",
+    "regie": "node mock/server.js --scenario test",
     "fixtures": "node tools/make-fixtures.js",
     "test": "node tools/smoke.js",
     "relay": "node tools/relay.js",

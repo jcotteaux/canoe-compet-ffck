@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Régie</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_regie.css?v8" rel="stylesheet">
+</head>
+
+<!--
+	Régie automatique d'une demi-journée, 1920 x 1080 : tv_regie.html?scenario=<id>.
+	Une seule couche visible à la fois ; les écrans existants sont dans des
+	cadres chargés une fois, la page ne fait que les montrer ou les masquer.
+	Voir js/tv_regie.js pour le déroulé et le blindage.
+-->
+<body>
+	<div id="scene">
+		<!-- générique vidéo, au lancement, avant que la session commence -->
+		<div class="couche" id="generique">
+			<video id="gen_video" preload="auto" playsinline></video>
+		</div>
+
+		<!-- compte à rebours jusqu'au premier départ -->
+		<div class="couche maison" id="compte">
+			<div class="bande" id="cp_bande1"></div>
+			<div class="bande" id="cp_bande2"></div>
+			<div class="logos"><div class="logo_ffck"></div><div class="logo_club"></div></div>
+			<div id="cp_titre"></div>
+			<div id="cp_phase"></div>
+			<div id="cp_lbl">Début de la compétition dans</div>
+			<div id="cp_reste"></div>
+			<div id="cp_cat"></div>
+			<div id="cp_date"></div>
+		</div>
+
+		<!-- présentateur : les caméras, son nom en bas à gauche quelques
+		     secondes, le compte à rebours en bas à droite -->
+		<div class="couche" id="speaker">
+			<div id="sp_bloc">
+				<div id="sp_barre"></div>
+				<div id="sp_nom_masque"><div id="sp_nom"></div></div>
+				<div id="sp_role_masque"><div id="sp_role"></div></div>
+			</div>
+			<div id="sp_compte">
+				<div id="sp_lbl">Premier départ dans</div>
+				<div id="sp_reste"></div>
+				<div id="sp_cat"></div>
+			</div>
+		</div>
+
+		<!-- titre de la catégorie qui commence -->
+		<div class="couche maison" id="titre">
+			<div class="bande" id="ti_bande1"></div>
+			<div class="bande" id="ti_bande2"></div>
+			<div class="logos"><div class="logo_ffck"></div><div class="logo_club"></div></div>
+			<div id="ti_titre"></div>
+			<div id="ti_cat_masque"><div id="ti_cat"></div></div>
+			<div id="ti_phase"></div>
+			<div id="ti_info"></div>
+		</div>
+
+		<!-- écrans existants -->
+		<div class="couche cadre" id="c_resultats"><iframe title="résultats"></iframe></div>
+		<div class="couche cadre" id="c_depart"><iframe title="liste de départ"></iframe></div>
+		<div class="couche cadre" id="c_duo"><iframe title="course, deux vidéos"></iframe></div>
+		<div class="couche cadre" id="c_inrace"><iframe title="course, bateau suivi"></iframe></div>
+
+		<!-- transition : bandes obliques qui couvrent l'écran au changement,
+		     les logos passent avec la bande marine -->
+		<div id="rideau">
+			<div class="r r_fin"></div>
+			<div class="r r_marine">
+				<div class="r_logos">
+					<div class="logo_ffck"></div>
+					<div class="r_sep"></div>
+					<div class="logo_club"></div>
+				</div>
+			</div>
+			<div class="r r_bleu"></div>
+			<div class="r r_clair"></div>
+		</div>
+
+		<!-- liaison avec le serveur WebSocket : rouge coupée, verte 5 s quand elle prend -->
+		<div id="liaison" title="Liaison avec le serveur">
+			<svg class="i_ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
+			<svg class="i_ko" viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.4a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0" />
+				<path class="barre" d="M4 4l16 16" />
+			</svg>
+		</div>
+
+		<div id="erreur"></div>
+		<div id="debug"></div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v3"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js"></script>
+	<script src="./js/regie_scenarios.js?v1"></script>
+	<script src="./js/tv_regie.js?v8"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

@@ -5,6 +5,10 @@
  * du logiciel, sans MySQL ni competFFCK.exe.
  *
  *   node mock/server.js [--fixture slalom-finale] [--speed 4] [--record out.jsonl]
+ *   node mock/server.js --scenario vendredi-matin [--speed 10]
+ *
+ * --scenario rejoue une demi-journée de régie (fixture regie-<id>, démarrée
+ * 10 min avant le premier départ) ; « test » donne la petite répétition.
  */
 
 const http = require('http');
@@ -22,7 +26,9 @@ const args = parseArgs(process.argv.slice(2));
 const HTTP_PORT = Number(args.port || process.env.PORT || 3000);
 const WS_PORT = Number(args['ws-port'] || process.env.WS_PORT || 8080);
 
-const fixtureName = args.fixture || 'slalom-finale';
+const scenario = typeof args.scenario === 'string' ? args.scenario : null;
+const fixtureName = scenario ? (scenario === 'test' ? 'france-elite-test' : `regie-${scenario}`)
+  : (args.fixture || 'slalom-finale');
 const fixture = loadFixture(fixtureName);
 if (args.speed) fixture.speed = Number(args.speed);
 
@@ -186,6 +192,9 @@ const MIME = {
   '.eot': 'application/vnd.ms-fontobject',
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
+  '.mp4': 'video/mp4',
+  '.mov': 'video/quicktime',
+  '.webm': 'video/webm',
   '.map': 'application/json',
 };
 
@@ -233,8 +242,32 @@ function serveFile(res, target, query) {
       return res.end(html);
     }
 
+    const type = MIME[ext] || 'application/octet-stream';
+
+    // Requêtes partielles : Chrome lit les vidéos par morceaux (générique de
+    // tv_regie) et refuse d'en lancer une servie d'un bloc sans Accept-Ranges.
+    const range = /^bytes=(\d*)-(\d*)$/.exec(res.req.headers.range || '');
+    if (range) {
+      const start = range[1] === '' ? Math.max(0, stat.size - Number(range[2])) : Number(range[1]);
+      const end = range[1] !== '' && range[2] !== '' ? Math.min(Number(range[2]), stat.size - 1) : stat.size - 1;
+      if (start > end || start >= stat.size) {
+        res.writeHead(416, { 'Content-Range': `bytes */${stat.size}` });
+        return res.end();
+      }
+      res.writeHead(206, {
+        'Content-Type': type,
+        'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+        'Content-Length': end - start + 1,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'no-cache',
+      });
+      return fs.createReadStream(target, { start, end }).pipe(res);
+    }
+
     res.writeHead(200, {
-      'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Content-Type': type,
+      'Content-Length': stat.size,
+      'Accept-Ranges': 'bytes',
       'Cache-Control': 'no-cache',
     });
     fs.createReadStream(target).pipe(res);
@@ -378,6 +411,8 @@ server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log(`  tv podium            http://localhost:${HTTP_PORT}/canoe/tv_podium.html`);
   console.log(`  tv ranking           http://localhost:${HTTP_PORT}/canoe/tv_ranking.html`);
   console.log(`  tv startlist         http://localhost:${HTTP_PORT}/canoe/tv_startlist.html`);
+  console.log(`  tv duo               http://localhost:${HTTP_PORT}/canoe/tv_duo.html`);
+  console.log(`  tv regie             http://localhost:${HTTP_PORT}/canoe/tv_regie.html?scenario=${scenario || 'test'}&repetition=1&debug=1`);
   console.log(`  jugement             http://localhost:${HTTP_PORT}/canoe/jugement.html`);
   console.log(`  inrace (php)         http://localhost:${HTTP_PORT}/canoe/inrace.php`);
   console.log('');

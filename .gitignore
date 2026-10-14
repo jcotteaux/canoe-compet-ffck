@@ -9,3 +9,11 @@ archives/
 
 # Clé du serveur live FFCK : copier config.example.php et la renseigner
 gestion_kcross_series/api/config/config.php
+
+# Championnats de France Elite (Cesson-Sévigné, 15-18 octobre 2026) :
+# documents de l'événement, hors dépôt
+france-elite/
+
+# Vidéos de la régie (générique…) : trop lourdes pour le dépôt, à copier sur
+# le serveur de course avec le reste de ws_live
+ws_live/canoe/video/
