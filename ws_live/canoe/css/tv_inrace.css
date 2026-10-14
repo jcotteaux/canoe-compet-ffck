@@ -204,6 +204,48 @@ body.chroma { background: var(--chroma-key); }
 }
 
 /*
+ * Mode réduit (identité repliée) : dossard et nom en petit sous le chrono,
+ * dans le même pavé, sans en changer la hauteur.
+ */
+#block_running .pave
+{
+	position: relative;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+#block_running .pave .time
+{
+	box-shadow: none;
+	transition: padding-bottom 0.3s ease;
+}
+
+#block_running .runner
+{
+	position: absolute;
+	left: 28px;
+	right: 28px;
+	bottom: 10px;
+	color: var(--time-text);
+	font-size: 24px;
+	line-height: 28px;
+	text-align: right;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+#block_running.reduced .pave .time
+{
+	min-width: 380px;
+	padding-bottom: 30px;
+	font-size: 60px;
+}
+
+#block_running.reduced .runner { opacity: 0.8; }
+
+/*
  * Le script affiche et masque les blocs par style.display ('block' / 'none') :
  * la mise en page vit donc dans un élément intérieur, que ce réglage ne touche pas.
  */
@@ -284,6 +326,54 @@ body.chroma { background: var(--chroma-key); }
 }
 
 #block_inter .row .time { box-shadow: none; }
+
+/*
+ * Chrono qui continue de tourner sous le temps de passage figé, en petit,
+ * précédé d'un point rouge « en direct ». Même place que le nom en mode réduit.
+ */
+#block_inter .pave { position: relative; }
+
+#block_inter .pave .time
+{
+	min-width: 340px;
+	padding-bottom: 30px;
+	font-size: 60px;
+}
+
+#block_inter .live
+{
+	position: absolute;
+	right: 28px;
+	bottom: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--time-text);
+	font-size: 28px;
+	line-height: 28px;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.8;
+}
+
+#block_inter .live::before
+{
+	content: '';
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: var(--red);
+	animation: live-dot 1s ease-in-out infinite alternate;
+}
+
+#block_inter .live:empty { display: none; }
+
+@keyframes live-dot
+{
+	from { opacity: 1; }
+	to   { opacity: 0.3; }
+}
+
+body.chroma #block_inter .live::before { animation: none; }
 
 /* Devant le leader à cet intermédiaire : badge doré qui pulse. */
 #block_inter .row .badge
@@ -531,4 +621,8 @@ body.chroma #block_pena .gate { animation-name: pena-in-chroma; }
 /* ?anim=0 : plus aucune animation, comme sur les autres pages TV. */
 body.no-anim *,
 body.no-anim *::before,
-body.no-anim *::after { animation: none !important; }
+body.no-anim *::after { animation: none !important; transition: none !important; }
+
+/* Pas de fondu en incrustation par couleur : il laisserait un fantôme rose. */
+body.chroma #block_running .runner,
+body.chroma #block_running .pave .time { transition: none; }

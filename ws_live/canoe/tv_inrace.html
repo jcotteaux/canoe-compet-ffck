@@ -7,7 +7,7 @@
 	<link rel="shortcut icon" href="./16x16_ffck.png" />
 	<link rel="icon" href="./16x16_ffck.png"/>
 
-	<link href="./css/tv_inrace.css?v2" rel="stylesheet">
+	<link href="./css/tv_inrace.css?v4" rel="stylesheet">
 </head>
 
 <!--
@@ -29,7 +29,10 @@
 	</div>
 
 	<div id="block_running" style="display:none">
-		<div class="time">0,00</div>
+		<div class="pave">
+			<div class="time">0,00</div>
+			<div class="runner"></div>
+		</div>
 	</div>
 
 	<div id="block_leader" style="display:none">
@@ -50,7 +53,10 @@
 			<div class="badge">New leader</div>
 			<div class="label">Inter</div>
 			<div class="diff">+99.99</div>
-			<div class="time">1:59.99</div>
+			<div class="pave">
+				<div class="time">1:59.99</div>
+				<div class="live"></div>
+			</div>
 		</div>
 	</div>
 
@@ -82,7 +88,7 @@
 	<script src="../adv/canoe.js"></script>
 
 	<script src="./js/tv_order.js?v1"></script>
-	<script src="./js/tv_inrace.js?v5"></script>
+	<script src="./js/tv_inrace.js?v7"></script>
 
 	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
 </body>

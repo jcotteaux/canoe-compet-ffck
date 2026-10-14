@@ -75,6 +75,7 @@ function Resync()
 	SetName('#block_start', tRanking, row);
 	SetClub('#block_start', tRanking, row);
 	SetCateg('#block_start', tRanking, row);
+	document.querySelector('#block_running .runner').dataset.bib = '';
 	if (canoe.GetCodeActivite() == 'SLA')
 	{
 		for (let p=1;p<=canoe.GetNbPorte();p++)
@@ -230,6 +231,7 @@ function DoBroadcastBibTimeInter(bib, time_chrono, inter)
 				txtTime = adv.GetChronoHHMMSSCC(tps);
 			
 			document.querySelector('#block_inter .row .label').textContent = 'Inter '+inter;
+			document.querySelector('#block_inter .live').textContent = '';
 			document.querySelector('#block_inter').classList.toggle('new-leader', newLeader);
 			document.querySelector('#block_inter .time').innerHTML = txtTime;
 			document.querySelector("#block_inter .diff").innerHTML = txtDiff;
@@ -587,7 +589,10 @@ function Reload()
 function OnFlowOnCourse(objJSON)
 {
 	if (wsMain.timeoutInter != null)
+	{
+		ShowRunningUnderInter(objJSON);
 		return;
+	}
 
 	// Avant le classement, on ne saurait ni nommer le bateau ni le situer :
 	// à l'ouverture de la page, on attend qu'il soit chargé.
@@ -684,6 +689,7 @@ function OnFlowOnCourse(objJSON)
 				ShowLeader(time_running);
 
 			HideBlockStart();
+			UpdateRunnerLine();
 		}
 		else
 		{
@@ -694,6 +700,37 @@ function OnFlowOnCourse(objJSON)
 			ForceBib(wsMain.bib_select);
 		}
 	}
+}
+
+/*
+ * Pendant l'intermédiaire, le temps de passage est figé en gros ; le chrono
+ * continue de tourner en petit dessous, pour qu'on ne perde pas la course.
+ */
+function ShowRunningUnderInter(objJSON)
+{
+	const el = document.querySelector('#block_inter .live');
+	const tOnCourse = adv.GetTableUnique(objJSON, 'table');
+	if (el == null || tOnCourse == null || typeof tOnCourse !== 'object')
+		return;
+
+	const i = tOnCourse.GetIndexRow('bib', wsMain.bib_select);
+	if (i < 0)
+	{
+		el.textContent = '';
+		return;
+	}
+
+	let time_running = tOnCourse.GetCellInt('time', i);
+	if (canoe.GetCodeActivite() == 'SLA')
+	{
+		const tRanking = canoe.GetTableRanking();
+		const row = canoe.GetRankingBibIndex(tRanking, wsMain.bib_select);
+		if (row >= 0 && wsMain.time_running_pena == 1)
+			time_running += canoe.GetCurrentSlalomTotalPena(tRanking, row)*1000;
+		el.textContent = adv.GetChrono(time_running, 'XSCC');
+	}
+	else
+		el.textContent = adv.GetChrono(time_running, 'HHMMSSCC');
 }
 
 function ShowBibNext(tOncourse)
@@ -975,36 +1012,55 @@ function SetLeader()
 	}
 }
 
+/** Nom du bateau sur une seule ligne : équipage abrégé « A / B ». */
+function BoatOneLine(bateau)
+{
+	let iSeparator = bateau.indexOf('/');
+	if (iSeparator > 0)
+	{
+		let equipier1 = bateau.substring(0, iSeparator).trim();
+		if (equipier1.length > 15)
+			equipier1 = equipier1.substring(0,14)+'.';
+
+		let equipier2 = bateau.substring(iSeparator+1).trim();
+		if (equipier2.length > 15)
+			equipier2 = equipier2.substring(0,14)+'.';
+
+		return equipier1+' / '+equipier2;
+	}
+	return TruncateNameLeader(bateau);
+}
+
 function SetLeaderName(el)
 {
 	const tRanking = canoe.GetTableRanking();
 	if (el != null && typeof tRanking === 'object')
 	{
 		el.innerHTML = '';
+		// Une seule ligne : la bande du leader n'a la hauteur que d'un nom.
 		if (wsMain.leader_index >= 0)
-		{
-			let bateau = tRanking.GetCell('Bateau', wsMain.leader_index);
-
-			let iSeparator = bateau.indexOf('/');
-			if (iSeparator > 0)
-			{
-				let equipier1 = bateau.substring(0, iSeparator).trim();
-				if (equipier1.length > 15)
-					equipier1 = equipier1.substring(0,14)+'.';
-
-				let equipier2 = bateau.substring(iSeparator+1).trim();
-				if (equipier2.length > 15)
-					equipier2 = equipier2.substring(0,14)+'.';
-				
-				// Une seule ligne : la bande du leader n'a la hauteur que d'un nom.
-				el.textContent = equipier1+' / '+equipier2;
-			}
-			else
-			{
-				el.textContent = TruncateNameLeader(bateau);
-			}
-		}
+			el.textContent = BoatOneLine(tRanking.GetCell('Bateau', wsMain.leader_index));
 	}
+}
+
+/*
+ * Mode réduit : une fois l'identité repliée (delay_start), seul le chrono
+ * reste à l'écran. Le dossard et le nom passent alors en petit sous le temps,
+ * dans le même pavé, pour qu'on sache toujours qui est sur l'eau.
+ */
+function UpdateRunnerLine()
+{
+	const block = document.getElementById('block_running');
+	const line = block.querySelector('.runner');
+	if (line.dataset.bib != String(wsMain.bib_select))
+	{
+		const tRanking = canoe.GetTableRanking();
+		const row = canoe.GetRankingBibIndex(tRanking, wsMain.bib_select);
+		line.textContent = row >= 0 ? wsMain.bib_select+'  '+BoatOneLine(tRanking.GetCell('Bateau', row)) : '';
+		line.dataset.bib = row >= 0 ? wsMain.bib_select : '';
+	}
+	const reduced = document.getElementById('block_start').style.display != 'block' && line.textContent != '';
+	block.classList.toggle('reduced', reduced);
 }
 
 function ShowLeader(tpsRunning)
