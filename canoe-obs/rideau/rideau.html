@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>Rideau</title>
+	<!-- Le rideau de la régie, seul, sur fond transparent : rideau.sh en fait
+	     la transition d'OBS. Le style est celui de tv_regie.css, sans copie. -->
+	<link href="../../canoe-wslive/ws_live/canoe/css/tv_regie.css" rel="stylesheet">
+</head>
+<body>
+	<div id="scene">
+		<div id="rideau" class="passe">
+			<div class="r r_fin"></div>
+			<div class="r r_marine">
+				<div class="r_logos">
+					<div class="logo_ffck"></div>
+					<div class="r_sep"></div>
+					<div class="logo_club"></div>
+				</div>
+			</div>
+			<div class="r r_bleu"></div>
+			<div class="r r_clair"></div>
+		</div>
+	</div>
+	<script>
+		// ?t=600 : l'image du rideau à 600 ms, animations arrêtées à cet instant.
+		const t = Number(new URLSearchParams(location.search).get('t') || 0);
+		document.getAnimations().forEach(function(a) { a.pause(); a.currentTime = t; });
+	</script>
+</body>
+</html>

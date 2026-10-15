@@ -603,6 +603,9 @@ body.chroma
 	transform: none;
 }
 
+/* Sur la clé, l'ombre ferait un halo magenta sombre autour de la pastille. */
+body.chroma #liaison { box-shadow: none; }
+
 #liaison.ok     { background: #1f9d4a; }
 #liaison.coupee { background: #d3202e; animation: liaison-pouls 1.4s ease-in-out infinite; }
 

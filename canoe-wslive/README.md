@@ -6,6 +6,12 @@ Les pages tournent sur ce Mac (`npm run serve`), les données viennent du
 competFFCK du serveur de course. **Pas `npm start`** : il lance aussi un faux
 serveur avec une course simulée.
 
+**En une commande** : `./regie.sh` fait les étapes 1 à 3 — vérifie le serveur
+de course et le générique, affiche l'adresse de la demi-journée (déduite du jour
+et de l'heure, ou `./regie.sh vendredi-matin`) et la copie dans le
+presse-papiers, puis lance le serveur local. `SERVEUR=… ./regie.sh` pour un
+autre serveur de course.
+
 ### 1. Préparer (une fois)
 
 ```bash

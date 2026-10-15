@@ -154,6 +154,13 @@ body.chroma
 	pointer-events: none;
 }
 
+/* Fenêtres remplies de clé (?bg=1) : le halo déborderait dans l'image des
+   caméras, mélangé au magenta. Le filet seul, net. */
+body.chroma .cadre
+{
+	box-shadow: none;
+}
+
 /******************** classement ********************/
 
 #classement

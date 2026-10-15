@@ -627,3 +627,9 @@ body.no-anim *::after { animation: none !important; transition: none !important;
 /* Pas de fondu en incrustation par couleur : il laisserait un fantôme rose. */
 body.chroma #block_running .runner,
 body.chroma #block_running .pave .time { transition: none; }
+
+/* Ni ombre portée : sur la clé, elle laisserait un halo magenta sombre sous
+   chaque bloc. */
+body.chroma *,
+body.chroma *::before,
+body.chroma *::after { box-shadow: none !important; }

@@ -88,7 +88,8 @@
  *   tuiles=4          emplacements du bandeau du bas, toujours de même taille :
  *                     dernier arrivé, bateaux en course, prochains partants
  *   delai_glisse=1000 attente entre une arrivée et le glissement des tuiles, en ms
- *   no_course         supprime le bandeau des bateaux en course
+ *   no_course         supprime le bandeau des bateaux en course ; le
+ *                     tableau descend alors jusqu'au pied de l'écran
  *   fmt=XSCC          format du chrono (défaut : selon l'activité)
  *   anim=1            active les animations (défaut : aucune, tout apparaît
  *                     d'un coup ; anim=0 reste accepté)
@@ -861,7 +862,9 @@ function PasDefilement(t)
 		piste.classList.remove('efface');
 	}
 
-	piste.style.transform = 'translateY(' + (-d.pos).toFixed(1) + 'px)';
+	// Au pixel entier : entre deux pixels, les lignes se brouillent et des
+	// coutures apparaissent entre elles pendant le défilement.
+	piste.style.transform = 'translateY(' + (-Math.round(d.pos)) + 'px)';
 	window.requestAnimationFrame(PasDefilement);
 }
 
@@ -1445,6 +1448,9 @@ function ChoisirHabillage(urlParams)
  * qui ramène le bas du tableau de 992 à 846. Sans bandeau, le tableau
  * n'occupe pas toute la hauteur disponible, et c'est justement dans cet
  * espace libre que le bandeau vient se loger.
+ *
+ * Avec ?no_course, le bandeau ne viendra jamais : le tableau prend toute la
+ * hauteur jusqu'au pied (c'est ce que demande la régie en fin de catégorie).
  */
 function CalerHauteurLignes()
 {
@@ -1452,7 +1458,9 @@ function CalerHauteurLignes()
 	// « mise en page resserrée »), le tableau gagne 70 px.
 	const photo = document.body.classList.contains('theme-photo');
 	const HAUT = photo ? 186 : 226;	// haut du tableau (tv_results.css)
-	const BAS = photo ? 876 : 846;	// bas du tableau quand le bandeau est là
+	// Bas du tableau : au-dessus du bandeau s'il peut venir, sinon au-dessus
+	// des bandes du pied (photo : 1032, classique : 1000).
+	const BAS = wsMain.showCourse ? (photo ? 876 : 846) : (photo ? 1020 : 992);
 	const ENTETE = 46;				// en-tête de colonnes + sa marge
 	const MARGE = 4;				// espace entre deux lignes
 	const FILET = 16;				// marge du filet de la partie tournante

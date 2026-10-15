@@ -248,10 +248,40 @@ function Bateaux(epreuve)
 }
 
 /**
+ * La catégorie du prochain partant, toutes catégories confondues : le bateau
+ * sans résultat, pas encore sur l'eau, dont l'heure de départ est la plus
+ * proche (un retard de 30 s compte encore). '' si personne n'est attendu.
+ */
+function EpreuveProchainPartant(heure)
+{
+	const tRanking = canoe.GetTableRanking();
+	if (!regie.pret || typeof tRanking !== 'object' || tRanking === null)
+		return '';
+
+	const cp = canoe.GetCodeCoursePhase();
+	let prochain = null;
+	for (let row = 0; row < tRanking.GetNbRows(); row++)
+	{
+		const depart = tRanking.GetCellInt('Heure_depart' + cp, row, 0);
+		if (depart <= 0 || depart < heure - 30000)
+			continue;
+		if (String(tRanking.GetCell('Tps' + cp, row)) !== '')
+			continue;
+		if (regie.onCourse.indexOf(String(tRanking.GetCell('Dossard', row))) >= 0)
+			continue;
+		if (prochain === null || depart < prochain.depart)
+			prochain = { depart : depart, epreuve : String(tRanking.GetCell('Code_categorie', row)) };
+	}
+	return prochain ? prochain.epreuve : '';
+}
+
+/**
  * Où en est une catégorie. `heure` en ms depuis minuit.
  *   commencee  un bateau a un résultat ou est sur l'eau
  *   finie      tous ont un résultat, ou personne sur l'eau 3 min après le
- *              dernier départ prévu
+ *              dernier départ prévu — mais jamais tant que le prochain
+ *              partant est de cette catégorie : son classement n'est pas
+ *              fini, il ne passe pas à l'antenne entre deux de ses bateaux
  *   finA       heure de la dernière arrivée (ms depuis minuit), 0 si inconnue
  */
 function Etat(cat, heure)
@@ -268,7 +298,8 @@ function Etat(cat, heure)
 
 	const commencee = surLeau || avecResultat.length > 0;
 	const finie = commencee && !surLeau
-		&& (avecResultat.length === bateaux.length || heure > dernierDepart + 180000);
+		&& (avecResultat.length === bateaux.length || heure > dernierDepart + 180000)
+		&& EpreuveProchainPartant(heure) !== String(cat.epreuve);
 
 	let finA = 0;
 	avecResultat.forEach(function(b) {
@@ -717,7 +748,10 @@ function PreparerCadres(s)
 	if (dep && dep.vue === 'kcross')
 		dep = null;
 
-	Cadre('c_resultats', res ? 'tv_results.html?epreuve=' + encodeURIComponent(res.epreuve) : null);
+	// En régie, le classement seul sur toute la hauteur : pas de tuiles (le
+	// dernier arrivé est déjà dans le classement), et plus de lignes. Les
+	// écrans TV fixes gardent leur tv_results habituel.
+	Cadre('c_resultats', res ? 'tv_results.html?epreuve=' + encodeURIComponent(res.epreuve) + '&no_course&max=12' : null);
 	Cadre('c_depart', dep ? 'tv_departs.html?epreuve=' + encodeURIComponent(dep.epreuve) : null);
 }
 
@@ -968,9 +1002,14 @@ function Init()
 		}
 	}
 
-	// Écrans de course chargés une fois pour toutes.
-	document.querySelector('#c_duo iframe').src = 'tv_duo.html';
-	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html';
+	// Écrans de course chargés une fois pour toutes. En incrustation par
+	// couleur, ils passent eux aussi en mode chroma (bg=1) : sans lui,
+	// tv_inrace entre en fondu et ses ombres, comme le halo des fenêtres de
+	// tv_duo, se mélangent au magenta de la régie (voile violet à l'antenne).
+	const q = (document.body.classList.contains('chroma') ? '?bg=1' : '?bg=0')
+		+ (regie.reglages.anim ? '' : '&anim=0');
+	document.querySelector('#c_duo iframe').src = 'tv_duo.html' + q;
+	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html' + q;
 
 	Redimensionner();
 	window.addEventListener('resize', Redimensionner);
