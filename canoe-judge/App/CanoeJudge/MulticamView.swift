@@ -34,7 +34,7 @@ struct PlayerView: NSViewRepresentable {
 
 struct MulticamGrid: View {
     let model: JudgeModel
-    @Binding var zoomed: URL?
+    @Binding var zoomed: String?
 
     private var visible: [PlayerCluster.Lane] {
         guard let zoomed else { return model.cluster.lanes }
@@ -92,7 +92,7 @@ struct MulticamGrid: View {
 private struct CameraCell: View {
     let model: JudgeModel
     let lane: PlayerCluster.Lane
-    @Binding var zoomed: URL?
+    @Binding var zoomed: String?
 
     private var covered: Bool { model.cluster.covers(lane, clockMs: model.cluster.clockMs) }
 
@@ -111,7 +111,7 @@ private struct CameraCell: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
 
-            Text(lane.source.camera)
+            Text(lane.camera)
                 .font(.system(size: 11, weight: .semibold))
                 .padding(.horizontal, 6).padding(.vertical, 3)
                 .background(.black.opacity(0.55), in: Capsule())
@@ -136,12 +136,12 @@ private struct CameraCell: View {
         .contextMenu {
             // Écarter une caméra là où on s'aperçoit qu'elle ne sert à rien :
             // devant son image, pas dans un menu à l'autre bout de la fenêtre.
-            Button("Ne pas utiliser \(lane.source.camera)") {
+            Button("Ne pas utiliser \(lane.camera)") {
                 if zoomed == lane.id { zoomed = nil }
-                model.setCamera(lane.source.camera, used: false)
+                model.setCamera(lane.camera, used: false)
             }
         }
-        .help("Double-cliquer pour agrandir \(lane.source.camera)")
+        .help("Double-cliquer pour agrandir \(lane.camera)")
     }
 }
 

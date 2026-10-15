@@ -155,7 +155,8 @@ func windowSourceCarriesOnlyTheSource() {
 func windowLayoutCarriesGeometry() {
     let command = MacroStep.windowLayout(window: 1, enabled: true, geometry: .bottomRight).encoded()
 
-    #expect(command.readUInt16BE(at: 8) == 0x1d)    // enabled + x + y + size
+    #expect(command.readUInt16BE(at: 8) == 0x3d)    // enabled + x + y + size + recadrage
+    #expect(command.readUInt8(at: 22) == 0)         // recadrage retiré
     #expect(command.readUInt8(at: 12) == 1)         // allumée
     #expect(command.readUInt16BE(at: 14) == 0)      // source hors masque
     #expect(command.readInt16BE(at: 16) == 800)
@@ -177,6 +178,11 @@ func regiePlanCoversBothWindows() throws {
     #expect(recipes[0].steps.contains(.windowLayout(window: 0, enabled: true, geometry: .topLeft)))
     #expect(recipes[0].steps.contains(.windowLayout(window: 1, enabled: true, geometry: .bottomRight)))
     #expect(recipes[0].steps.contains(.program(source: 6000)))
+    // Les fenêtres 3 et 4 de la mosaïque par défaut sont éteintes dans les deux cadrages.
+    for recipe in recipes[0...1] {
+        #expect(recipe.steps.contains(.windowOff(window: 2)))
+        #expect(recipe.steps.contains(.windowOff(window: 3)))
+    }
 
     // Le plein écran éteint la seconde fenêtre plutôt que de la déplacer.
     #expect(recipes[1].steps.contains(.windowLayout(window: 0, enabled: true, geometry: .fullScreen)))

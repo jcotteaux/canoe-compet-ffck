@@ -66,11 +66,19 @@ final class AppModel {
         static let sectorMacros = "sectors.macros"
     }
 
+    /// Les adresses de la régie des France Elite : l'app s'y connecte dès le
+    /// premier lancement. Une adresse vidée dans les réglages y revient.
+    static let defaultAtemHost = "192.168.50.10"
+    static let defaultCanoeHost = "192.168.1.52"
+    static let defaultCanoePort = 8080
+
     init() {
-        atemHost = defaults.string(forKey: Keys.atemHost) ?? ""
-        canoeHost = defaults.string(forKey: Keys.canoeHost) ?? ""
+        let atem = defaults.string(forKey: Keys.atemHost) ?? ""
+        atemHost = atem.isEmpty ? Self.defaultAtemHost : atem
+        let canoe = defaults.string(forKey: Keys.canoeHost) ?? ""
+        canoeHost = canoe.isEmpty ? Self.defaultCanoeHost : canoe
         let port = defaults.integer(forKey: Keys.canoePort)
-        canoePort = port > 0 ? port : 20_000
+        canoePort = port > 0 ? port : Self.defaultCanoePort
 
         // Les macros sont rangées en entiers, -1 valant « aucune » : le format
         // de liste des réglages ne connaît pas les valeurs absentes.

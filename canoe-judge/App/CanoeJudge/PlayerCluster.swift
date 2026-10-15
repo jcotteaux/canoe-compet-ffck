@@ -13,10 +13,18 @@ import JudgeKit
 @MainActor
 @Observable
 final class PlayerCluster {
+    /// Une caméra : une case de la grille et un lecteur, quel que soit le
+    /// nombre de fichiers. L'ATEM en ouvre un nouveau à chaque reprise
+    /// d'enregistrement ; le lecteur charge celui qui couvre l'instant demandé.
     struct Lane: Identifiable {
-        var source: VideoSource
+        let camera: String
+        /// Les fichiers de la caméra, du plus ancien au plus récent.
+        var segments: [VideoSource]
         let player: AVPlayer
-        var id: URL { source.url }
+        /// Le fichier chargé dans le lecteur.
+        var loaded = 0
+        var id: String { camera }
+        var source: VideoSource { segments[loaded] }
     }
 
     private(set) var lanes: [Lane] = []
@@ -35,14 +43,14 @@ final class PlayerCluster {
 
     func open(_ sources: [VideoSource]) {
         close()
-        lanes = sources.map { source in
-            let player = AVPlayer(url: source.url)
+        lanes = Self.group(sources).map { camera, segments in
+            let player = AVPlayer(url: segments[0].url)
             player.actionAtItemEnd = .pause
             player.isMuted = true
             // Sans cela, AVPlayer retarde le démarrage pour constituer un
             // tampon : les caméras ne partent alors plus ensemble.
             player.automaticallyWaitsToMinimizeStalling = false
-            return Lane(source: source, player: player)
+            return Lane(camera: camera, segments: segments, player: player)
         }
         clockMs = coverage?.lowerBound ?? 0
         seek(toClock: clockMs)
@@ -57,24 +65,58 @@ final class PlayerCluster {
         rate = 0
     }
 
-    /// L'intervalle d'heures couvert par au moins une caméra.
+    /// Les fichiers rangés par caméra, dans l'ordre où les caméras arrivent.
+    private static func group(_ sources: [VideoSource]) -> [(String, [VideoSource])] {
+        var order: [String] = []
+        var byCamera: [String: [VideoSource]] = [:]
+        for source in sources {
+            if byCamera[source.camera] == nil { order.append(source.camera) }
+            byCamera[source.camera, default: []].append(source)
+        }
+        return order.map { ($0, byCamera[$0]!.sorted { $0.startMs < $1.startMs }) }
+    }
+
+    /// L'intervalle d'heures de course couvert par au moins une caméra.
+    ///
+    /// En heure de **course** : le recalage s'applique. Sans lui, une fois les
+    /// horloges recalées, chaque déplacement était ramené dans les heures de
+    /// l'enregistreur, c'est-à-dire à côté de la descente.
     var coverage: ClosedRange<Int>? {
-        guard !lanes.isEmpty else { return nil }
-        let starts = lanes.map(\.source.startMs)
-        let ends = lanes.map { $0.source.startMs + Int($0.source.durationSeconds * 1000) }
+        let segments = lanes.flatMap(\.segments)
+        guard !segments.isEmpty else { return nil }
+        let starts = segments.map { $0.startMs - offsetMs }
+        let ends = segments.map { $0.startMs - offsetMs + Int($0.durationSeconds * 1000) }
         guard let low = starts.min(), let high = ends.max(), low < high else { return nil }
         return low...high
     }
 
-    func videoTime(_ lane: Lane, atClock clockMs: Int) -> TimeInterval {
-        lane.source.alignment(offsetMs: offsetMs).videoTime(atClock: clockMs)
+    func videoTime(_ source: VideoSource, atClock clockMs: Int) -> TimeInterval {
+        source.alignment(offsetMs: offsetMs).videoTime(atClock: clockMs)
+    }
+
+    /// Le fichier de la caméra qui couvre cet instant.
+    private func segment(of lane: Lane, clockMs: Int) -> Int? {
+        lane.segments.firstIndex { source in
+            let t = videoTime(source, atClock: clockMs)
+            return t >= 0 && t <= source.durationSeconds
+        }
     }
 
     /// Une caméra couvre-t-elle cet instant ? Une caméra qui ne le couvre pas
     /// affiche une ardoise plutôt qu'une image gelée d'un autre moment.
     func covers(_ lane: Lane, clockMs: Int) -> Bool {
-        let t = videoTime(lane, atClock: clockMs)
-        return t >= 0 && t <= lane.source.durationSeconds
+        segment(of: lane, clockMs: clockMs) != nil
+    }
+
+    /// Charge dans le lecteur le fichier qui couvre l'instant, et dit où s'y
+    /// placer. `nil` : la caméra n'enregistrait pas.
+    private func prepare(_ index: Int, atClock clockMs: Int) -> TimeInterval? {
+        guard let segment = segment(of: lanes[index], clockMs: clockMs) else { return nil }
+        if lanes[index].loaded != segment {
+            lanes[index].loaded = segment
+            lanes[index].player.replaceCurrentItem(with: AVPlayerItem(url: lanes[index].source.url))
+        }
+        return videoTime(lanes[index].source, atClock: clockMs)
     }
 
     // MARK: - Déplacement
@@ -82,9 +124,9 @@ final class PlayerCluster {
     func seek(toClock target: Int) {
         let clamped = coverage.map { min(max(target, $0.lowerBound), $0.upperBound) } ?? target
         clockMs = clamped
-        for lane in lanes {
-            let seconds = videoTime(lane, atClock: clamped)
-            guard seconds >= 0, seconds <= lane.source.durationSeconds else { continue }
+        for index in lanes.indices {
+            guard let seconds = prepare(index, atClock: clamped) else { continue }
+            let lane = lanes[index]
             // Tolérance nulle : sur un jugement, « à peu près la bonne image »
             // n'est pas une réponse. C'est plus lent, et c'est le prix.
             lane.player.seek(to: CMTime(seconds: seconds, preferredTimescale: 600),
@@ -136,13 +178,12 @@ final class PlayerCluster {
         let start = CMClockGetTime(CMClockGetHostTimeClock())
             + CMTime(seconds: 0.2, preferredTimescale: 600)
 
-        for lane in lanes {
-            let seconds = videoTime(lane, atClock: clockMs)
-            guard seconds >= 0, seconds <= lane.source.durationSeconds else {
-                lane.player.rate = 0
+        for index in lanes.indices {
+            guard let seconds = prepare(index, atClock: clockMs) else {
+                lanes[index].player.rate = 0
                 continue
             }
-            lane.player.setRate(newRate,
+            lanes[index].player.setRate(newRate,
                                 time: CMTime(seconds: seconds, preferredTimescale: 600),
                                 atHostTime: start)
         }
@@ -190,14 +231,20 @@ final class PlayerCluster {
         let previousRate = rate
         pause()
 
-        for (index, lane) in lanes.enumerated() {
-            guard let fresh = updated.first(where: { $0.url == lane.source.url }) else { continue }
-            guard fresh.durationSeconds > lane.source.durationSeconds + 0.5 else {
-                lanes[index].source = fresh
-                continue
+        let groups = Dictionary(uniqueKeysWithValues: Self.group(updated))
+        for index in lanes.indices {
+            // Une nouvelle prise de la caméra rejoint sa case : elle était
+            // jusque-là inatteignable.
+            guard let fresh = groups[lanes[index].camera], !fresh.isEmpty else { continue }
+            let shown = lanes[index].source
+            lanes[index].segments = fresh
+            if let kept = fresh.firstIndex(where: { $0.url == shown.url }) {
+                lanes[index].loaded = kept
+                guard fresh[kept].durationSeconds > shown.durationSeconds + 0.5 else { continue }
+            } else {
+                lanes[index].loaded = 0
             }
-            lanes[index].source = fresh
-            lane.player.replaceCurrentItem(with: AVPlayerItem(url: fresh.url))
+            lanes[index].player.replaceCurrentItem(with: AVPlayerItem(url: lanes[index].source.url))
         }
         seek(toClock: position)
         if previousRate != 0 { play(rate: previousRate) }

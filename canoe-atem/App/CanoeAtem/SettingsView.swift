@@ -12,7 +12,7 @@ struct SettingsView: View {
             Form {
                 Section {
                     LabeledContent("Adresse") {
-                        TextField("192.168.1.50", text: $model.atemHost)
+                        TextField(AppModel.defaultAtemHost, text: $model.atemHost)
                             .multilineTextAlignment(.trailing)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
@@ -26,21 +26,21 @@ struct SettingsView: View {
 
                 Section {
                     LabeledContent("Adresse") {
-                        TextField("192.168.1.20", text: $model.canoeHost)
+                        TextField(AppModel.defaultCanoeHost, text: $model.canoeHost)
                             .multilineTextAlignment(.trailing)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .keyboardType(.numbersAndPunctuation)
                     }
                     LabeledContent("Port") {
-                        TextField("20000", value: $model.canoePort, format: .number.grouping(.never))
+                        TextField("\(AppModel.defaultCanoePort)", value: $model.canoePort, format: .number.grouping(.never))
                             .multilineTextAlignment(.trailing)
                             .keyboardType(.numberPad)
                     }
                 } header: {
                     Text("competFFCK")
                 } footer: {
-                    Text("Le poste qui fait tourner competFFCK. Le port 20000 est celui des déploiements courants ; le bouchon canoe-wslive écoute sur le même.")
+                    Text("Le poste qui fait tourner competFFCK. Le port est celui du WebSocket de competFFCK (8080), le même que pour les pages ws_live ; le bouchon canoe-wslive écoute sur le même.")
                 }
 
                 Section {

@@ -63,14 +63,13 @@ public struct ChromaColor: Sendable, Equatable {
 
     // MARK: - Échantillon
 
-    /// L'échelle des composantes échantillonnées est le seul nombre de tout ce
-    /// fichier qui ne soit **pas** vérifiable : ni Blackmagic ni
+    /// L'échelle des composantes échantillonnées : ni Blackmagic ni
     /// l'implémentation de référence ne disent si le mélangeur attend des
-    /// millièmes ou des dix-millièmes. Le millième est la convention de presque
-    /// toutes les autres grandeurs du protocole (taille, niveau, position),
-    /// d'où ce choix par défaut — et d'où la sonde, qui lit ce que le
-    /// mélangeur a réellement retenu plutôt que de continuer à supposer.
-    public static let defaultSampleScale: Double = 1000
+    /// millièmes ou des dix-millièmes. La sonde l'a tranché sur un ATEM Mini
+    /// Extreme ISO G2 (protocole 2.32) : il retenait Y 6748, et Y ne dépasse
+    /// pas 1 — ce sont donc des dix-millièmes. `--echelle` reste là pour un
+    /// mélangeur qui ferait autrement.
+    public static let defaultSampleScale: Double = 10000
 
     public func sampled(scale: Double = defaultSampleScale) -> (y: UInt16, cb: Int16, cr: Int16) {
         (

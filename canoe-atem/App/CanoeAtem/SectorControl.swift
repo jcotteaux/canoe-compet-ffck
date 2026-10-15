@@ -115,6 +115,9 @@ struct NextSectorButton: View {
             .background(Theme.accent, in: RoundedRectangle(cornerRadius: Theme.corner, style: .continuous))
         }
         .buttonStyle(PressableButtonStyle())
+        // La barre d'espace d'un clavier, ou d'une télécommande Bluetooth qui
+        // en envoie une : on change de caméra sans quitter l'image des yeux.
+        .keyboardShortcut(.space, modifiers: [])
     }
 }
 

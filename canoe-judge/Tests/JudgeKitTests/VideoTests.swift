@@ -130,3 +130,24 @@ func shortNamesKeepTheMeaningfulWord() {
     #expect(VideoLibrary.shortenNames(sources(["Slalom - Porte 5", "Slalom - Arrivee"])).map(\.camera)
             == ["Porte 5", "Arrivee"])
 }
+
+@Test("Les prises successives d'une caméra ATEM gardent le nom de la caméra")
+func atemTakesShareTheCameraName() {
+    #expect(VideoLibrary.cameraName(fileName: "wr-finala CAM 1 01") == "wr-finala CAM 1")
+    #expect(VideoLibrary.cameraName(fileName: "wr-finala CAM 1 02") == "wr-finala CAM 1")
+    // Un seul nombre : c'est celui de la caméra, on n'y touche pas.
+    #expect(VideoLibrary.cameraName(fileName: "Coupe de France 2026 - ISO 1") == "Coupe de France 2026 - ISO 1")
+    #expect(VideoLibrary.cameraName(fileName: "ISO_2") == "ISO_2")
+    #expect(VideoLibrary.cameraName(fileName: "Depart") == "Depart")
+
+    // Deux prises de huit caméras : huit noms, raccourcis comme d'habitude.
+    let files = (1...8).flatMap { cam in ["01", "02"].map { "wr-finala CAM \(cam) \($0)" } }
+    let sources = files.map {
+        VideoSource(url: URL(fileURLWithPath: "/tmp/\($0).mp4"),
+                    camera: VideoLibrary.cameraName(fileName: $0),
+                    startMs: 0, durationSeconds: 1, startSource: .metadata)
+    }
+    let names = VideoLibrary.shortenNames(sources).map(\.camera)
+    #expect(Array(names.prefix(4)) == ["CAM 1", "CAM 1", "CAM 2", "CAM 2"])
+    #expect(Set(names).count == 8)
+}

@@ -29,8 +29,12 @@ public struct WindowGeometry: Sendable, Equatable {
 public enum MacroStep: Sendable, Equatable {
     /// Change la source d'une fenêtre sans toucher à son cadrage.
     case windowSource(window: UInt8, source: UInt16)
-    /// Pose une fenêtre : présence et cadrage, sans toucher à sa source.
+    /// Pose une fenêtre : présence et cadrage, sans toucher à sa source. Le
+    /// recadrage est retiré au passage : une fenêtre rognée ne tomberait plus
+    /// dans le trou que tv_duo lui a percé.
     case windowLayout(window: UInt8, enabled: Bool, geometry: WindowGeometry)
+    /// Éteint une fenêtre sans toucher au reste.
+    case windowOff(window: UInt8)
     /// Le fond, visible dans les quadrants qu'aucune fenêtre ne couvre.
     case background(source: UInt16)
     /// Envoie une source au programme.
@@ -53,10 +57,12 @@ public enum MacroStep: Sendable, Equatable {
         case .windowLayout(let window, let enabled, let geometry):
             AtemOutgoing.superSourceBox(
                 window,
-                mask: [.enabled, .geometry],
+                mask: [.enabled, .geometry, .cropped],
                 enabled: enabled,
                 x: geometry.x, y: geometry.y, size: geometry.size
             )
+        case .windowOff(let window):
+            AtemOutgoing.superSourceBox(window, mask: .enabled, enabled: false)
         case .background(let source):
             AtemOutgoing.superSourceArt(fill: source)
         case .program(let source):
@@ -82,6 +88,8 @@ public enum MacroStep: Sendable, Equatable {
             enabled
                 ? "fenetre \(window + 1) : x \(geometry.x) y \(geometry.y) taille \(geometry.size)"
                 : "fenetre \(window + 1) : éteinte"
+        case .windowOff(let window):
+            "fenetre \(window + 1) : éteinte"
         case .background(let source):
             "fond ← \(state.inputName(source))"
         case .program(let source):
@@ -122,7 +130,9 @@ public struct MacroRecipe: Sendable, Equatable, Identifiable {
 ///
 /// - la fenêtre 1 est celle qu'on voit seule en plein écran, et en haut à
 ///   gauche en duo ;
-/// - la fenêtre 2 n'apparaît qu'en duo, en bas à droite.
+/// - la fenêtre 2 n'apparaît qu'en duo, en bas à droite ;
+/// - les fenêtres 3 et 4, que le mélangeur allume par défaut en mosaïque, sont
+///   éteintes par les deux cadrages : elles déborderaient sous l'habillage.
 public enum RegiePlan {
     /// Le SuperSource vu comme source : les mélangeurs le présentent sous cet
     /// identifiant. Il est confirmé à la connexion par `InPr`, qui donne le
@@ -144,6 +154,8 @@ public enum RegiePlan {
                     .background(source: background),
                     .windowLayout(window: 0, enabled: true, geometry: .topLeft),
                     .windowLayout(window: 1, enabled: true, geometry: .bottomRight),
+                    .windowOff(window: 2),
+                    .windowOff(window: 3),
                     .program(source: superSource),
                 ]
             ),
@@ -154,6 +166,8 @@ public enum RegiePlan {
                 steps: [
                     .windowLayout(window: 0, enabled: true, geometry: .fullScreen),
                     .windowLayout(window: 1, enabled: false, geometry: .bottomRight),
+                    .windowOff(window: 2),
+                    .windowOff(window: 3),
                     .program(source: superSource),
                 ]
             ),
@@ -167,7 +181,7 @@ public enum RegiePlan {
                 let offset = UInt16(2 + Int(window) * cameras.count + rank)
                 recipes.append(MacroRecipe(
                     index: firstIndex + offset,
-                    name: "F\(window + 1) Cam \(rank + 1)",
+                    name: "F\(window + 1)-Cam\(rank + 1)",
                     details: window == 0
                         ? "Fenetre 1 (plein ecran et haut gauche) : camera \(rank + 1)"
                         : "Fenetre 2 (bas droite) : camera \(rank + 1)",

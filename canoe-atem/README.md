@@ -174,10 +174,10 @@ prouve qu'un ATEM répondra.
 5. la gravure aboutit : la macro apparaît nommée dans ATEM Software Control.
    Sinon c'est `MSRc`, ou le mélangeur n'accepte pas d'enregistrer à distance ;
 6. l'incrustation chroma découpe bien la couleur demandée — voir plus bas :
-   l'échelle des composantes échantillonnées est le seul nombre du dépôt qui
-   n'ait pas de source.
+   l'échelle des composantes échantillonnées n'a pas de source, elle a été
+   relevée sur le mélangeur.
 
-**Le point à vérifier avant tous les autres** : jouer « F1 Cam 3 » alors qu'on
+**Le point à vérifier avant tous les autres** : jouer « F1-Cam3 » alors qu'on
 est en duo doit changer la caméra *sans* remettre la fenêtre en plein cadre. Le
 jeu de macros repose entièrement là-dessus — que le mélangeur grave l'opération
 masquée et non l'état complet de la fenêtre. C'est le seul point qu'un
@@ -269,10 +269,10 @@ Les douze macros d'une régie à deux kayakistes :
 
 | macro | ce qu'elle fait |
 |---|---|
-| `Duo` | les deux fenêtres : la 1 en haut à gauche, la 2 en bas à droite |
-| `Plein ecran` | la fenêtre 1 seule, plein cadre |
-| `F1 Cam 1…5` | la caméra de la fenêtre 1 |
-| `F2 Cam 1…5` | la caméra de la fenêtre 2 |
+| `Duo` | les deux fenêtres de `tv_duo` : la 1 en haut à gauche, la 2 en bas à droite, sans recadrage ; 3 et 4 éteintes |
+| `Plein ecran` | la fenêtre 1 seule, plein cadre ; 2, 3 et 4 éteintes |
+| `F1-Cam1…5` | la caméra de la fenêtre 1 |
+| `F2-Cam1…5` | la caméra de la fenêtre 2 |
 
 **Deux images à l'écran, c'est le SuperSource** : un compositeur qui tient
 plusieurs fenêtres et qui s'envoie au programme comme une source ordinaire. Sur
@@ -317,7 +317,7 @@ pas à la connaître.
 
 ### L'échelle de la couleur
 
-C'est le seul nombre de tout le dépôt qui n'ait **aucune source**. Le keyer
+C'est le seul nombre du dépôt qui n'ait **aucune source écrite**. Le keyer
 chroma des mélangeurs récents ne se règle pas par teinte mais par
 échantillonnage : on pose un curseur sur l'image et le mélangeur en tire une
 couleur. Ces trois composantes (Y, Cb, Cr) sont heureusement inscriptibles
@@ -325,9 +325,9 @@ directement — c'est ce qui permet de graver une couleur connue dans une macro
 sans rien avoir à viser.
 
 Mais ni Blackmagic ni l'implémentation de référence ne disent dans quelle
-**échelle** le mélangeur les range. Le millième est la convention de presque
-toutes les autres grandeurs du protocole, d'où le choix par défaut ; il reste un
-choix. `#CC00CC` vaut, en BT.709, Y 0,2278, Cb +0,3083, Cr +0,3633 — soit
+**échelle** le mélangeur les range. La sonde l'a tranché sur un ATEM Mini
+Extreme ISO G2 (protocole 2.32) : il retenait Y 6748, or Y ne dépasse pas 1 —
+c'est donc le **dix-millième**, désormais le défaut. `#CC00CC` vaut, en BT.709, Y 0,2278, Cb +0,3083, Cr +0,3633 — soit
 `228 / 308 / 363` au millième, ou `2278 / 3083 / 3633` au dix-millième.
 
 D'où la sonde, qui ne suppose rien :

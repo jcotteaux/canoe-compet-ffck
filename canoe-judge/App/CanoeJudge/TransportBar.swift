@@ -32,6 +32,12 @@ struct MarksStrip: View {
                 }
 
                 Spacer(minLength: 0)
+                if let mismatch = model.videoMismatch {
+                    Label("Hors vidéo", systemImage: "exclamationmark.triangle.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.touch)
+                        .help(mismatch)
+                }
                 exportButton
             } else {
                 Text(model.selected == nil
@@ -113,7 +119,15 @@ struct TransportBar: View {
         // Sur une descente sélectionnée, la réglette couvre la descente et rien
         // d'autre. Étalée sur deux heures d'ISO, un pixel vaudrait cinq
         // secondes : inutilisable pour le geste qu'on vient y chercher.
-        model.sequence?.window(padSeconds: 8) ?? model.cluster.coverage
+        //
+        // Sauf si la descente tombe hors des vidéos (horloges pas recalées) :
+        // la réglette ramènerait alors chaque geste au bord des fichiers, et
+        // l'image ne bougerait plus. On rend toute la vidéo, pour aller
+        // chercher le départ à l'œil et recaler dessus.
+        let coverage = model.cluster.coverage
+        guard let run = model.sequence?.window(padSeconds: 8) else { return coverage }
+        if let coverage, !run.overlaps(coverage) { return coverage }
+        return run
     }
 
     var body: some View {
@@ -232,6 +246,9 @@ private struct Scrubber: View {
                         .shadow(radius: 2)
                 }
                 .frame(maxHeight: .infinity)
+                // Une réglette élargie à toute la vidéo laisse des repères
+                // hors champ : ils ne doivent pas déborder sur la fenêtre.
+                .clipped()
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)

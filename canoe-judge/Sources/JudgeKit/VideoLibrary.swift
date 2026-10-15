@@ -78,7 +78,7 @@ public enum VideoLibrary {
 
         let (date, origin) = await startOfRecording(asset: asset, url: url, duration: duration.seconds)
         return VideoSource(url: url,
-                           camera: url.deletingPathExtension().lastPathComponent,
+                           camera: cameraName(fileName: url.deletingPathExtension().lastPathComponent),
                            startMs: date.map { timeOfDayMs($0) } ?? 0,
                            startDate: date,
                            durationSeconds: duration.seconds,
@@ -109,6 +109,18 @@ public enum VideoLibrary {
         return (nil, .fileSystem)
     }
 
+    /// Le nom de la caméra, sans le numéro de prise.
+    ///
+    /// L'ATEM ouvre un nouveau fichier par caméra à chaque reprise
+    /// d'enregistrement : `wr-finala CAM 1 01`, puis `wr-finala CAM 1 02`.
+    /// C'est la même caméra, et elle doit tenir une seule case de la grille.
+    /// On ne retire le dernier nombre que s'il suit un autre nombre : `ISO 1`
+    /// reste `ISO 1`, sinon toutes les caméras s'appelleraient `ISO`.
+    static func cameraName(fileName: String) -> String {
+        guard let match = fileName.firstMatch(of: #/^(.*\d)[ _-]+\d+$/#) else { return fileName }
+        return String(match.1)
+    }
+
     /// Raccourcit les noms de caméra en retirant ce qu'ils ont tous en commun.
     ///
     /// L'ATEM nomme ses ISO d'après l'enregistrement :
@@ -118,7 +130,11 @@ public enum VideoLibrary {
     /// Mais tout retirer ne laisserait que `1`, `2`, `3` : le mot qui porte le
     /// sens est gardé dès que le reste n'est qu'un numéro.
     static func shortenNames(_ sources: [VideoSource]) -> [VideoSource] {
-        let names = sources.map(\.camera)
+        // Les prises d'une même caméra portent le même nom : on raisonne sur
+        // les noms distincts, sinon une caméra seule en deux prises serait
+        // réduite à rien.
+        var names: [String] = []
+        for camera in sources.map(\.camera) where !names.contains(camera) { names.append(camera) }
         guard names.count > 1 else { return sources }
 
         let separators = CharacterSet(charactersIn: " -_·—–")

@@ -4,9 +4,13 @@ import JudgeKit
 
 struct ContentView: View {
     @Bindable var model: JudgeModel
-    @State private var zoomed: URL?
+    @State private var zoomed: String?
     @State private var showSettings = false
     @FocusState private var searchFocused: Bool
+    /// Le focus des touches du jugement. Rien ne le donnait au lancement :
+    /// flèches et espace restaient sans effet tant qu'on n'avait pas cliqué
+    /// dans la liste.
+    @FocusState private var keysFocused: Bool
 
     var body: some View {
         HSplitView {
@@ -15,16 +19,23 @@ struct ContentView: View {
 
             VStack(spacing: 0) {
                 MulticamGrid(model: model, zoomed: $zoomed)
+                    // Un clic sur l'image rend les touches au transport, même
+                    // après être passé par la recherche ou un réglage.
+                    .simultaneousGesture(TapGesture().onEnded { reclaimKeys() })
                 MarksStrip(model: model)
                 TransportBar(model: model)
+                    .simultaneousGesture(TapGesture().onEnded { reclaimKeys() })
             }
             .frame(minWidth: 520)
         }
         .background(Theme.background)
         .preferredColorScheme(.dark)
         .focusable()
+        .focused($keysFocused)
         .focusEffectDisabled()
         .onKeyPress(phases: .down) { press in handle(press) }
+        .onAppear { keysFocused = true }
+        .onChange(of: showSettings) { _, shown in if !shown { keysFocused = true } }
         .toolbar { toolbar }
         .sheet(isPresented: $showSettings) {
             SettingsView(model: model, isPresented: $showSettings)
@@ -90,10 +101,10 @@ struct ContentView: View {
             // retenues, sans ouvrir le menu.
             if !model.sources.isEmpty {
                 Menu {
-                    ForEach(model.sources) { source in
-                        Toggle(source.camera, isOn: Binding(
-                            get: { model.isCameraUsed(source.camera) },
-                            set: { model.setCamera(source.camera, used: $0) }
+                    ForEach(model.cameras, id: \.self) { camera in
+                        Toggle(camera, isOn: Binding(
+                            get: { model.isCameraUsed(camera) },
+                            set: { model.setCamera(camera, used: $0) }
                         ))
                     }
                     if !model.disabledCameras.isEmpty {
@@ -106,7 +117,7 @@ struct ContentView: View {
                     // beaucoup de caméras — c'est-à-dire quand il sert.
                     HStack(spacing: 3) {
                         Image(systemName: "rectangle.3.group")
-                        Text("\(model.activeSources.count)/\(model.sources.count)")
+                        Text("\(model.activeCameraCount)/\(model.cameras.count)")
                             .font(.system(size: 11, design: .monospaced))
                     }
                 }
@@ -131,6 +142,11 @@ struct ContentView: View {
         if model.race.field.isEmpty { return model.status.label }
         let journal = model.isJournalling ? "journal en cours" : "journal interrompu"
         return "\(model.race.field.count) bateaux · \(model.race.gateCount) portes · \(journal)"
+    }
+
+    private func reclaimKeys() {
+        searchFocused = false
+        keysFocused = true
     }
 
     /// Les touches du jugement. Elles n'ont pas d'équivalent menu : on les

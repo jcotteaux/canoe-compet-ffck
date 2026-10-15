@@ -353,7 +353,10 @@ case "atem":
         }
     }
     await connection.start()
-    try? await Task.sleep(for: .seconds(action == "list" ? 3 : seconds))
+    // Graver dure plus que les 10 s par défaut : ces actions sortent d'elles-mêmes
+    // une fois finies, le délai n'est là que si le mélangeur ne répond jamais.
+    let selfExiting = ["grave", "cadrage", "incrust"].contains(action)
+    try? await Task.sleep(for: .seconds(action == "list" ? 3 : selfExiting ? max(seconds, 120) : seconds))
 
 case "canoe":
     let port = UInt16(argument("port", default: "20000")) ?? 20000
@@ -397,7 +400,7 @@ default:
     options : --host h  --port p  --seconds n
               --cameras 1,2,3,4,5  --depart 0  --fond 0  --cam1 n  --cam2 n
               --source 8  --couleur CC00CC|melangeur  --keyer 1  --emplacement n
-              --echelle 1000  --sonde (lit la couleur du mélangeur, ne grave pas)
+              --echelle 10000  --sonde (lit la couleur du mélangeur, ne grave pas)
               --essai (n'envoie rien)  --force (écrase les macros occupées)
               --sans-arret (ne grave pas la macro de retrait)
     """)

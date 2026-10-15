@@ -170,6 +170,31 @@ final class JudgeModel {
 
     func isCameraUsed(_ camera: String) -> Bool { !disabledCameras.contains(camera) }
 
+    /// Les caméras, une fois chacune : une caméra enregistrée en plusieurs
+    /// prises reste une seule caméra à prendre ou à laisser.
+    var cameras: [String] {
+        var names: [String] = []
+        for camera in sources.map(\.camera) where !names.contains(camera) { names.append(camera) }
+        return names
+    }
+
+    var activeCameraCount: Int { cameras.filter(isCameraUsed).count }
+
+    /// La descente sélectionnée tombe-t-elle hors de toutes les vidéos ?
+    ///
+    /// C'est le cas quand l'enregistreur et le chronométrage ne sont pas à la
+    /// même heure — une course de test aux heures du programme, filmée
+    /// l'après-midi. Sans le dire, la réglette restait collée au début des
+    /// fichiers et l'on croyait le lecteur bloqué.
+    var videoMismatch: String? {
+        guard let window = sequence?.window(padSeconds: 0),
+              let coverage = cluster.coverage,
+              !window.overlaps(coverage) else { return nil }
+        let start = Chrono.formatClock(window.lowerBound)
+        return "Départ à \(start), vidéos de \(Chrono.formatClock(coverage.lowerBound)) à \(Chrono.formatClock(coverage.upperBound)) : "
+            + "se placer sur le départ, puis clic droit sur « Départ » → Recaler les horloges"
+    }
+
     var entries: [CanoeEntry] {
         FieldSearch.filter(race.field, query: query, filter: filter, order: order,
                            checked: checkedFifties)
@@ -378,6 +403,7 @@ final class JudgeModel {
 
     private func show() {
         guard let sequence else { return }
+        if let videoMismatch { lastMessage = videoMismatch }
         if let fifty = sequence.fifties.first {
             go(to: fifty)
         } else if let start = sequence.start {
