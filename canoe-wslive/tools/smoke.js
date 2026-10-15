@@ -372,43 +372,45 @@ const CASES = [
 
   { name: 'tv_ranking', url: '/canoe/tv_ranking.html', settle: 8000 },
 
-  // tv_results choisit seule la derniere epreuve TERMINEE : les 12 K1H sont
-  // traites, les K1D ne le sont pas, la page doit montrer K1H sans reglage.
-  { name: 'tv_results / derniere epreuve terminee', url: '/canoe/tv_results.html?delay=60000',
+  // Riviere vide : tv_results montre seule la derniere epreuve COURUE. Les 12
+  // K1H sont traites, aucun K1D n'est parti : K1H, sans reglage. Les 3
+  // premiers dans la tete figee, les 9 autres sur la piste qui defile.
+  { name: 'tv_results / derniere epreuve courue', url: '/canoe/tv_results.html',
     fixture: 'slalom-finale', setup: epreuveK1HTerminee(), settle: 8000,
-    expect: (r) => (r.eval && r.eval.categ === 'Kayak Homme' && r.eval.rows === 8
+    expect: (r) => (r.eval && r.eval.categ === 'Kayak Homme' && r.eval.tete === 3 && r.eval.piste === 9
       && r.eval.provisoire === false && r.eval.figes === '1,2,3'
-      ? null : `attendu Kayak Homme, 3 figes + 5 tournants, definitif ; vu ${JSON.stringify(r.eval)}`),
-    evalExpr: "(() => { const l = [...document.querySelectorAll('#corps .ligne')];"
+      ? null : `attendu Kayak Homme, 3 figes + 9 sur la piste, definitif ; vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const t = [...document.querySelectorAll('#tete .ligne')];"
       + " return JSON.stringify({categ: document.getElementById('epreuve_nom').textContent,"
-      + " rows: l.length, provisoire: document.body.classList.contains('provisoire'),"
-      + " figes: l.slice(0, 3).map(e => e.querySelector('.c_rang').textContent).join(',')}); })()" },
+      + " tete: t.length, piste: document.querySelectorAll('#piste .ligne.res').length,"
+      + " provisoire: document.body.classList.contains('provisoire'),"
+      + " figes: t.map(e => e.querySelector('.c_rang').textContent).join(',')}); })()" },
 
   // Aucune epreuve complete : on montre quand meme les classes, en le disant.
   // Le coeur de la disposition : les trois premiers ne doivent JAMAIS bouger,
   // et la queue doit defiler sous eux. On echantillonne l'affichage pendant
   // plusieurs cycles.
-  { name: 'tv_results / tete figee, queue tournante', url: '/canoe/tv_results.html?epreuve=K1H&delay=2500',
+  { name: 'tv_results / tete figee, queue tournante', url: '/canoe/tv_results.html?epreuve=K1H&pause=500',
     fixture: 'slalom-finale', setup: epreuveK1HTerminee(),
     evalEarlyExpr: "window.__obs = [];"
-      + " setInterval(() => { const l = [...document.querySelectorAll('#corps .ligne')];"
-      + " if (!l.length) return;"
-      + " const t = l.slice(0, 3).map(e => e.querySelector('.c_rang').textContent).join(',');"
-      + " const q = l.slice(3).map(e => e.querySelector('.c_dossard').textContent).join(',');"
-      + " const sig = t + ' | ' + q;"
+      + " setInterval(() => { const t = [...document.querySelectorAll('#tete .ligne')];"
+      + " const p = document.getElementById('piste');"
+      + " if (!t.length || !p) return;"
+      + " const sig = t.map(e => e.querySelector('.c_rang').textContent).join(',') + ' | ' + p.style.transform;"
       + " if (window.__obs[window.__obs.length - 1] !== sig) window.__obs.push(sig); }, 250); 'ok'",
     settle: 11000,
     expect: (r) => {
       const o = (r.eval && r.eval.obs) || [];
-      if (o.length < 2) return `la queue devrait defiler, vu ${JSON.stringify(o)}`;
+      if (o.length < 2) return `la piste devrait defiler, vu ${JSON.stringify(o)}`;
       const figee = o.every((x) => x.indexOf('1,2,3 | ') === 0);
       return figee ? null : `la tete a bouge : ${JSON.stringify(o)}`;
     },
     evalExpr: "JSON.stringify({obs: window.__obs})" },
 
   // Hauteur de ligne et nombre de lignes doivent rester constants : pendant
-  // le defilement, ET quand le bandeau des bateaux en course apparait.
-  { name: 'tv_results / hauteur et bloc constants', url: '/canoe/tv_results.html?epreuve=K1H&delay=2500',
+  // le defilement, ET quand un bateau part (le bandeau, toujours la avec les
+  // prochains partants, change de contenu sans bouger le tableau).
+  { name: 'tv_results / hauteur et bloc constants', url: '/canoe/tv_results.html?epreuve=K1H&pause=500',
     fixture: 'slalom-finale', setup: epreuveK1HTerminee(),
     events: [[3500, 'bib-start', { bib: 13 }]],
     evalEarlyExpr: "window.__obs = [];"
@@ -425,8 +427,8 @@ const CASES = [
       const nb = new Set(o.map((x) => x.split('/')[1]));
       const bandeau = new Set(o.map((x) => x.split('/')[2]));
       if (hauteurs.size !== 1) return `la hauteur de ligne a change : ${JSON.stringify(o)}`;
-      if (nb.size !== 1 || !nb.has('8')) return `le nombre de lignes a change : ${JSON.stringify(o)}`;
-      if (bandeau.size !== 2) return `le bandeau n'est jamais apparu : ${JSON.stringify(o)}`;
+      if (nb.size !== 1 || !nb.has('12')) return `le nombre de lignes a change : ${JSON.stringify(o)}`;
+      if (bandeau.size !== 1 || !bandeau.has('bandeau')) return `le bandeau a bascule : ${JSON.stringify(o)}`;
       return null;
     },
     evalExpr: "JSON.stringify({obs: window.__obs})" },
@@ -470,7 +472,7 @@ const CASES = [
     events: [[4000, 'penalty', { bib: 1, porte: 4, value: 50 }]], settle: 10000,
     // Le dossard 12 est DSQ : les non-classes ferment la liste, le dossard 1
     // penalise est donc DERNIER DES CLASSES, pas dernier tout court.
-    expect: (r) => (r.eval && r.eval.memeNoeud === true && r.eval.pena === '50'
+    expect: (r) => (r.eval && r.eval.memeNoeud === true && r.eval.pena === '+50'
       && r.eval.rang === r.eval.nbClasses
       ? null : `attendu le dossard 1 dernier des classes avec 50, vu ${JSON.stringify(r.eval)}`),
     evalExpr: "(() => { const l = [...document.querySelectorAll('#corps .ligne')];"
@@ -481,36 +483,37 @@ const CASES = [
       + " rang: un ? un.querySelector('.c_rang').textContent : null,"
       + " nbClasses: String(classes.length)}); })()" },
 
-  // Le bandeau n'apparait que s'il y a du monde sur l'eau, et il fait retrecir
-  // le tableau : sans cela les deux se chevaucheraient en bas d'ecran.
-  { name: 'tv_results / bandeau des bateaux en course', url: '/canoe/tv_results.html',
+  // Bandeau du bas : 4 tuiles, dont les 2 bateaux sur l'eau (le 14 avec ses
+  // +2), et le tableau s'arrete au-dessus : sans cela les deux se
+  // chevaucheraient en bas d'ecran.
+  { name: 'tv_results / bandeau des bateaux en course', url: '/canoe/tv_results.html?epreuve=K1H',
     fixture: 'slalom-finale',
     setup: epreuveK1HTerminee().concat([
       ['bib-start', { bib: 13 }], ['bib-start', { bib: 14 }],
       ['penalty', { bib: 14, porte: 5, value: 2 }]]),
     settle: 9000,
-    expect: (r) => (r.eval && r.eval.enCourse === true && r.eval.cartes === 2
-      && r.eval.pena14 === '+2' && r.eval.basTableau <= 862
-      ? null : `attendu 2 cartes dont le 14 a +2, sous un tableau retreci ; vu ${JSON.stringify(r.eval)}`),
-    evalExpr: "(() => { const c = [...document.querySelectorAll('.coureur')];"
+    expect: (r) => (r.eval && r.eval.enCourse === true && r.eval.cartes === 4 && r.eval.course === 2
+      && r.eval.pena14 === '+2' && r.eval.basTableau > 0 && r.eval.basTableau <= r.eval.hautBandeau
+      ? null : `attendu 4 tuiles dont 2 en course, le 14 a +2, le tableau au-dessus du bandeau ; vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "(() => { const c = [...document.querySelectorAll('.coureur:not(.sort)')];"
       + " const q = c.find(e => e.querySelector('.c_bib').textContent === '14');"
-      + " const l = [...document.querySelectorAll('#corps .ligne')];"
-      + " const d = l.length ? l[l.length - 1] : null;"
+      + " const d = document.getElementById('defile');"
       + " return JSON.stringify({enCourse: document.body.classList.contains('en-course'),"
-      + " cartes: c.length, pena14: q ? q.querySelector('.c_pena').textContent : null,"
-      + " basTableau: d ? Math.round(d.getBoundingClientRect().bottom) : 0}); })()" },
+      + " cartes: c.length, course: c.filter(e => e.classList.contains('course')).length,"
+      + " pena14: q ? q.querySelector('.c_pena').textContent : null,"
+      + " basTableau: d ? Math.round(d.getBoundingClientRect().bottom) : 0,"
+      + " hautBandeau: Math.round(document.getElementById('encourse').getBoundingClientRect().top)}); })()" },
 
-  // Une arrivee doit amener la fenetre qui contient ce bateau, et l'encadrer :
-  // le dernier arrivant est en 12e position, donc dans la seconde fenetre de
-  // la queue, alors que l'affichage demarre sur la premiere.
+  // Une arrivee est encadree la ou elle tombe (12e, sur la piste), sans
+  // arreter le defilement ; le pied passe de « Encore 1 bateau » a « terminee ».
   { name: 'tv_results / arrivee mise en valeur', url: '/canoe/tv_results.html?epreuve=K1H&delay=30000',
     fixture: 'slalom-finale', setup: onzeK1HArrives(),
     evalEarlyExpr: "window.__p0 = document.getElementById('pagination').textContent; 'ok'",
     events: [[3000, 'bib-start', { bib: 12 }], [4500, 'bib-finish', { bib: 12, time: 99500 }]],
     settle: 10000,
-    expect: (r) => (r.eval && r.eval.avant.indexOf('1 / 2') === 0
-      && r.eval.apres.indexOf('2 / 2') === 0 && r.eval.vedette === '12'
-      ? null : `attendu un saut de la fenetre 1 a la fenetre 2 avec le 12 encadre, vu ${JSON.stringify(r.eval)}`),
+    expect: (r) => (r.eval && r.eval.avant === 'Encore 1 bateau à arriver'
+      && r.eval.apres === 'Épreuve terminée' && r.eval.vedette === '12'
+      ? null : `attendu le 12 encadre et l'epreuve terminee, vu ${JSON.stringify(r.eval)}`),
     evalExpr: "(() => { const v = document.querySelector('.ligne.res.vedette');"
       + " return JSON.stringify({avant: window.__p0,"
       + " apres: document.getElementById('pagination').textContent,"
@@ -527,12 +530,14 @@ const CASES = [
     evalExpr: "JSON.stringify({categ: document.getElementById('epreuve_nom').textContent,"
       + " provisoire: document.body.classList.contains('provisoire')})" },
 
-  { name: 'tv_results / bandeau absent riviere vide', url: '/canoe/tv_results.html',
+  // Riviere vide : aucune tuile « en course », le bandeau ne montre que le
+  // dernier arrive et les prochains partants.
+  { name: 'tv_results / riviere vide, pas de tuile en course', url: '/canoe/tv_results.html',
     fixture: 'slalom-finale', setup: epreuveK1HTerminee(), settle: 8000,
-    expect: (r) => (r.eval && r.eval.enCourse === false && r.eval.cartes === 0
-      ? null : `le bandeau devrait etre absent, vu ${JSON.stringify(r.eval)}`),
-    evalExpr: "JSON.stringify({enCourse: document.body.classList.contains('en-course'),"
-      + " cartes: document.querySelectorAll('.coureur').length})" },
+    expect: (r) => (r.eval && r.eval.course === 0 && r.eval.cartes > 0
+      ? null : `attendu des tuiles sans bateau en course, vu ${JSON.stringify(r.eval)}`),
+    evalExpr: "JSON.stringify({course: document.querySelectorAll('.coureur.course:not(.sort)').length,"
+      + " cartes: document.querySelectorAll('.coureur:not(.sort)').length})" },
 
   { name: 'tv_startlist', url: '/canoe/tv_startlist.html', settle: 8000 },
   { name: 'tv_clear', url: '/canoe/tv_clear.html' },
