@@ -413,6 +413,7 @@ server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log(`  tv startlist         http://localhost:${HTTP_PORT}/canoe/tv_startlist.html`);
   console.log(`  tv duo               http://localhost:${HTTP_PORT}/canoe/tv_duo.html`);
   console.log(`  tv duo kayak-cross   http://localhost:${HTTP_PORT}/canoe/tv_duo_kx.html`);
+  console.log(`  tv résultats KX      http://localhost:${HTTP_PORT}/canoe/tv_results_kx.html`);
   console.log(`  tv regie             http://localhost:${HTTP_PORT}/canoe/tv_regie.html?scenario=${scenario || 'test'}&repetition=1&debug=1`);
   console.log(`  jugement             http://localhost:${HTTP_PORT}/canoe/jugement.html`);
   console.log(`  inrace (php)         http://localhost:${HTTP_PORT}/canoe/inrace.php`);

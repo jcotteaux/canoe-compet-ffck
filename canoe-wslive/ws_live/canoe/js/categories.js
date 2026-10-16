@@ -58,12 +58,14 @@ const nom_long = {
 
 // Programme chpts de france kayak cross indiv
   "XK1INV": "Invités",
+  XK1H: "Kayak Homme",
+  XK1D: "Kayak Dame",
   "XK1H U15": "Kayak Homme U15",
   "XK1D U15": "Kayak Dame U15",
   "XK1H U18": "Kayak Homme U18",
-  "XK1D U15": "Kayak Dame U18",
+  "XK1D U18": "Kayak Dame U18",
   "XK1H U23": "Kayak Homme U23",
-  "XK1D U15": "Kayak Dame U23",
+  "XK1D U23": "Kayak Dame U23",
 
 // Pogramme chpts de France Master
   C1HM35: "Canoe Master 35",

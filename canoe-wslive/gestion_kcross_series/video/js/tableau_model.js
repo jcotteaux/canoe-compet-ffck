@@ -21,12 +21,12 @@ const LANES = ['R', 'V', 'B', 'J'];
 const OUT_OF_PROGRESSION = new Set(['DNS', 'DQB']);
 
 /**
- * Dames ou Hommes, d'après le code de catégorie (K1D, K1H, K1DJ…). Les tours
+ * Dames ou Hommes, d'après le code de catégorie (K1D, K1H, K1DJ, XK1D, XK1H…). Les tours
  * des deux catégories sont intercalés : le public doit savoir d'un coup d'œil
  * laquelle il regarde. null si le code ne le dit pas.
  */
 export function genreOf(categoryKey) {
-  const m = String(categoryKey || '').toUpperCase().match(/^[KC]\d([DFH])/);
+  const m = String(categoryKey || '').toUpperCase().match(/^X?[KC]\d([DFH])/);
   if (!m) return null;
   return m[1] === 'H' ? 'hommes' : 'dames';
 }

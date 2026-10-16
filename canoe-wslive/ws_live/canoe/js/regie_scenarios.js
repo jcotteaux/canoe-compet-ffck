@@ -72,7 +72,7 @@ const REGIE_SCENARIOS = {
 		titre : 'Championnats de France Elite Kayak-Cross',
 		phase : 'Kayak-Cross — phases finales',
 		date : '2026-10-17',
-		kcross : { competition : null },
+		kcross : { competition : '62' },		// competCrossFFCK sur 192.168.1.65
 		categories : [
 			{ epreuve : 'KX', libelle : 'Kayak-Cross', depart : '14:00:00', fin : '17:00:00', nb : 0, vue : 'kcross' },
 		],

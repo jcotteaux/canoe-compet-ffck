@@ -16,6 +16,15 @@
  * pilotage (canoe/tv_podium_pilote.html, sur ce poste ou un téléphone) envoie
  * la catégorie et l'étape de révélation, l'écran du podium (tv_palmares.html
  * ?pilote=1, dans OBS) les reçoit aussitôt. Voir PILOTE plus bas.
+ *
+ * Et le kayak-cross des séries (samedi après-midi) : /gestion_kcross_series/
+ * sert la copie de ce dépôt (pilote automatique de l'incrustation, tableau,
+ * écran TV, dalles…), et /gestion_kcross_series/api/ est transmis au serveur
+ * competCrossFFCK (--kx, défaut SERVEUR_KX ou 192.168.1.65). La régie n'a donc
+ * pas besoin que ces pages soient installées sur la machine de course : seule
+ * son API (PHP + base) sert.
+ *
+ *   node tools/serve.js [--port 3000] [--kx 192.168.1.65]
  */
 
 const http = require('http');
@@ -28,6 +37,9 @@ const opt = (k, d) => { const i = argv.indexOf('--' + k); return i >= 0 ? argv[i
 
 const PORT = Number(opt('port', process.env.PORT || 3000));
 const WWW = path.join(__dirname, '..', 'ws_live');
+const KX = '/gestion_kcross_series';
+const KX_ROOT = path.join(__dirname, '..', 'gestion_kcross_series');
+const KX_SERVEUR = opt('kx', process.env.SERVEUR_KX || '192.168.1.65');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -108,6 +120,25 @@ function routePilote(req, res, pathname) {
   res.end(JSON.stringify(pilote));
 }
 
+/** Transmet une requête d'API kayak-cross à competCrossFFCK, telle quelle. */
+function relaisKx(req, res) {
+  const [hote, port] = KX_SERVEUR.split(':');
+  const amont = http.request({
+    host: hote, port: Number(port || 80), method: req.method, path: req.url,
+    headers: { ...req.headers, host: KX_SERVEUR }, timeout: 8000,
+  }, (r) => {
+    res.writeHead(r.statusCode, { ...r.headers, 'access-control-allow-origin': '*' });
+    r.pipe(res);
+  });
+  amont.on('timeout', () => amont.destroy(new Error('délai dépassé')));
+  amont.on('error', (e) => {
+    if (res.headersSent) return res.end();
+    res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: false, message: `competCrossFFCK ${KX_SERVEUR} injoignable : ${e.message}` }));
+  });
+  req.pipe(amont);
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname;
@@ -121,9 +152,19 @@ const server = http.createServer((req, res) => {
     return res.end();
   }
 
+  // Kayak-cross : l'API part vers competCrossFFCK, les pages viennent d'ici.
+  let racine = WWW;
+  let chemin = pathname;
+  if (pathname === KX || pathname.startsWith(KX + '/')) {
+    if (pathname.startsWith(KX + '/api/'))
+      return relaisKx(req, res);
+    racine = KX_ROOT;
+    chemin = pathname.slice(KX.length) || '/';
+  }
+
   // Protégé contre la traversée de répertoire.
-  const target = path.normalize(path.join(WWW, pathname));
-  if (!target.startsWith(WWW)) {
+  const target = path.normalize(path.join(racine, chemin));
+  if (!target.startsWith(racine)) {
     res.writeHead(403);
     return res.end('403');
   }
@@ -173,6 +214,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`  ws_live servi sur http://localhost:${PORT}/  (sans bouchon : aucune donnée simulée)`);
   console.log(`  régie : http://localhost:${PORT}/canoe/tv_regie.html?scenario=<demi-journée>&ws=<serveur>:8080`);
   console.log(`  pilote du podium : http://localhost:${PORT}/canoe/tv_podium_pilote.html (ou l'adresse de ce Mac, depuis un téléphone)`);
+  console.log(`  kayak-cross : http://localhost:${PORT}${KX}/ (pages de ce dépôt, API sur ${KX_SERVEUR})`);
   if (!fs.existsSync(path.join(WWW, 'canoe', 'video', 'generique.mp4')))
     console.log('  ⚠ canoe/video/generique.mp4 absent : la régie sautera le générique');
   console.log('');

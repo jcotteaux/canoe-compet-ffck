@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Results Kayak-Cross</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_results_kx.css?v1" rel="stylesheet">
+</head>
+<body>
+	<!-- Hors de la scène : en mode photo, le fond couvre toute la fenêtre,
+	     même quand elle n'est pas en 16:9. -->
+	<div id="fond"></div>
+	<div id="voile"></div>
+
+	<div id="scene">
+		<div class="bande" id="bande_haut_sombre"></div>
+		<div class="bande" id="bande_haut_vive"></div>
+		<div class="bande" id="bande_bas_vive"></div>
+		<div class="bande" id="bande_bas_sombre"></div>
+
+		<div id="titre"></div>
+
+		<div id="sous_titre">
+			<span id="lieu"></span>
+			<span id="provisoire">Classement provisoire</span>
+		</div>
+
+		<div id="epreuve"><span id="epreuve_nom"></span></div>
+
+		<div id="tableau">
+			<div class="ligne" id="entete">
+				<div class="c_rang">Clt</div>
+				<div class="c_dossard">Dos.</div>
+				<div class="c_nom">Nom</div>
+				<div class="c_nation">Nat.</div>
+				<div class="c_pena">Pén.</div>
+				<div class="c_temps">Temps</div>
+				<div class="c_ecart">Écart</div>
+			</div>
+			<div id="corps"></div>
+		</div>
+
+		<!-- Écran d'attente : aucun classement à montrer. Le compte à rebours
+		     jusqu'au premier départ, tenu par le JS (RenderAttente). -->
+		<div id="attente">
+			<div id="attente_titre">Premier départ dans</div>
+			<div id="attente_reste"></div>
+			<div id="attente_info"></div>
+		</div>
+
+		<div id="encourse"></div>
+
+		<div id="pagination"></div>
+		<div id="logo_ffck"></div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v4"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js?v2"></script>
+	<script src="./js/tv_results_kx.js?v1"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

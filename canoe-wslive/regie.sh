@@ -6,12 +6,15 @@
 #   SERVEUR=192.168.1.60 ./regie.sh  autre serveur de course
 #   PORT=3100 ./regie.sh             autre port local
 #
-# Le samedi après-midi (kayak-cross) demande en plus SERVEUR_KX et CODE_KX.
+# Le samedi après-midi (kayak-cross) lit aussi competCrossFFCK : SERVEUR_KX
+# (défaut 192.168.1.65) et CODE_KX, la compétition (défaut 62).
 # Ctrl-C arrête le serveur local.
 
 cd "${0:A:h}"
 
 SERVEUR=${SERVEUR:-192.168.1.52}
+SERVEUR_KX=${SERVEUR_KX:-192.168.1.65}
+CODE_KX=${CODE_KX:-62}
 PORT=${PORT:-3000}
 
 # La demi-journée : celle passée en argument, sinon le jour et l'heure (avant 13h : matin).
@@ -33,12 +36,14 @@ esac
 
 url="http://localhost:$PORT/canoe/tv_regie.html?scenario=$scenario&ws=$SERVEUR:8080"
 if [[ $scenario == samedi-apres-midi ]]; then
-	if [[ -z $SERVEUR_KX || -z $CODE_KX ]]; then
-		echo "samedi après-midi : définir SERVEUR_KX et CODE_KX, ex."
-		echo "  SERVEUR_KX=192.168.1.52 CODE_KX=1234 ./regie.sh samedi-apres-midi"
-		exit 1
+	# Les pages kayak-cross (pilote de l'incrustation…) viennent de ce Mac,
+	# leur API de competCrossFFCK : tools/serve.js --kx relaie /api/.
+	url="$url&kx=http://localhost:$PORT/gestion_kcross_series&kx_competition=$CODE_KX"
+	if curl -s -m 3 -o /dev/null "http://$SERVEUR_KX/gestion_kcross_series/api/api_get_server_time.php"; then
+		echo "✓ competCrossFFCK $SERVEUR_KX joignable (compétition $CODE_KX)"
+	else
+		echo "⚠︎ competCrossFFCK $SERVEUR_KX injoignable — l'incrustation kayak-cross restera vide"
 	fi
-	url="$url&kx=http://$SERVEUR_KX/gestion_kcross_series&kx_competition=$CODE_KX"
 fi
 
 # Le serveur de course répond-il ? On prévient sans bloquer : il peut démarrer après.
@@ -64,4 +69,4 @@ if lsof -nP -iTCP:$PORT -sTCP:LISTEN >/dev/null 2>&1; then
 	exit 0
 fi
 
-exec node tools/serve.js --port $PORT
+exec node tools/serve.js --port $PORT --kx $SERVEUR_KX

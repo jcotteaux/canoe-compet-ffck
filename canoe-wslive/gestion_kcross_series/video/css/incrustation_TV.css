@@ -474,6 +474,21 @@ body[data-genre] .results-info::before {
     color: #fff;
 }
 
+/*
+ * Le libellé avant la zone, comme le matin (tv_duo_kx, tv_results_kx) :
+ * « FLT 3 » en jaune, « RAL R » en rouge. Seulement sur les vraies fautes
+ * (createPenaltySummaryHTML leur met un title) : un statut (DNF, DSQ…) porte
+ * aussi la classe ral, sans title, et reste écrit tel quel.
+ */
+.penalty-tag.flt[title]::before { content: 'FLT'; }
+.penalty-tag.ral[title]::before { content: 'RAL'; }
+.penalty-tag.flt[title]::before,
+.penalty-tag.ral[title]::before {
+    margin-right: 0.3em;
+    font-size: 0.8em;
+    letter-spacing: 0.03em;
+}
+
 /* ============================================================ QUALIFIÉS */
 
 .qualif-tag,

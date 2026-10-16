@@ -224,6 +224,21 @@ function Duree(sec)
 	return sec * 1000 * (regie.repetition ? regie.vitesse : 1);
 }
 
+/**
+ * Le bateau a-t-il un résultat (temps, DNF, DNS…) ? En slalom, Tps le dit.
+ * En kayak-cross (EXS), canoe.UpdateExsTotalPena écrit Tps = 0 pour tous,
+ * même pas partis : seul le chrono de competFFCK (Tps_chrono) fait foi.
+ */
+function AResultat(tRanking, row, cp)
+{
+	if (canoe.GetCodeActivite() === 'EXS')
+	{
+		const v = String(tRanking.GetCell('Tps_chrono' + cp, row));
+		return v !== '' && v !== '0';
+	}
+	return String(tRanking.GetCell('Tps' + cp, row)) !== '';
+}
+
 /** Les bateaux d'une catégorie dans le classement. */
 function Bateaux(epreuve)
 {
@@ -240,7 +255,7 @@ function Bateaux(epreuve)
 
 		out.push({
 			bib : String(tRanking.GetCell('Dossard', row)),
-			resultat : String(tRanking.GetCell('Tps' + cp, row)) !== '',
+			resultat : AResultat(tRanking, row, cp),
 			depart : tRanking.GetCellInt('Heure_depart' + cp, row, 0),
 			chrono : tRanking.GetCellInt('Tps_chrono' + cp, row, 0),
 		});
@@ -266,7 +281,7 @@ function EpreuveProchainPartant(heure)
 		const depart = tRanking.GetCellInt('Heure_depart' + cp, row, 0);
 		if (depart <= 0 || depart < heure - 30000)
 			continue;
-		if (String(tRanking.GetCell('Tps' + cp, row)) !== '')
+		if (AResultat(tRanking, row, cp))
 			continue;
 		if (regie.onCourse.indexOf(String(tRanking.GetCell('Dossard', row))) >= 0)
 			continue;
@@ -753,7 +768,9 @@ function PreparerCadres(s)
 	// En régie, le classement seul sur toute la hauteur : pas de tuiles (le
 	// dernier arrivé est déjà dans le classement), et plus de lignes. Les
 	// écrans TV fixes gardent leur tv_results habituel.
-	Cadre('c_resultats', res ? 'tv_results.html?epreuve=' + encodeURIComponent(res.epreuve) + '&no_course&max=12' : null);
+	// Kayak-cross contre-la-montre : tv_results_kx (pénalités FLT, rang du contre-la-montre).
+	Cadre('c_resultats', res ? (res.vue === 'duo_kx' ? 'tv_results_kx.html' : 'tv_results.html')
+		+ '?epreuve=' + encodeURIComponent(res.epreuve) + '&no_course&max=12' : null);
 	Cadre('c_depart', dep ? 'tv_departs.html?epreuve=' + encodeURIComponent(dep.epreuve) : null);
 }
 
@@ -984,7 +1001,7 @@ function Init()
 	if (regie.scenario.categories.some(function(c) { return c.vue === 'kcross'; }))
 	{
 		const base = (urlParams.get('kx') || 'http://' + location.hostname + ':3001').replace(/\/+$/, '');
-		const comp = (urlParams.get('kx_competition') || (regie.scenario.kcross && regie.scenario.kcross.competition) || '900')
+		const comp = String(urlParams.get('kx_competition') || (regie.scenario.kcross && regie.scenario.kcross.competition) || '900')
 			.replace(/[^a-zA-Z0-9_]/g, '');
 
 		if (/^https?:\/\/[^\s"'<>]+$/.test(base))

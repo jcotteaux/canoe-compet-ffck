@@ -3,8 +3,15 @@
 // Fait ce que l'opérateur de video_control.html ferait, d'après l'état des
 // séries seulement, sans rien retenir : recharger la page la remet au même
 // point. Toutes les 1,5 s :
-//   - une série sur l'eau (en course, à valider, en modification) : LIVE_RUN,
-//     arrivés dans l'ordre d'arrivée puis les autres dans l'ordre des couloirs ;
+//   - une série en course : LIVE_RUN (la dernière partie : elle passe avant
+//     une série précédente restée à valider), arrivés dans l'ordre d'arrivée
+//     puis les autres dans l'ordre des couloirs ;
+//   - une série à valider (ou en modification) dont tous les bateaux ont une
+//     place ou un statut : RESULTS « PROVISOIRE », le classement déduit des
+//     places et des fautes (voir classementProvisoire), pendant ?maintien= s
+//     depuis sa dernière modification ; ensuite on passe à la série suivante
+//     (sa préparation) sans attendre les résultats officiels. Pas tous
+//     arrivés : LIVE_RUN, pendant le même maintien ;
 //   - sinon la dernière série validée, pendant ?maintien= s : RESULTS ;
 //   - sinon la prochaine série : d'abord ?tableau= s de tableau des phases
 //     finales (BRACKET, si le format en a un), puis sa rampe (START_RAMP) ;
@@ -33,6 +40,8 @@ const ROUND_NAMES = {
   HUITIEMES: 'Huitième de Finale', QUARTS: 'Quart de Finale', DEMI: 'Demi-Finale', FINALE: 'Finale',
 };
 const PRIO_CLASSES = ['prio-red', 'prio-green', 'prio-blue', 'prio-yellow'];
+// js/constants.js, statusOrder : sans statut d'abord, puis DNF, DSQ, DNS, DQB.
+const STATUS_ORDER = { DNF: 1, DSQ: 2, DNS: 3, DQB: 4 };
 const ON_WATER = new Set([3, 4, 6]);
 
 let clockOffset = 0;	// heure serveur - heure locale
@@ -57,8 +66,46 @@ async function loadHeats() {
     .sort((a, b) => a.globalHeatNumber - b.globalHeatNumber);
 }
 
+/** js/engine.js, PenaltyEncoder.encode : le nombre de RAL, puis de FLT, puis leur position. */
+function penaltyScore(penaltyString) {
+  if (!penaltyString || [...penaltyString].every((c) => c === '0')) return 0;
+  const n = penaltyString.length;
+  let ralCount = 0, fltCount = 0, ralMask = 0, fltMask = 0;
+  for (let i = 0; i < n; i++) {
+    const pos = n - 1 - i;
+    if (penaltyString[i] === '5') { ralCount++; ralMask |= (1 << pos); }
+    else if (penaltyString[i] === '2') { fltCount++; fltMask |= (1 << pos); }
+  }
+  return (ralCount << 28) | (fltCount << 24) | (ralMask << 12) | fltMask;
+}
+
+/**
+ * Classement provisoire d'une série sur l'eau, dès que tous ses bateaux ont
+ * une place d'arrivée ou un statut ; null sinon. Mêmes règles que
+ * Serie.calculateAndApplyRanking (js/engine.js) : le statut (aucun, DNF, DSQ,
+ * DNS, DQB), puis les pénalités (RAL d'abord, puis FLT, puis leur position),
+ * puis la place d'arrivée. Le rang du contre-la-montre, dernier départage du
+ * moteur, n'est pas dans l'API : le couloir (prioDepart) en tient lieu.
+ * Renvoie les slots dans l'ordre, chacun avec son rang provisoire.
+ */
+function classementProvisoire(heat) {
+  const slots = heat.slots.filter((s) => s.participant && s.participant.id);
+  if (slots.length === 0) return null;
+  const aResultat = (p) => (p.ordre_arrivee !== null && p.ordre_arrivee !== '' && p.ordre_arrivee !== undefined) || !!p.specialStatus;
+  if (!slots.every((s) => aResultat(s.participant))) return null;
+
+  const tries = [...slots].sort((a, b) => {
+    const pa = a.participant, pb = b.participant;
+    return (STATUS_ORDER[pa.specialStatus] || 0) - (STATUS_ORDER[pb.specialStatus] || 0)
+      || penaltyScore(pa.penalite) - penaltyScore(pb.penalite)
+      || (parseInt(pa.ordre_arrivee, 10) || Infinity) - (parseInt(pb.ordre_arrivee, 10) || Infinity)
+      || a.prioDepart - b.prioDepart;
+  });
+  return tries.map((s, i) => ({ slot: s, rank: String(i + 1) }));
+}
+
 /** La charge utile d'un mode pour une série, comme pushToOBS. */
-function payloadFor(mode, heat) {
+function payloadFor(mode, heat, provisoire = null) {
   const payload = {
     mode,
     title: `${heat.categoryKey} | ${ROUND_NAMES[heat.roundKey] || heat.roundKey} | ${heat.name}`,
@@ -85,7 +132,15 @@ function payloadFor(mode, heat) {
     return payload;
   }
 
-  const list = mode === 'RESULTS'
+  // Provisoire : l'ordre et les rangs déduits des places et des fautes.
+  const rangs = new Map();
+  if (provisoire) {
+    payload.resultsLabel = 'PROVISOIRE';
+    provisoire.forEach((e) => rangs.set(e.slot, e.rank));
+  }
+
+  const list = provisoire ? provisoire.map((e) => e.slot)
+    : mode === 'RESULTS'
     ? [...slots].sort((a, b) => (parseInt(a.participant.finalRank) || 999) - (parseInt(b.participant.finalRank) || 999))
     : [...slots].sort((a, b) => (parseInt(a.participant.ordre_arrivee) || 99) - (parseInt(b.participant.ordre_arrivee) || 99)
                                 || a.prioDepart - b.prioDepart);
@@ -98,7 +153,7 @@ function payloadFor(mode, heat) {
       : createPenaltySummaryHTML(p.penalite, { heatResult: { order: null }, gateCount: heat.gateCount, rollZoneAfterGate: heat.rollZoneAfterGate }, '');
     payload.slots.push({
       name: p.name, club: p.club || null, numPos: (s.prioDepart - 1) % 4,
-      colorLetter: PRIO_CLASSES[(s.prioDepart - 1) % 4], rank: p.finalRank, penaltyHtml,
+      colorLetter: PRIO_CLASSES[(s.prioDepart - 1) % 4], rank: rangs.get(s) || p.finalRank, penaltyHtml,
     });
   }
   return payload;
@@ -116,14 +171,35 @@ function hasBracket(heat, heats) {
 /** Ce qu'il faut montrer maintenant : la charge utile, ou null pour vider. */
 function decide(heats) {
   const now = Date.now() + clockOffset;
-  const onWater = heats.find((h) => ON_WATER.has(h.etat));
-  if (onWater) return payloadFor('LIVE_RUN', onWater);
+
+  // La série en course d'abord : la dernière partie, même si une série
+  // précédente attend encore sa validation.
+  const enCourse = [...heats].reverse().find((h) => h.etat === 3);
+  if (enCourse) {
+    const provisoire = classementProvisoire(enCourse);
+    return provisoire ? payloadFor('RESULTS', enCourse, provisoire) : payloadFor('LIVE_RUN', enCourse);
+  }
+
+  // À valider (ou en modification) : le provisoire pendant le maintien, puis
+  // la préparation de la suivante, sans attendre les résultats officiels.
+  const aValider = [...heats].reverse().find((h) => ON_WATER.has(h.etat));
+  let provisoire = null;
+  if (aValider) {
+    provisoire = classementProvisoire(aValider);
+    // Un bateau sans place ni statut (DNF pas saisi) ne bloque pas l'écran :
+    // même maintien, puis la suite.
+    if (now - (aValider.lastModified || 0) < HOLD_MS)
+      return provisoire ? payloadFor('RESULTS', aValider, provisoire) : payloadFor('LIVE_RUN', aValider);
+  }
 
   const lastDone = [...heats].reverse().find((h) => h.etat === 5);
-  if (lastDone && now - lastDone.lastModified < HOLD_MS) return payloadFor('RESULTS', lastDone);
+  if (lastDone && now - lastDone.lastModified < HOLD_MS
+      && !(aValider && aValider.globalHeatNumber > lastDone.globalHeatNumber))
+    return payloadFor('RESULTS', lastDone);
 
   const next = heats.find((h) => h.etat <= 2);
-  if (!next) return null;
+  // Plus rien à courir : la dernière série reste en provisoire jusqu'à la validation.
+  if (!next) return provisoire ? payloadFor('RESULTS', aValider, provisoire) : null;
 
   // Le tableau d'abord, juste après les résultats de la série précédente (et
   // après le titre de la régie si l'on change de bloc).

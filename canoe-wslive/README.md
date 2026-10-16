@@ -48,14 +48,18 @@ le navigateur avant : `open "<adresse>"`.
 | vendredi 16 matin — qualifs manche 1 | 9h00 → 12h18 | `http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-matin&ws=SERVEUR:8080` |
 | vendredi 16 après-midi — qualifs manche 2 | 14h00 → 15h20 | `http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-apres-midi&ws=SERVEUR:8080` |
 | samedi 17 matin — kayak-cross contre-la-montre | 10h15 → 11h38 | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-matin&ws=SERVEUR:8080` |
-| samedi 17 après-midi — kayak-cross séries | 14h00 → 17h00 *(à confirmer)* | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=SERVEUR:8080&kx=http://SERVEUR_KX/gestion_kcross_series&kx_competition=CODE` |
+| samedi 17 après-midi — kayak-cross séries | 14h00 → 17h00 *(à confirmer)* | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=SERVEUR:8080&kx=http://localhost:3000/gestion_kcross_series&kx_competition=62` |
 | dimanche 18 matin — demi-finales | 9h00 → 13h03 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=SERVEUR:8080` |
 | dimanche 18 après-midi — finales | 14h00 → 15h46 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=SERVEUR:8080` |
 
 Remplacer `SERVEUR` par l'adresse du serveur de course (ex. `192.168.1.52`).
-Samedi après-midi : `SERVEUR_KX` = la machine qui sert competCrossFFCK
-(`gestion_kcross_series`), `CODE` = son code de compétition ; ne pas ouvrir
-`video_control.html` en même temps, la régie pilote l'incrustation.
+Samedi après-midi : les pages kayak-cross (pilote de l'incrustation, tableau…)
+sont servies par CE Mac, depuis `gestion_kcross_series/` du dépôt, et
+`tools/serve.js --kx SERVEUR_KX` relaie leur API vers competCrossFFCK
+(`SERVEUR_KX`, défaut `192.168.1.65` ; compétition `CODE_KX`, défaut `62`).
+`./regie.sh samedi-apres-midi` lance tout. La machine de course n'a donc pas
+besoin d'avoir ces pages à jour. Ne pas ouvrir `video_control.html` en même
+temps : la régie pilote l'incrustation.
 
 Depuis le terminal, les mêmes adresses avec la variable :
 
@@ -63,7 +67,7 @@ Depuis le terminal, les mêmes adresses avec la variable :
 open "http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-matin&ws=$SERVEUR:8080"
 open "http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-apres-midi&ws=$SERVEUR:8080"
 open "http://localhost:3000/canoe/tv_regie.html?scenario=samedi-matin&ws=$SERVEUR:8080"
-open "http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=$SERVEUR:8080&kx=http://$SERVEUR_KX/gestion_kcross_series&kx_competition=$CODE_KX"
+open "http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=$SERVEUR:8080&kx=http://localhost:3000/gestion_kcross_series&kx_competition=$CODE_KX"
 open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=$SERVEUR:8080"
 open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=$SERVEUR:8080"
 ```

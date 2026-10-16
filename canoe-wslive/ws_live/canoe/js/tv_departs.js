@@ -84,6 +84,20 @@ function OnFlowOnCourse(objJSON)
 
 /******************** la liste ********************/
 
+/**
+ * A un résultat ? En slalom, Tps le dit. En kayak-cross (EXS), canoe.js écrit
+ * Tps = 0 pour tous, même pas partis : seul Tps_chrono fait foi.
+ */
+function AResultat(tRanking, row, cp)
+{
+	if (canoe.GetCodeActivite() === 'EXS')
+	{
+		const v = String(tRanking.GetCell('Tps_chrono' + cp, row));
+		return v !== '' && v !== '0';
+	}
+	return String(tRanking.GetCell('Tps' + cp, row)) !== '';
+}
+
 /** Les bateaux de l'épreuve, dans l'ordre des départs. */
 function Liste(epreuve)
 {
@@ -106,7 +120,7 @@ function Liste(epreuve)
 			name : tRanking.GetCell('Bateau', row),
 			club : tRanking.GetCell('Club', row),
 			nation : tRanking.GetCell('Code_nation', row),
-			fait : String(tRanking.GetCell('Tps' + cp, row)) !== '',
+			fait : AResultat(tRanking, row, cp),
 			surLeau : wsMain.onCourse.indexOf(bib) >= 0,
 		});
 	}
@@ -135,7 +149,7 @@ function ChoisirEpreuve()
 		if (wsMain.onCourse.indexOf(bib) >= 0)
 			return tRanking.GetCell('Code_categorie', row);
 
-		if (String(tRanking.GetCell('Tps' + cp, row)) !== '')
+		if (AResultat(tRanking, row, cp))
 			continue;
 
 		const h = tRanking.GetCellInt('Heure_depart' + cp, row, 0);

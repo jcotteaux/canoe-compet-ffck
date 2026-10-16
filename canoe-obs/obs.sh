@@ -4,7 +4,9 @@
 #   ./obs.sh                          serveur de course par défaut (192.168.1.52)
 #   SERVEUR=192.168.1.60 ./obs.sh     autre serveur de course
 #   FPS=50 ./obs.sh                   autre cadence (celle de l'ATEM)
-#   SERVEUR_KX=… CODE_KX=… ./obs.sh   ajoute la régie du samedi après-midi
+#   CODE_KX=70 ./obs.sh               samedi après-midi : autre compétition kayak-cross
+#                                     (défaut 62 ; le serveur competCrossFFCK, lui, se
+#                                     règle dans regie.sh : SERVEUR_KX, défaut 192.168.1.65)
 #   ./obs.sh --sans-lancer            installe sans ouvrir OBS
 #   ./obs.sh --sans-son               sans attendre la sortie son HDMI de l'ATEM
 #

@@ -7,7 +7,7 @@ redonne exactement la même chose.
 ```bash
 ./obs.sh                              # installe et ouvre OBS dessus (OBS fermé)
 SERVEUR=192.168.1.60 ./obs.sh         # autre serveur de course
-SERVEUR_KX=192.168.1.52 CODE_KX=1234 ./obs.sh   # + régie du samedi après-midi
+CODE_KX=70 ./obs.sh                   # samedi après-midi : autre compétition kayak-cross
 ```
 
 Les pages sont servies par ce Mac : lancer `../canoe-wslive/regie.sh` (ou
@@ -45,6 +45,9 @@ voir les caméras.
 | `Manuel · Bateaux en course` | `tv_oncourse.html?bg=1` |
 | `Manuel · Départs` | `tv_departs.html` |
 | `Manuel · Résultats` | `tv_results.html?no_course` (sans le bandeau des bateaux en course) |
+| `Manuel · Résultats KX` | `tv_results_kx.html?no_course` : le classement du contre-la-montre kayak-cross (pénalités FLT par porte, rang du contre-la-montre) |
+| `Manuel · Séries KX (incrustation)` | samedi après-midi sans la régie : `gestion_kcross_series/video/video_incrustation.html` et, invisible dans la même scène, son pilote automatique (série en course, classement provisoire dès les 4 arrivées, résultats, rampe de la suivante) |
+| `Manuel · Tableau KX Dames` / `Hommes` | le tableau des phases finales de XK1D / XK1H, plein écran |
 | `Test son · générique` | le générique lu par OBS, sur le même chemin de son que la régie : à passer avant l'antenne |
 | `Répétition · bouchon` | `tv_regie.html?scenario=test&repetition=1&ws=localhost:8080`, avec `node mock/server.js` dans `canoe-wslive` |
 
@@ -56,8 +59,11 @@ l'écran derrière le podium, opaques et sans fond de clé. Les sortir par un
 **projecteur de scène** (clic droit sur la scène → *Projecteur plein écran
 (scène)* → l'écran du podium), pas par le programme.
 
-`Régie · Samedi après-midi` n'existe que si `SERVEUR_KX` et `CODE_KX` sont
-donnés à l'installation.
+`Régie · Samedi après-midi` et les scènes KX lisent les pages kayak-cross sur
+ce Mac (`http://localhost:3000/gestion_kcross_series/`, la copie du dépôt) :
+`regie.sh` lance `tools/serve.js --kx`, qui relaie leur API vers
+competCrossFFCK (`SERVEUR_KX`, défaut `192.168.1.65` ; compétition `CODE_KX`,
+défaut `62`).
 
 Partout :
 
@@ -135,7 +141,7 @@ pas laisser une scène `Régie` en aperçu.
 |---|---|---|
 | `SERVEUR` | `192.168.1.52` | serveur competFFCK (port 8080) |
 | `PORT` | `3000` | port local de `regie.sh` / `npm run serve` |
-| `SERVEUR_KX` / `CODE_KX` | — | competCrossFFCK et son code de compétition, samedi après-midi |
+| `SERVEUR_KX` / `CODE_KX` | `192.168.1.65` / `62` | competCrossFFCK et son code de compétition, samedi après-midi |
 | `FPS` | `25` | cadence, celle de l'ATEM |
 | `SON_NOM` | `BMD HDMI` | sortie son vers l'ATEM, relevée au lancement (`--sans-son` pour ne pas l'attendre) |
 | `ENREGISTREMENTS` | `~/Movies/canoe-obs` | dossier des enregistrements |

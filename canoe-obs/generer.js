@@ -25,8 +25,8 @@ const DOSSIER_PROFIL = 'canoe-ffck';
 const env = process.env;
 const SERVEUR = env.SERVEUR || '192.168.1.52';      // competFFCK, port 8080
 const PORT = env.PORT || '3000';                    // ws_live servi par ce Mac (regie.sh)
-const SERVEUR_KX = env.SERVEUR_KX || '';            // competCrossFFCK, samedi après-midi
-const CODE_KX = env.CODE_KX || '';
+const SERVEUR_KX = env.SERVEUR_KX || '192.168.1.65'; // competCrossFFCK, samedi après-midi
+const CODE_KX = env.CODE_KX || '62';                 // compétition kayak-cross du samedi
 const FPS = Number(env.FPS || 25);                  // doit suivre le format vidéo de l'ATEM
 // Sortie son vers l'ATEM : le HDMI du Mac, vu par macOS sous le nom « BMD HDMI ».
 const SON_ID = env.SON_ID || '23010000-0000-0000-2610-010380472896';
@@ -41,6 +41,7 @@ const LARGEUR = 1920;
 const HAUTEUR = 1080;
 
 const base = `http://localhost:${PORT}/canoe`;
+const kx = `http://localhost:${PORT}/gestion_kcross_series`;	// tools/serve.js --kx
 const ws = `ws=${SERVEUR}:8080`;
 
 /* ------------------------------------------------------------------ */
@@ -59,7 +60,9 @@ const DEMI_JOURNEES = [
 function urlRegie(scenario) {
 	let url = `${base}/tv_regie.html?scenario=${scenario}&${ws}`;
 	if (scenario === 'samedi-apres-midi')
-		url += `&kx=http://${SERVEUR_KX}/gestion_kcross_series&kx_competition=${CODE_KX}`;
+		// Pages kayak-cross servies par ce Mac (tools/serve.js), qui relaie leur
+		// API vers competCrossFFCK : le pilote de l'incrustation est celui du dépôt.
+		url += `&kx=${kx}&kx_competition=${CODE_KX}`;
 	return url;
 }
 
@@ -85,6 +88,13 @@ scenes.push(
 	{ nom: 'Manuel · Bateaux en course', page: `${base}/tv_oncourse.html?bg=1&${ws}` },
 	{ nom: 'Manuel · Départs', page: `${base}/tv_departs.html?${ws}` },
 	{ nom: 'Manuel · Résultats', page: `${base}/tv_results.html?${ws}&no_course` },
+	{ nom: 'Manuel · Résultats KX', page: `${base}/tv_results_kx.html?${ws}&no_course` },
+	// Samedi après-midi, sans la régie : l'incrustation des séries, avec son
+	// pilote automatique dans la même scène (invisible), et le tableau.
+	{ nom: 'Manuel · Séries KX (incrustation)', page: `${kx}/video/video_incrustation.html?competition=${CODE_KX}`,
+	  pilote: `${kx}/video/video_pilote.html?competition=${CODE_KX}` },
+	{ nom: 'Manuel · Tableau KX Dames', page: `${kx}/video/video_tableau.html?competition=${CODE_KX}&force=1&vue=complet&categorie=XK1D` },
+	{ nom: 'Manuel · Tableau KX Hommes', page: `${kx}/video/video_tableau.html?competition=${CODE_KX}&force=1&vue=complet&categorie=XK1H` },
 	{ nom: 'Répétition · bouchon', page: `${base}/tv_regie.html?scenario=test&repetition=1&ws=localhost:8080`, son: true },
 );
 
@@ -194,6 +204,21 @@ for (const scene of scenes) {
 		} : { hotkeys: { 'ObsBrowser.Refresh': [] } });
 		sources.push(page);
 		items.push(element(page, 2, false));
+	}
+	// Une page qui travaille sans rien montrer (le pilote de l'incrustation) :
+	// présente dans la scène pour tourner, mais vidée de tout affichage.
+	if (scene.pilote) {
+		const pilote = source(`Pilote · ${scene.nom}`, 'browser_source', 'browser_source', {
+			url: scene.pilote,
+			width: 320,
+			height: 60,
+			fps_custom: false,
+			css: 'body { display: none; }',
+			shutdown: true,
+			restart_when_active: false,
+		}, { hotkeys: { 'ObsBrowser.Refresh': [] } });
+		sources.push(pilote);
+		items.push(element(pilote, items.length + 1, true));
 	}
 	sources.push(source(scene.nom, 'scene', 'scene', {
 		custom_size: false,
