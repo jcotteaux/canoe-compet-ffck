@@ -7,6 +7,7 @@
 #   CODE_KX=70 ./obs.sh               samedi après-midi : autre compétition kayak-cross
 #                                     (défaut 62 ; le serveur competCrossFFCK, lui, se
 #                                     règle dans regie.sh : SERVEUR_KX, défaut 192.168.1.65)
+#   JOUR=2026-10-17 ./obs.sh          prépare la veille : les régies de ce jour restent chargées
 #   ./obs.sh --sans-lancer            installe sans ouvrir OBS
 #   ./obs.sh --sans-son               sans attendre la sortie son HDMI de l'ATEM
 #

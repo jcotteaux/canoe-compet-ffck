@@ -341,6 +341,10 @@ async function LireKcross()
 		const r = await fetch(kx.base + '/api/api_get_next_heats.php?competition='
 			+ encodeURIComponent(kx.competition) + '&etat=1,2,3,4,5,6');
 		const j = await r.json();
+		// Le relais (tools/serve.js) répond 502 si competCrossFFCK est tombé :
+		// ce n'est pas une réponse, on garde le dernier état connu.
+		if (!r.ok || j.success === false)
+			return;
 		kx.heats = (j.heats || []).filter(function(h) { return h.name !== '_TEST_RESEAU_' && h.globalHeatNumber; });
 		kx.recu = Date.now();
 	}
@@ -796,10 +800,16 @@ function Cadre(id, url)
  * serveur WebSocket (après 1,5 s, pour ne pas clignoter au lancement), verte
  * pendant 5 s quand la connexion s'établit ou revient, puis effacée. La
  * reconnexion elle-même est celle de ws.js.
+ *
+ * Demi-journée tout kayak-cross (samedi après-midi) : competFFCK ne sert pas,
+ * l'icône suit competCrossFFCK — une réponse de son API il y a moins de 5 s.
  */
 function Liaison()
 {
-	const ok = !!(wsMain.websocket && wsMain.websocket.readyState === WebSocket.OPEN);
+	const toutKx = regie.kx && regie.scenario.categories.every(function(c) { return c.vue === 'kcross'; });
+	const ok = toutKx
+		? Date.now() - (regie.kx.recu || 0) < 5000
+		: !!(wsMain.websocket && wsMain.websocket.readyState === WebSocket.OPEN);
 	const el = document.getElementById('liaison');
 	const now = Date.now();
 

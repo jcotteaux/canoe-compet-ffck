@@ -42,7 +42,8 @@ async function loadHeats() {
   const r = await fetch(`../api/api_get_next_heats.php?competition=${competition}&etat=1,2,3,4,5,6&club=true`);
   if (!r.ok) return;
   const j = await r.json();
-  heats = (j.heats || []).filter((h) => h.name !== '_TEST_RESEAU_');
+  heats = (j.heats || []).filter((h) => h.name !== '_TEST_RESEAU_')
+    .sort((a, b) => (a.globalHeatNumber || 0) - (b.globalHeatNumber || 0));
 }
 
 async function loadOverlay() {
@@ -65,9 +66,14 @@ function target() {
     return { categoryKey: fixedCategory || overlay.categoryKey, highlight: overlay.heatId ?? null };
   }
   if (!forced) return null;
-  // Répétition : la prochaine série à courir d'une catégorie en tableau.
-  const upcoming = heats.find((h) => h.etat <= 3 && hasBracket(h.categoryKey) && (!fixedCategory || h.categoryKey === fixedCategory));
-  const categoryKey = fixedCategory || upcoming?.categoryKey || heats.find((h) => hasBracket(h.categoryKey))?.categoryKey;
+  // Sans régie (?force=1) : la prochaine série à PARTIR (prête ou en attente)
+  // d'une catégorie en tableau ; celle en course garde sa mention dans l'arbre.
+  // Plus rien à partir : la dernière catégorie courue.
+  const enTableau = (h) => hasBracket(h.categoryKey) && (!fixedCategory || h.categoryKey === fixedCategory);
+  const upcoming = heats.find((h) => h.etat <= 2 && enTableau(h));
+  const derniere = [...heats].reverse().find((h) => h.etat >= 3 && enTableau(h));
+  const categoryKey = fixedCategory || upcoming?.categoryKey || derniere?.categoryKey
+    || heats.find((h) => hasBracket(h.categoryKey))?.categoryKey;
   return categoryKey ? { categoryKey, highlight: upcoming?.id ?? null } : null;
 }
 

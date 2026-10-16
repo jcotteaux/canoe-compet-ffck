@@ -46,8 +46,9 @@ voir les caméras.
 | `Manuel · Départs` | `tv_departs.html` |
 | `Manuel · Résultats` | `tv_results.html?no_course` (sans le bandeau des bateaux en course) |
 | `Manuel · Résultats KX` | `tv_results_kx.html?no_course` : le classement du contre-la-montre kayak-cross (pénalités FLT par porte, rang du contre-la-montre) |
-| `Manuel · Séries KX (incrustation)` | samedi après-midi sans la régie : `gestion_kcross_series/video/video_incrustation.html` et, invisible dans la même scène, son pilote automatique (série en course, classement provisoire dès les 4 arrivées, résultats, rampe de la suivante) |
-| `Manuel · Tableau KX Dames` / `Hommes` | le tableau des phases finales de XK1D / XK1H, plein écran |
+| `Manuel · Séries KX (incrustation)` | samedi après-midi sans la régie : `gestion_kcross_series/video/video_incrustation.html`. Le pilote automatique (série en course, classement provisoire dès les 4 arrivées, résultats, rampe de la suivante) est celui de la régie du samedi après-midi, toujours chargée ce jour-là ; un autre jour, un pilote invisible est posé dans la scène |
+| `Manuel · Tableau KX (en cours)` | l'arbre des phases finales de la catégorie de la **prochaine série à partir**, elle en évidence avec son heure (« Prochaine course »), la série en course marquée dans l'arbre |
+| `Manuel · Tableau KX Dames` / `Hommes` | le même arbre, figé sur XK1D / XK1H |
 | `Test son · générique` | le générique lu par OBS, sur le même chemin de son que la régie : à passer avant l'antenne |
 | `Répétition · bouchon` | `tv_regie.html?scenario=test&repetition=1&ws=localhost:8080`, avec `node mock/server.js` dans `canoe-wslive` |
 
@@ -58,6 +59,11 @@ Les scènes `Écran podium` ne vont pas à l'antenne : elles sont faites pour
 l'écran derrière le podium, opaques et sans fond de clé. Les sortir par un
 **projecteur de scène** (clic droit sur la scène → *Projecteur plein écran
 (scène)* → l'écran du podium), pas par le programme.
+
+Les régies **du jour** (date du scénario = date de l'installation) restent
+chargées quand on passe sur une autre scène : en y revenant, la régie n'est pas
+rechargée. Les autres jours s'arrêtent hors antenne. Relancer `./obs.sh` chaque
+matin (ou `JOUR=2026-10-17 ./obs.sh` la veille).
 
 `Régie · Samedi après-midi` et les scènes KX lisent les pages kayak-cross sur
 ce Mac (`http://localhost:3000/gestion_kcross_series/`, la copie du dépôt) :

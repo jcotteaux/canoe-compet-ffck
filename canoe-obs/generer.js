@@ -57,6 +57,13 @@ const DEMI_JOURNEES = [
 	['dimanche-apres-midi', 'Dimanche après-midi — finales'],
 ];
 
+// La date du jour, en heure locale : celle des scénarios (regie_scenarios.js).
+const JOUR = env.JOUR || (() => {
+	const d = new Date();
+	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+})();
+const SCENARIOS = scenariosRegie();
+
 function urlRegie(scenario) {
 	let url = `${base}/tv_regie.html?scenario=${scenario}&${ws}`;
 	if (scenario === 'samedi-apres-midi')
@@ -76,7 +83,13 @@ for (const [scenario, titre] of DEMI_JOURNEES) {
 		console.warn('⚠︎ SERVEUR_KX ou CODE_KX manquant : pas de scène « samedi après-midi »');
 		continue;
 	}
-	scenes.push({ nom: `Régie · ${titre}`, page: urlRegie(scenario), son: true });
+	// La régie du jour reste chargée quand on passe sur une autre scène : en y
+	// revenant, elle n'est pas rechargée (pas de noir, rideau et horloge
+	// intacts) et son pilote kayak-cross continue d'écrire l'incrustation. Les
+	// autres jours restent arrêtés hors antenne : pas trente WebSocket ouverts
+	// pour rien. obs.sh se relance chaque matin ; JOUR=AAAA-MM-JJ pour forcer.
+	const permanente = (SCENARIOS[scenario] || {}).date === JOUR;
+	scenes.push({ nom: `Régie · ${titre}`, page: urlRegie(scenario), son: true, permanente });
 }
 
 // Secours manuel, si la régie automatique ne convient pas : chaque page seule.
@@ -89,10 +102,16 @@ scenes.push(
 	{ nom: 'Manuel · Départs', page: `${base}/tv_departs.html?${ws}` },
 	{ nom: 'Manuel · Résultats', page: `${base}/tv_results.html?${ws}&no_course` },
 	{ nom: 'Manuel · Résultats KX', page: `${base}/tv_results_kx.html?${ws}&no_course` },
-	// Samedi après-midi, sans la régie : l'incrustation des séries, avec son
-	// pilote automatique dans la même scène (invisible), et le tableau.
+	// Samedi après-midi, sans la régie : l'incrustation des séries. Son pilote
+	// est celui de la régie quand elle reste chargée (le jour même) ; sinon un
+	// pilote dans la scène, invisible, aux mêmes réglages (maintien, titre),
+	// pour ne jamais avoir deux pilotes qui se contredisent.
 	{ nom: 'Manuel · Séries KX (incrustation)', page: `${kx}/video/video_incrustation.html?competition=${CODE_KX}`,
-	  pilote: `${kx}/video/video_pilote.html?competition=${CODE_KX}` },
+	  pilote: (SCENARIOS['samedi-apres-midi'] || {}).date === JOUR ? null
+	    : `${kx}/video/video_pilote.html?competition=${CODE_KX}&maintien=20&titre=10` },
+	// L'arbre de la catégorie de la prochaine série à partir, avec elle en
+	// évidence et son heure ; les deux suivantes figent Dames ou Hommes.
+	{ nom: 'Manuel · Tableau KX (en cours)', page: `${kx}/video/video_tableau.html?competition=${CODE_KX}&force=1&vue=complet` },
 	{ nom: 'Manuel · Tableau KX Dames', page: `${kx}/video/video_tableau.html?competition=${CODE_KX}&force=1&vue=complet&categorie=XK1D` },
 	{ nom: 'Manuel · Tableau KX Hommes', page: `${kx}/video/video_tableau.html?competition=${CODE_KX}&force=1&vue=complet&categorie=XK1H` },
 	{ nom: 'Répétition · bouchon', page: `${base}/tv_regie.html?scenario=test&repetition=1&ws=localhost:8080`, son: true },
@@ -193,7 +212,7 @@ for (const scene of scenes) {
 			// Une page cachée est arrêtée, et rechargée quand sa scène revient :
 			// pas dix connexions WebSocket ouvertes pour rien, et la régie,
 			// sans état, se recale sur l'heure au rechargement.
-			shutdown: true,
+			shutdown: !scene.permanente,
 			restart_when_active: false,
 			reroute_audio: !!scene.son,
 		}, scene.son ? {
