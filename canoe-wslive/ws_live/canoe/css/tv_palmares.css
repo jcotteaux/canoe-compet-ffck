@@ -630,6 +630,177 @@ body.vide #suite { visibility: hidden; }
 	100% { transform: scale(1);    text-shadow: 0 0 0 rgba(255, 255, 255, 0); }
 }
 
+/******************** la fête du vainqueur ********************/
+
+/*
+ * Posée par Celebrer() (tv_palmares.js) à l'apparition du 1er, retirée au
+ * bout de 10 s. Coordonnées de la scène 1920 x 1080. Calque au-dessus des
+ * marches, sans prise sur la souris.
+ */
+#fete
+{
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 5;
+}
+
+#fete > *
+{
+	position: absolute;
+}
+
+/* L'éclat doré derrière le vainqueur. */
+#fete .eclat
+{
+	left: 960px;
+	top: 440px;
+	width: 900px;
+	height: 900px;
+	margin: -450px 0 0 -450px;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(255, 246, 200, 0.75) 0%, rgba(247, 220, 99, 0.35) 22%, rgba(247, 220, 99, 0) 62%);
+	mix-blend-mode: screen;
+	animation: fete-eclat 2.6s ease-out both;
+}
+
+@keyframes fete-eclat
+{
+	0%   { transform: scale(0.1); opacity: 0; }
+	18%  { opacity: 1; }
+	100% { transform: scale(1.25); opacity: 0; }
+}
+
+/* Une étoile à cinq branches, de la couleur --c, de la taille --t. */
+#fete .etoile
+{
+	width: var(--t);
+	height: var(--t);
+	margin: calc(var(--t) / -2) 0 0 calc(var(--t) / -2);
+	background: var(--c);
+	clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+	filter: drop-shadow(0 0 6px rgba(255, 240, 170, 0.95));
+}
+
+/* La gerbe : elles jaillissent du nom, tournent et s'éteignent. */
+#fete .etoile.gerbe
+{
+	opacity: 0;
+	animation: fete-gerbe 1.9s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+
+@keyframes fete-gerbe
+{
+	0%   { transform: translate(0, 0) scale(0.2) rotate(0deg); opacity: 0; }
+	12%  { opacity: 1; }
+	70%  { opacity: 1; }
+	100% { transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot)); opacity: 0; }
+}
+
+/* Celles qui restent : elles scintillent, puis tout s'éteint vers 9 s. */
+#fete .etoile.scintille
+{
+	opacity: 0;
+	animation-name: fete-scintille, fete-fin;
+	animation-timing-function: ease-in-out, linear;
+	animation-iteration-count: infinite, 1;
+	animation-fill-mode: both, both;
+}
+
+@keyframes fete-scintille
+{
+	0%, 100% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+	50%      { transform: scale(1.1) rotate(40deg); opacity: 1; }
+}
+
+@keyframes fete-fin
+{
+	0%, 85% { visibility: visible; }
+	100%    { visibility: hidden; }
+}
+
+/* Les bouteilles : elles montent de derrière la marche, s'inclinent vers le
+   vainqueur, tremblent au moment du bouchon, puis s'effacent en fondu, sur place. */
+#fete .bouteille
+{
+	width: 60px;
+	height: 200px;
+	margin: -200px 0 0 -30px;		/* le pied sur le haut de la marche */
+	transform-origin: 50% 100%;
+	filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+	animation: fete-bouteille 9.5s ease-in-out both;
+	animation-delay: 0.5s;
+}
+
+#fete .bouteille svg { display: block; }
+
+@keyframes fete-bouteille
+{
+	0%   { transform: translateY(260px) rotate(0deg); opacity: 0; }
+	9%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+	13%  { transform: translateY(0) rotate(var(--angle)); }
+	14%  { transform: translateY(0) rotate(calc(var(--angle) * 1.12)); }
+	15%  { transform: translateY(0) rotate(calc(var(--angle) * 0.92)); }
+	16%  { transform: translateY(0) rotate(var(--angle)); }
+	80%  { transform: translateY(0) rotate(var(--angle)); opacity: 1; }
+	100% { transform: translateY(0) rotate(var(--angle)); opacity: 0; }
+}
+
+/* Le bouchon : il saute, tourne et sort de l'écran. */
+#fete .bouchon
+{
+	width: 14px;
+	height: 18px;
+	margin: -9px 0 0 -7px;
+	border-radius: 5px 5px 3px 3px;
+	background: linear-gradient(90deg, #8a6a1c, #f7dc63, #8a6a1c);
+	opacity: 0;
+	animation: fete-bouchon 1.4s cubic-bezier(0.2, 0.6, 0.4, 1) both;
+	animation-delay: 1.5s;
+}
+
+@keyframes fete-bouchon
+{
+	0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+	100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
+
+/* La mousse : chaque goutte avance d'un pas régulier (i, --dx) pendant
+   qu'elle monte puis retombe (b, --h puis --f) : une parabole. */
+#fete .goutte
+{
+	opacity: 0;
+	animation-name: fete-goutte-x;
+	animation-timing-function: linear;
+	animation-fill-mode: both;
+}
+
+#fete .goutte b
+{
+	display: block;
+	margin: -4px 0 0 -4px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.92);
+	box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+	animation-name: fete-goutte-y;
+	animation-fill-mode: both;
+}
+
+@keyframes fete-goutte-x
+{
+	0%   { transform: translateX(0); opacity: 1; }
+	85%  { opacity: 0.9; }
+	100% { transform: translateX(var(--dx)); opacity: 0; }
+}
+
+@keyframes fete-goutte-y
+{
+	0%   { transform: translateY(0) scale(0.6); animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1); }
+	40%  { transform: translateY(var(--h)) scale(1); animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4); }
+	100% { transform: translateY(var(--f)) scale(0.8); }
+}
+
 /******************** entrée d'une catégorie ********************/
 
 /*

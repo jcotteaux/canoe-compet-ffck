@@ -56,7 +56,131 @@ function AppliquerEtape()
 	document.getElementById('m2').classList.toggle('montre', e >= 2);
 	document.getElementById('m1').classList.toggle('montre', e >= 3);
 	document.body.classList.toggle('tout', e >= 3);
+
+	// Le 1er vient d'être révélé : la fête.
+	if (e >= 3 && !(wsMain.etapeVue >= 3))
+		Celebrer();
+	if (e < 3)
+		ArreterFete();
+	wsMain.etapeVue = e;
 }
+
+/******************** la fête du vainqueur ********************/
+
+/*
+ * À l'apparition du 1er : un éclat doré derrière lui, une gerbe d'étoiles qui
+ * jaillit de son nom, puis deux bouteilles de champagne montent de part et
+ * d'autre de sa marche, les bouchons sautent et la mousse jaillit en arcs
+ * au-dessus de lui (chaque goutte : un pas horizontal régulier, une montée
+ * puis une chute, d'où la parabole). Des étoiles scintillent ensuite autour
+ * de lui. Tout est dessiné ici (rien à charger) et retiré au bout de 10 s.
+ * Jamais avec ?anim=0.
+ *
+ * Coordonnées de la scène 1920 x 1080 : la marche du 1er est au centre
+ * (x 722 à 1198), son bloc va de y 560 à 770, son nom est vers y 420. Les
+ * bouteilles se tiennent devant le bloc doré, goulot vers le vainqueur.
+ */
+const FETE = { cx : 960, nomY : 430, piedY : 712, gaucheX : 790, droiteX : 1130 };
+
+function Hasard(a, b) { return a + Math.random() * (b - a); }
+
+function ArreterFete()
+{
+	clearTimeout(wsMain.feteTimer);
+	wsMain.feteTimer = null;
+	const f = document.getElementById('fete');
+	if (f)
+		f.remove();
+}
+
+function Celebrer()
+{
+	ArreterFete();
+	if (document.body.classList.contains('no-anim'))
+		return;
+	const m1 = document.getElementById('m1');
+	if (!m1 || m1.classList.contains('libre'))
+		return;
+
+	const fete = document.createElement('div');
+	fete.id = 'fete';
+	fete.setAttribute('aria-hidden', 'true');
+	let html = '<div class="eclat"></div>';
+
+	// La gerbe d'étoiles, depuis le nom.
+	for (let i = 0; i < 26; i++)
+	{
+		const a = (i / 26) * 2 * Math.PI + Hasard(-0.12, 0.12);
+		const r = Hasard(240, 560);
+		html += '<i class="etoile gerbe" style="left:' + FETE.cx + 'px;top:' + FETE.nomY + 'px;'
+			+ '--dx:' + Math.round(Math.cos(a) * r) + 'px;--dy:' + Math.round(Math.sin(a) * r * 0.7) + 'px;'
+			+ '--t:' + Math.round(Hasard(18, 46)) + 'px;--rot:' + Math.round(Hasard(-260, 260)) + 'deg;'
+			+ 'animation-delay:' + Hasard(0, 0.25).toFixed(2) + 's;'
+			+ (i % 3 === 0 ? '--c:#fff' : '--c:#f7dc63') + '"></i>';
+	}
+
+	// Les étoiles qui restent et scintillent autour du vainqueur.
+	for (let i = 0; i < 14; i++)
+	{
+		const x = FETE.cx + Hasard(-330, 330);
+		const y = FETE.nomY + Hasard(-170, 90);
+		html += '<i class="etoile scintille" style="left:' + Math.round(x) + 'px;top:' + Math.round(y) + 'px;'
+			+ '--t:' + Math.round(Hasard(14, 30)) + 'px;--c:' + (i % 2 ? '#fff6c8' : '#f7dc63') + ';'
+			+ 'animation-delay:' + Hasard(1.2, 3.2).toFixed(2) + 's,' + Hasard(1.2, 3.2).toFixed(2) + 's;'
+			+ 'animation-duration:' + Hasard(1.1, 2).toFixed(2) + 's,7s"></i>';
+	}
+
+	// Les deux bouteilles, inclinées vers le vainqueur, et leur mousse.
+	[{ x : FETE.gaucheX, angle : 28 }, { x : FETE.droiteX, angle : -28 }].forEach(function(b, n) {
+		html += '<div class="bouteille" style="left:' + b.x + 'px;top:' + FETE.piedY + 'px;--angle:' + b.angle + 'deg">'
+			+ BOUTEILLE_SVG + '</div>';
+
+		// Le goulot, une fois la bouteille inclinée (190 px du pied au bouchon).
+		const rad = b.angle * Math.PI / 180;
+		const gx = b.x + Math.sin(rad) * 190;
+		const gy = FETE.piedY - Math.cos(rad) * 190;
+		const sens = b.angle > 0 ? 1 : -1;
+
+		html += '<i class="bouchon" style="left:' + Math.round(gx) + 'px;top:' + Math.round(gy) + 'px;'
+			+ '--dx:' + (sens * 260) + 'px;--dy:-520px;--rot:' + (sens * 900) + 'deg"></i>';
+
+		for (let i = 0; i < 90; i++)
+		{
+			// Lancée vers le haut et vers le centre, un peu au hasard.
+			const portee = sens * Hasard(90, 380);
+			const hauteur = Hasard(130, 300);
+			const chute = Hasard(220, 420);
+			const taille = Hasard(5, 13);
+			html += '<i class="goutte" style="left:' + Math.round(gx) + 'px;top:' + Math.round(gy) + 'px;'
+				+ '--dx:' + Math.round(portee) + 'px;animation-delay:' + (1.55 + Hasard(0, 2.2) + n * 0.12).toFixed(2) + 's;'
+				+ 'animation-duration:' + Hasard(1.5, 2.3).toFixed(2) + 's">'
+				+ '<b style="--h:' + Math.round(-hauteur) + 'px;--f:' + Math.round(chute) + 'px;'
+				+ 'width:' + taille.toFixed(1) + 'px;height:' + taille.toFixed(1) + 'px;'
+				+ 'animation-duration:inherit;animation-delay:inherit;'
+				+ (i % 4 === 0 ? 'background:#f7dc63' : '') + '"></b></i>';
+		}
+	});
+
+	fete.innerHTML = html;
+	document.getElementById('scene').appendChild(fete);
+	wsMain.feteTimer = setTimeout(ArreterFete, 10000);
+}
+
+/* Bouteille de champagne, 60 x 200, le pied en bas au centre. */
+const BOUTEILLE_SVG =
+	'<svg viewBox="0 0 60 200" width="60" height="200">'
+	+ '<defs><linearGradient id="verre" x1="0" x2="1">'
+	+ '<stop offset="0" stop-color="#0b3d22"/><stop offset="0.35" stop-color="#2f7a4c"/>'
+	+ '<stop offset="0.55" stop-color="#14532e"/><stop offset="1" stop-color="#062414"/></linearGradient>'
+	+ '<linearGradient id="dore" x1="0" x2="1">'
+	+ '<stop offset="0" stop-color="#9c7a22"/><stop offset="0.45" stop-color="#f7dc63"/><stop offset="1" stop-color="#8a6a1c"/></linearGradient></defs>'
+	+ '<path d="M22 8 h16 v52 c0 14 18 22 18 44 v86 a10 10 0 0 1 -10 10 h-32 a10 10 0 0 1 -10 -10 v-86 c0 -22 18 -30 18 -44 z" fill="url(#verre)"/>'
+	+ '<path d="M21 4 h18 v54 c0 6 4 10 8 14 h-34 c4 -4 8 -8 8 -14 z" fill="url(#dore)"/>'
+	+ '<rect x="7" y="118" width="46" height="40" rx="3" fill="url(#dore)"/>'
+	+ '<rect x="12" y="124" width="36" height="28" rx="2" fill="#0b1f4f"/>'
+	+ '<text x="30" y="143" text-anchor="middle" font-size="11" font-weight="bold" fill="#f7dc63" font-family="Calibri, Arial">FFCK</text>'
+	+ '<path d="M12 40 q-2 60 2 140" stroke="rgba(255,255,255,0.35)" stroke-width="3" fill="none"/>'
+	+ '</svg>';
 
 /**
  * Publie à la télécommande les catégories que cet écran a vraiment (celles
@@ -501,6 +625,11 @@ function Render()
 
 		if (changement)
 		{
+			// Sans pilote, le 1er arrive au bout de la révélation : la fête à ce moment-là.
+			ArreterFete();
+			if (!wsMain.pilote && cl.length > 0)
+				wsMain.feteTimer = setTimeout(Celebrer, (1.4 + 2 * wsMain.revele) * 1000 + 300);
+
 			// Rejoue l'entrée : la catégorie, puis les marches, puis la suite.
 			document.querySelectorAll('.marche.maj').forEach(function(m) { m.classList.remove('maj'); });
 			document.body.classList.remove('entre');
