@@ -447,6 +447,34 @@ body.sans-logo #logo_club
 	background: rgba(54, 128, 255, 0.14);
 }
 
+/*
+ * Sous les premiers, figés, la suite défile dans une fenêtre de hauteur fixe
+ * (posée par le JS). Le filet sépare les deux blocs.
+ */
+#filet
+{
+	height: 2px;
+	margin: 4px 0 4px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, rgba(9, 122, 255, 0) 100%);
+}
+
+#defile
+{
+	overflow: hidden;
+}
+
+#piste
+{
+	will-change: transform;
+	transition: opacity 0.3s ease;
+}
+
+/* En bas : fondu, la piste remonte invisible, puis réapparaît. */
+#piste.efface
+{
+	opacity: 0;
+}
+
 /* Un arrivant : sa ligne est encadrée le temps qu'on la lise. */
 .ligne.res.vedette
 {

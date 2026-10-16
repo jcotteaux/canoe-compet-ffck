@@ -5,7 +5,7 @@
  * transparentes dans OBS, ou remplies de la couleur de clé avec ?bg=1 quand
  * c'est l'ATEM qui incruste. Autour :
  *   - en haut à droite, le classement de l'épreuve en cours : les `fixes`
- *     premiers restent en haut, la suite défile (même règle que tv_results) ;
+ *     premiers restent en haut, la suite défile en continu (comme tv_results) ;
  *   - en bas à gauche, les bateaux en course : dossard, nom, pénalités porte
  *     par porte, chrono tournant ; à l'arrivée, temps et place.
  *
@@ -44,7 +44,8 @@
  *   bg=1                 fenêtres remplies de la couleur de clé (ATEM)
  *   epreuve=K1H          fige l'épreuve du classement
  *   max=8 fixes=3        lignes du classement, dont figées en haut
- *   delay=8000           durée d'une page du classement en ms
+ *   vitesse=40           défilement de la suite du classement, en px/s
+ *   pause=4000           arrêt en haut et en bas de la suite, en ms
  *   max_course=3         nombre de lignes de la pile des bateaux en course (1 à 3) :
  *                        les derniers partis, hauteur fixe
  *   delay_inter=6000     mise en valeur d'un intermédiaire qui vient de tomber
@@ -210,7 +211,7 @@ function OnBroadcastRunErase(objJSON)
 	wsMain.finished.clear();
 	wsMain.inters.clear();
 	wsMain.affiches = [];
-	wsMain.page = 0;
+	RemonterPiste();
 	RenderCourse();
 	ReloadEpreuve();
 }
@@ -492,14 +493,15 @@ function SyncLigne(el, r, premier, ouvreLaRotation)
 }
 
 /**
- * Dessine la page courante du classement : les `fixes` premiers en haut en
- * permanence, la queue par fenêtres de `max - fixes` lignes. `remonter`
- * repart de la première fenêtre (changement d'épreuve).
+ * Dessine le classement : les `fixes` premiers en haut en permanence, la
+ * suite sur une piste qui défile en continu dans une fenêtre de `max - fixes`
+ * lignes (voir PasDefilement). `remonter` ramène la piste en haut
+ * (changement d'épreuve) : une simple correction ne fait pas sauter au début.
  */
 function Render(remonter)
 {
 	if (remonter)
-		wsMain.page = 0;
+		RemonterPiste();
 
 	document.getElementById('epreuve_nom').textContent = NomEpreuve(wsMain.epreuve);
 
@@ -517,86 +519,190 @@ function Render(remonter)
 	const nbFixes = Math.min(wsMain.fixes, tout.length);
 	const tete = tout.slice(0, nbFixes);
 	const queue = tout.slice(nbFixes);
-
 	const fenetre = Math.max(1, wsMain.max - nbFixes);
-	const nbPages = Math.max(1, Math.ceil(queue.length / fenetre));
-	const parPage = queue.length > 0 ? fenetre : 0;
 
-	if (wsMain.page >= nbPages)
-		wsMain.page = 0;
-
-	// Un bateau vient d'arriver : on amène sa fenêtre et on l'encadre, défilement gelé.
+	// Un bateau vient d'arriver : encadré, et la piste va le chercher.
 	if (wsMain.bibArrive !== null)
 	{
-		const cible = tout.findIndex(function(r) { return r.bib === wsMain.bibArrive; });
-		if (cible >= 0)
+		const cible = queue.findIndex(function(r) { return r.bib === wsMain.bibArrive; });
+		if (tout.some(function(r) { return r.bib === wsMain.bibArrive; }))
 		{
-			if (cible >= nbFixes && parPage > 0)
-				wsMain.page = Math.floor((cible - nbFixes) / parPage);
-
 			wsMain.vedette = wsMain.bibArrive;
 			wsMain.vedetteFin = Date.now() + wsMain.vedetteDuree;
-
-			if (wsMain.pageTimer !== null)
-			{
-				window.clearTimeout(wsMain.pageTimer);
-				wsMain.pageTimer = null;
-			}
-
+			wsMain.def.cible = cible;		// -1 : dans la tête, rien à chercher
 			window.setTimeout(function() { Render(false); }, wsMain.vedetteDuree + 50);
 		}
-
 		wsMain.bibArrive = null;
 	}
 
 	if (wsMain.vedette !== null && Date.now() >= wsMain.vedetteFin)
 		wsMain.vedette = null;
 
-	const debut = wsMain.page * parPage;
-	const page = tete.concat(queue.slice(debut, debut + parPage));
+	// Structure : la tête figée, un filet, puis la fenêtre et sa piste.
+	if (!document.getElementById('piste'))
+		corps.innerHTML = '<div id="tete"></div><div id="filet"></div><div id="defile"><div id="piste"></div></div>';
 
+	SyncBloc(document.getElementById('tete'), tete, tout[0]);
+
+	// Une suite plus courte que la fenêtre est complétée de lignes vides.
+	const piste = queue.slice();
 	if (queue.length > 0)
 	{
-		while (page.length < nbFixes + fenetre)
-			page.push(null);
+		while (piste.length < fenetre)
+			piste.push(null);
 	}
+	SyncBloc(document.getElementById('piste'), piste, tout[0]);
 
-	const avecFilet = nbFixes > 0 && queue.length > 0;
+	const avecQueue = queue.length > 0;
+	document.getElementById('filet').hidden = !(nbFixes > 0 && avecQueue);
 
-	document.body.classList.toggle('pagine', nbPages > 1);
-	document.getElementById('pagination').textContent =
-		(wsMain.page + 1) + ' / ' + nbPages + ' — ' + tout.length + ' bateaux';
+	const defile = document.getElementById('defile');
+	defile.hidden = !avecQueue;
+	defile.style.height = avecQueue ? (fenetre * PAS_LIGNE - 3) + 'px' : '0';
 
-	// Mise à jour sur place : recréer les lignes relancerait leur animation.
-	const existantes = corps.children;
-	for (let i = 0; i < page.length; i++)
+	document.body.classList.toggle('pagine', queue.length > fenetre);
+	document.getElementById('pagination').textContent = tout.length + ' bateaux';
+
+	Defiler();
+}
+
+/** Met un bloc de lignes à jour sur place : recréer les noeuds les ferait clignoter. */
+function SyncBloc(bloc, lignes, premier)
+{
+	for (let i = 0; i < lignes.length; i++)
 	{
-		let el = existantes[i];
+		let el = bloc.children[i];
 		if (el === undefined)
 		{
 			el = CreerLigne();
-			corps.appendChild(el);
+			bloc.appendChild(el);
 		}
-
-		SyncLigne(el, page[i], tout[0], avecFilet && i === nbFixes);
+		SyncLigne(el, lignes[i], premier, false);
 	}
 
-	while (corps.children.length > page.length)
-		corps.removeChild(corps.lastChild);
-
-	Programmer(nbPages);
+	while (bloc.children.length > lignes.length)
+		bloc.removeChild(bloc.lastChild);
 }
 
-function Programmer(nbPages)
+/******************** défilement de la suite ********************/
+
+/*
+ * Même mouvement que tv_results : `pause` ms en haut, défilement à `vitesse`
+ * px/s jusqu'à la dernière ligne, `pause` ms en bas, fondu et retour en haut.
+ * Un arrivant dans la suite : la piste glisse jusqu'à sa ligne et s'y arrête
+ * le temps de l'encadrement, puis reprend de là. requestAnimationFrame : le
+ * mouvement reste régulier quoi que fasse le flux de données.
+ * PAS_LIGNE suit .ligne dans tv_duo.css (40 px + 3 px de marge).
+ */
+const PAS_LIGNE = 43;
+const FONDU_MS = 300;
+
+function RemonterPiste()
 {
-	if (wsMain.pageTimer !== null || nbPages <= 1 || wsMain.vedette !== null)
+	wsMain.def = { pos : 0, phase : 'haut', depuis : performance.now(), dernier : performance.now(), cible : -1 };
+	const piste = document.getElementById('piste');
+	if (piste)
+	{
+		piste.style.transform = 'translateY(0)';
+		piste.classList.remove('efface');
+	}
+}
+
+/** Lance la boucle si elle ne tourne pas déjà. */
+function Defiler()
+{
+	if (wsMain.defBoucle)
 		return;
 
-	wsMain.pageTimer = setTimeout(function() {
-		wsMain.pageTimer = null;
-		wsMain.page++;
-		Render(false);
-	}, wsMain.pageDelay);
+	wsMain.defBoucle = true;
+	window.requestAnimationFrame(PasDefilement);
+}
+
+function PasDefilement(t)
+{
+	const piste = document.getElementById('piste');
+	const defile = document.getElementById('defile');
+	if (!piste || !defile || defile.hidden)
+	{
+		wsMain.defBoucle = false;
+		return;
+	}
+
+	const d = wsMain.def;
+	const dt = Math.min(100, t - d.dernier);
+	d.dernier = t;
+
+	const max = Math.max(0, piste.scrollHeight - defile.clientHeight);
+
+	// Un arrivant dans la suite : on va à sa ligne (au milieu de la fenêtre).
+	if (d.cible >= 0)
+	{
+		d.but = Math.max(0, Math.min(max,
+			d.cible * PAS_LIGNE - Math.floor((defile.clientHeight - PAS_LIGNE) / 2)));
+		d.cible = -1;
+		d.phase = 'vers';
+		piste.classList.remove('efface');
+	}
+
+	if (max <= 0)
+	{
+		d.pos = 0;
+		d.phase = 'haut';
+		d.depuis = t;
+	}
+	else if (d.phase === 'vers')
+	{
+		// Plus vite que le défilement normal : l'arrivant doit apparaître tôt.
+		const pas = Math.max(wsMain.vitesse * 6, 200) * dt / 1000;
+		d.pos = d.pos < d.but ? Math.min(d.but, d.pos + pas) : Math.max(d.but, d.pos - pas);
+		if (d.pos === d.but)
+			d.phase = 'tient';
+	}
+	else if (d.phase === 'tient')
+	{
+		if (wsMain.vedette === null)
+		{
+			d.phase = d.pos >= max ? 'bas' : 'defile';
+			d.depuis = t;
+		}
+	}
+	else if (d.phase === 'haut')
+	{
+		d.pos = 0;
+		if (t - d.depuis > wsMain.pause)
+			d.phase = 'defile';
+	}
+	else if (d.phase === 'defile')
+	{
+		d.pos = Math.min(max, d.pos + wsMain.vitesse * dt / 1000);
+		if (d.pos >= max)
+		{
+			d.phase = 'bas';
+			d.depuis = t;
+		}
+	}
+	else if (d.phase === 'bas')
+	{
+		d.pos = max;
+		if (t - d.depuis > wsMain.pause)
+		{
+			d.phase = 'fondu';
+			d.depuis = t;
+			piste.classList.add('efface');
+		}
+	}
+	else if (d.phase === 'fondu' && t - d.depuis > FONDU_MS)
+	{
+		// Invisible : on remonte d'un coup, et la piste réapparaît en haut.
+		d.pos = 0;
+		d.phase = 'haut';
+		d.depuis = t;
+		piste.classList.remove('efface');
+	}
+
+	// Au pixel entier : entre deux pixels, les lignes se brouillent.
+	piste.style.transform = 'translateY(' + (-Math.round(d.pos)) + 'px)';
+	window.requestAnimationFrame(PasDefilement);
 }
 
 /******************** bateaux en course ********************/
@@ -1080,8 +1186,9 @@ function Init()
 	wsMain.lang = 'fr';
 	wsMain.max = Math.max(1, num('max', 8));
 	wsMain.fixes = Math.max(0, num('fixes', 3));
-	// Surtout pas wsMain.delay : ws.Context s'en sert pour la diffusion différée.
-	wsMain.pageDelay = num('delay', 8000);
+	wsMain.vitesse = Math.max(5, num('vitesse', 40));		// px/s de la suite
+	wsMain.pause = num('pause', 4000);						// ms en haut et en bas
+	wsMain.defBoucle = false;
 	wsMain.lengthIdentity = num('length_identity', 24);
 	wsMain.epreuveForcee = urlParams.has('epreuve') ? urlParams.get('epreuve') : '';
 	wsMain.epreuve = '';
@@ -1112,8 +1219,7 @@ function Init()
 	document.getElementById('cartes').style.height =
 		(wsMain.maxCourse * (CARTE_H + CARTE_ECART) - CARTE_ECART) + 'px';
 
-	wsMain.page = 0;
-	wsMain.pageTimer = null;
+	RemonterPiste();
 	wsMain.reloadTimer = null;
 
 	if (urlParams.get('bg') === '1')

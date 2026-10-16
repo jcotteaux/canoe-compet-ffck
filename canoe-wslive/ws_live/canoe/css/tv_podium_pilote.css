@@ -1,0 +1,164 @@
+/*
+ * Télécommande de l'écran du podium (tv_podium_pilote.html) : de gros
+ * boutons, utilisables au doigt sur un téléphone, et lisibles en dock OBS.
+ */
+
+:root
+{
+	--fond: #05081F;
+	--carte: #10154a;
+	--texte: #ffffff;
+	--doux: #9fb6dc;
+	--bleu: #097AFF;
+	--or: #E8C33A;
+	--argent: #B9C4CF;
+	--bronze: #C98A3E;
+	--vert: #2fbf71;
+	--rouge: #e5484d;
+}
+
+*
+{
+	box-sizing: border-box;
+}
+
+html, body
+{
+	margin: 0;
+	background: var(--fond);
+	color: var(--texte);
+	font-family: -apple-system, 'Segoe UI', Calibri, Arial, sans-serif;
+}
+
+body
+{
+	padding: 16px;
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+header
+{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+h1
+{
+	margin: 0;
+	font-size: 22px;
+}
+
+h2
+{
+	margin: 22px 0 10px;
+	font-size: 15px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--doux);
+}
+
+#etat
+{
+	margin-left: 8px;
+	text-transform: none;
+	letter-spacing: 0;
+	color: var(--texte);
+}
+
+#liaison
+{
+	padding: 4px 10px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 600;
+	background: rgba(47, 191, 113, 0.18);
+	color: var(--vert);
+}
+
+#liaison.coupee
+{
+	background: rgba(229, 72, 77, 0.18);
+	color: var(--rouge);
+}
+
+.grille
+{
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+button
+{
+	min-height: 64px;
+	padding: 10px 12px;
+	border: 2px solid transparent;
+	border-radius: 10px;
+	background: var(--carte);
+	color: var(--texte);
+	font: inherit;
+	font-size: 20px;
+	font-weight: 600;
+	cursor: pointer;
+	touch-action: manipulation;
+}
+
+button:active
+{
+	transform: scale(0.98);
+}
+
+button.actif
+{
+	border-color: var(--bleu);
+	background: #17206b;
+}
+
+.grille.etapes
+{
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.etapes button
+{
+	min-height: 96px;
+	font-size: 34px;
+	font-weight: 800;
+	color: #1a1440;
+}
+
+.etapes .bronze { background: var(--bronze); }
+.etapes .argent { background: var(--argent); }
+.etapes .or     { background: var(--or); }
+
+/* L'étape déjà montrée : cochée. */
+.etapes button.fait
+{
+	box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.9);
+}
+
+.etapes button.fait::after
+{
+	content: ' ✓';
+	font-size: 24px;
+}
+
+button.discret
+{
+	min-height: 52px;
+	font-size: 17px;
+	color: var(--doux);
+}
+
+.aide
+{
+	margin-top: 22px;
+	font-size: 14px;
+	line-height: 1.45;
+	color: var(--doux);
+}

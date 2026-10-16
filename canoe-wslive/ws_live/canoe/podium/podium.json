@@ -1,0 +1,25 @@
+{
+	"titre": "Championnats de France Elite Kayak-Cross",
+	"phase": "Kayak-Cross — contre-la-montre",
+	"categories": [
+		{
+			"epreuve": "XK1H",
+			"libelle": "Kayak Homme",
+			"classement": [
+				{ "nom": "NOM Prénom", "club": "Club", "temps": "1:05.32" },
+				{ "nom": "NOM Prénom", "club": "Club", "temps": "1:06.10" },
+				{ "nom": "NOM Prénom", "club": "Club", "temps": "1:06.48" }
+			]
+		},
+		{
+			"epreuve": "XK1D",
+			"libelle": "Kayak Dame",
+			"classement": []
+		},
+		{
+			"epreuve": "XK1INV",
+			"libelle": "Invités",
+			"classement": []
+		}
+	]
+}

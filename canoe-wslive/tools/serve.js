@@ -11,6 +11,11 @@
  *
  * Mêmes réponses que le bouchon pour les fichiers : types MIME, requêtes
  * partielles (le générique vidéo), gabarits .php par mock/php-lite.js.
+ *
+ * Un seul ajout, le relais du pilote du podium (/pilote/podium) : la page de
+ * pilotage (canoe/tv_podium_pilote.html, sur ce poste ou un téléphone) envoie
+ * la catégorie et l'étape de révélation, l'écran du podium (tv_palmares.html
+ * ?pilote=1, dans OBS) les reçoit aussitôt. Voir PILOTE plus bas.
  */
 
 const http = require('http');
@@ -45,10 +50,71 @@ const MIME = {
   '.webm': 'video/webm',
 };
 
+/*
+ * PILOTE du podium. Un état en mémoire, { epreuve, etape, seq } :
+ *   etape 0  marches vides, 1  le 3e, 2  le 3e et le 2e, 3  le podium complet
+ *            et la suite du classement.
+ *   GET  /pilote/podium         l'état, en JSON
+ *   GET  /pilote/podium/flux    l'état à chaque changement (text/event-stream)
+ *   POST /pilote/podium         { epreuve?, etape?, categories? } : change l'état
+ *   categories : [{ code, libelle }], publiées par l'écran (celles qu'il a
+ *            vraiment) pour que la télécommande les propose.
+ * Rien n'est gardé au redémarrage du serveur : l'écran repart sur les marches vides.
+ */
+const pilote = { epreuve: '', etape: 0, categories: [], seq: 0 };
+const abonnes = new Set();
+
+function diffuserPilote() {
+  const msg = `data: ${JSON.stringify(pilote)}\n\n`;
+  for (const r of abonnes) r.write(msg);
+}
+
+// Un commentaire toutes les 20 s : rien ne coupe un flux resté muet.
+setInterval(() => { for (const r of abonnes) r.write(': ok\n\n'); }, 20000).unref();
+
+function routePilote(req, res, pathname) {
+  const entetes = { 'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*' };
+  if (pathname === '/pilote/podium/flux') {
+    res.writeHead(200, { ...entetes, 'Content-Type': 'text/event-stream; charset=utf-8', Connection: 'keep-alive' });
+    res.write(`retry: 1000\ndata: ${JSON.stringify(pilote)}\n\n`);
+    abonnes.add(res);
+    req.on('close', () => abonnes.delete(res));
+    return;
+  }
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, { ...entetes, 'Access-Control-Allow-Methods': 'GET, POST', 'Access-Control-Allow-Headers': 'Content-Type' });
+    return res.end();
+  }
+  if (req.method === 'POST') {
+    let corps = '';
+    req.on('data', (c) => { corps += c; if (corps.length > 10000) req.destroy(); });
+    req.on('end', () => {
+      let p = {};
+      try { p = JSON.parse(corps || '{}'); } catch (e) { res.writeHead(400, entetes); return res.end('JSON invalide'); }
+      if (typeof p.epreuve === 'string') pilote.epreuve = p.epreuve.slice(0, 32);
+      if (Number.isInteger(p.etape)) pilote.etape = Math.max(0, Math.min(3, p.etape));
+      if (Array.isArray(p.categories))
+        pilote.categories = p.categories.slice(0, 40)
+          .filter((c) => c && typeof c.code === 'string' && c.code !== '')
+          .map((c) => ({ code: c.code.slice(0, 32), libelle: String(c.libelle || c.code).slice(0, 64) }));
+      pilote.seq++;
+      diffuserPilote();
+      res.writeHead(200, { ...entetes, 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify(pilote));
+    });
+    return;
+  }
+  res.writeHead(200, { ...entetes, 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(pilote));
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname;
   try { pathname = decodeURIComponent(url.pathname); } catch (e) { res.writeHead(400); return res.end(); }
+
+  if (pathname === '/pilote/podium' || pathname === '/pilote/podium/flux')
+    return routePilote(req, res, pathname);
 
   if (pathname === '/') {
     res.writeHead(302, { Location: '/canoe/' });
@@ -106,6 +172,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log(`  ws_live servi sur http://localhost:${PORT}/  (sans bouchon : aucune donnée simulée)`);
   console.log(`  régie : http://localhost:${PORT}/canoe/tv_regie.html?scenario=<demi-journée>&ws=<serveur>:8080`);
+  console.log(`  pilote du podium : http://localhost:${PORT}/canoe/tv_podium_pilote.html (ou l'adresse de ce Mac, depuis un téléphone)`);
   if (!fs.existsSync(path.join(WWW, 'canoe', 'video', 'generique.mp4')))
     console.log('  ⚠ canoe/video/generique.mp4 absent : la régie sautera le générique');
   console.log('');

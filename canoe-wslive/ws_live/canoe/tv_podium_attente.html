@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Podium attente</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<!-- même habillage que le palmarès : fond, bandes, logos, paillettes -->
+	<link href="./css/tv_palmares.css?v5" rel="stylesheet">
+	<link href="./css/tv_podium_attente.css?v1" rel="stylesheet">
+</head>
+
+<!--
+	Écran derrière le podium, en attente de la remise des prix, 1920 x 1080,
+	opaque. Le nom de la compétition et de l'épreuve viennent de competFFCK
+	(?ws=), à défaut de regie_scenarios.js : la page marche aussi sans serveur.
+	Voir js/tv_podium_attente.js pour les paramètres.
+-->
+<body class="entre">
+	<div id="scene">
+		<div id="fond"></div>
+		<div id="lumiere"></div>
+		<div id="paillettes"></div>
+		<div class="bande" id="bande1"></div>
+		<div class="bande" id="bande2"></div>
+
+		<div id="entete">
+			<div id="titre"></div>
+			<div id="phase"></div>
+		</div>
+		<div class="logos"><div class="logo_ffck"></div><div class="logo_club"></div></div>
+
+		<div id="at_bloc">
+			<div id="at_masque"><div id="at_texte">Remise des prix</div></div>
+			<div id="at_trait"></div>
+			<div id="at_sous"></div>
+			<div id="at_compte">
+				<div id="at_lbl">Dans</div>
+				<div id="at_reste"></div>
+			</div>
+		</div>
+
+		<!-- trois marches stylisées, vides : le podium qui attend ses athlètes -->
+		<div id="at_marches">
+			<div class="at_marche m2"><span>2</span><span class="reflet"></span></div>
+			<div class="at_marche m1"><span>1</span><span class="reflet"></span></div>
+			<div class="at_marche m3"><span>3</span><span class="reflet"></span></div>
+		</div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v4"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/regie_scenarios.js?v9"></script>
+	<script src="./js/tv_podium_attente.js?v2"></script>
+</body>
+</html>

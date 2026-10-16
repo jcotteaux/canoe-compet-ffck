@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Pilote podium</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_podium_pilote.css?v1" rel="stylesheet">
+</head>
+
+<!--
+	Télécommande de l'écran du podium (tv_palmares.html?pilote=1) : la
+	catégorie, puis le 3e, le 2e et le 1er, quand on veut. Sur ce poste, sur un
+	téléphone (http://<adresse du Mac>:3000/canoe/tv_podium_pilote.html), ou en
+	dock dans OBS. Voir js/tv_podium_pilote.js.
+-->
+<body>
+	<header>
+		<h1>Écran du podium</h1>
+		<div id="liaison" class="coupee">hors ligne</div>
+	</header>
+
+	<section>
+		<h2>Catégorie</h2>
+		<div id="categories" class="grille"></div>
+	</section>
+
+	<section>
+		<h2>Révélation <span id="etat"></span></h2>
+		<div class="grille etapes">
+			<button data-etape="1" class="bronze">3<sup>e</sup></button>
+			<button data-etape="2" class="argent">2<sup>e</sup></button>
+			<button data-etape="3" class="or">1<sup>er</sup></button>
+		</div>
+		<div class="grille">
+			<button data-etape="0" class="discret">Cacher (marches vides)</button>
+		</div>
+	</section>
+
+	<p class="aide">Choisir une catégorie remet les marches à vide. L'écran suit
+	aussitôt ; s'il est rechargé, il reprend l'état d'ici.</p>
+
+	<script src="./js/regie_scenarios.js?v9"></script>
+	<script src="./js/tv_podium_pilote.js?v2"></script>
+</body>
+</html>

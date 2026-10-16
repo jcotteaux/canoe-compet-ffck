@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Prochaine session</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_prochaine.css?v2" rel="stylesheet">
+</head>
+
+<!--
+	Incrustation 1920 x 1080 sur fond transparent (?chroma=1 : fond de clé #CC00CC) : le temps avant la
+	prochaine session, en bas de l'écran. Pour les pauses entre deux
+	demi-journées, par-dessus les caméras.
+
+	La session est la prochaine demi-journée de js/regie_scenarios.js dont le
+	premier départ n'est pas passé ; voir js/tv_prochaine.js pour les paramètres.
+-->
+<body>
+	<div id="scene">
+		<div id="bloc">
+			<div id="fond"></div>
+			<div id="barre"></div>
+			<div id="texte">
+				<div id="lbl">Prochaine session dans</div>
+				<div id="reste"></div>
+			</div>
+			<div id="infos">
+				<div id="phase"></div>
+				<div id="cat"></div>
+			</div>
+		</div>
+	</div>
+
+	<script src="./js/regie_scenarios.js?v9"></script>
+	<script src="./js/tv_prochaine.js?v4"></script>
+</body>
+</html>

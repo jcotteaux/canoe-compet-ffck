@@ -80,10 +80,11 @@ for (const [scenario, titre] of DEMI_JOURNEES) {
 scenes.push(
 	{ nom: 'Caméras seules', page: null },
 	{ nom: 'Manuel · Course duo', page: `${base}/tv_duo.html?bg=1&${ws}` },
+	{ nom: 'Manuel · Course duo KX', page: `${base}/tv_duo_kx.html?bg=1&${ws}` },
 	{ nom: 'Manuel · Course 1 bateau', page: `${base}/tv_inrace.html?bg=1&${ws}` },
 	{ nom: 'Manuel · Bateaux en course', page: `${base}/tv_oncourse.html?bg=1&${ws}` },
 	{ nom: 'Manuel · Départs', page: `${base}/tv_departs.html?${ws}` },
-	{ nom: 'Manuel · Résultats', page: `${base}/tv_results.html?${ws}` },
+	{ nom: 'Manuel · Résultats', page: `${base}/tv_results.html?${ws}&no_course` },
 	{ nom: 'Répétition · bouchon', page: `${base}/tv_regie.html?scenario=test&repetition=1&ws=localhost:8080`, son: true },
 );
 
@@ -243,8 +244,83 @@ sources.push(source('Sponsors · boucle', 'scene', 'scene', {
 	id_counter: 2,
 	items: [element(fondCle, 1, true), element(sponsors, 2, false)],
 }, { hotkeys: { 'OBSBasic.SelectScene': [] } }));
+
+// Sponsors avec le temps avant la prochaine session : la même vidéo, et
+// par-dessus tv_prochaine.html (fond transparent), qui trouve seule la
+// prochaine demi-journée et compte à rebours. Pour les pauses entre deux
+// sessions. La page est arrêtée hors de la scène, et repart à l'heure.
+const timer = source('Page · Sponsors · boucle avec Timer', 'browser_source', 'browser_source', {
+	url: `${base}/tv_prochaine.html`,
+	width: LARGEUR,
+	height: HAUTEUR,
+	fps_custom: false,
+	css: 'body { margin: 0; overflow: hidden; }',
+	shutdown: true,
+	restart_when_active: false,
+	reroute_audio: false,
+}, { hotkeys: { 'ObsBrowser.Refresh': [] } });
+sources.push(timer);
+scenes.splice(scenes.findIndex(s => s.nom === 'Sponsors · boucle') + 1, 0, { nom: 'Sponsors · boucle avec Timer' });
+sources.push(source('Sponsors · boucle avec Timer', 'scene', 'scene', {
+	custom_size: false,
+	id_counter: 3,
+	items: [element(fondCle, 1, true), element(sponsors, 2, false), element(timer, 3, false)],
+}, { hotkeys: { 'OBSBasic.SelectScene': [] } }));
 if (!fs.existsSync(SPONSORS))
-	console.warn(`⚠︎ ${SPONSORS} manque : la scène « Sponsors » restera magenta (caméras seules)`);
+	console.warn(`⚠︎ ${SPONSORS} manque : les scènes « Sponsors » resteront magenta (caméras seules)`);
+
+// Écran derrière le podium : le palmarès plein écran (tv_palmares.html), une
+// page opaque pour un écran public, à sortir par un projecteur de scène vers
+// cet écran. Pas de fond de clé : rien n'y est découpé, et une page vide doit
+// donner du noir, pas du magenta, devant le public.
+//
+// Une scène par catégorie de la demi-journée PODIUM (un scénario de
+// regie_scenarios.js, samedi-matin par défaut), lue dans le fichier même de la
+// régie : les codes suivent le programme. Plus l'attente de la remise des prix
+// et la rotation sur toutes les catégories courues.
+const PODIUM_SCENARIO = env.PODIUM || 'samedi-matin';
+const PODIUM_HEURE = env.PODIUM_HEURE || '';        // ex. 16:30 : compte à rebours de l'attente
+function scenariosRegie() {
+	const vm = require('vm');
+	const src = fs.readFileSync(path.resolve(__dirname, '../canoe-wslive/ws_live/canoe/js/regie_scenarios.js'), 'utf8');
+	const ctx = {};
+	vm.runInNewContext(`${src}\nthis.S = REGIE_SCENARIOS;`, ctx);
+	return ctx.S;
+}
+const scPodium = scenariosRegie()[PODIUM_SCENARIO];
+if (!scPodium)
+	throw new Error(`PODIUM=${PODIUM_SCENARIO} : scénario inconnu dans regie_scenarios.js`);
+const PODIUM = [
+	['Écran podium · attente', `${base}/tv_podium_attente.html?scenario=${PODIUM_SCENARIO}&${ws}${PODIUM_HEURE ? `&heure=${PODIUM_HEURE}` : ''}`],
+	...scPodium.categories
+		.filter(c => c.vue !== 'kcross')
+		.map(c => [`Écran podium · ${c.libelle}`, `${base}/tv_palmares.html?epreuve=${encodeURIComponent(c.epreuve)}&${ws}`]),
+	['Écran podium · rotation', `${base}/tv_palmares.html?sans_inv&duree=20&${ws}`],
+	// À la main : catégorie et révélation 3e, 2e, 1er depuis tv_podium_pilote.html.
+	['Écran podium · piloté', `${base}/tv_palmares.html?pilote=1&${ws}`],
+	// Sans competFFCK : le palmarès vient de ws_live/canoe/podium/podium.json, édité à la main.
+	['Écran podium · fichier, piloté', `${base}/tv_palmares.html?fichier&pilote=1`],
+	['Écran podium · fichier, rotation', `${base}/tv_palmares.html?fichier&sans_inv&duree=20`],
+];
+for (const [nom, url] of PODIUM) {
+	const page = source(`Page · ${nom}`, 'browser_source', 'browser_source', {
+		url,
+		width: LARGEUR,
+		height: HAUTEUR,
+		fps_custom: false,
+		css: 'body { margin: 0; overflow: hidden; }',
+		shutdown: true,
+		restart_when_active: false,
+		reroute_audio: false,
+	}, { hotkeys: { 'ObsBrowser.Refresh': [] } });
+	sources.push(page);
+	scenes.splice(scenes.findIndex(s => s.nom.startsWith('Manuel')), 0, { nom });
+	sources.push(source(nom, 'scene', 'scene', {
+		custom_size: false,
+		id_counter: 1,
+		items: [element(page, 1, false)],
+	}, { hotkeys: { 'OBSBasic.SelectScene': [] } }));
+}
 
 // La transition : le rideau de la régie (bandes obliques, logos), rendu en
 // vidéo transparente par rideau/rideau.sh. La scène change à 600 ms, au

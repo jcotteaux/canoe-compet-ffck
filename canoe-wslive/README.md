@@ -760,7 +760,7 @@ Déroulé :
 | après le générique | les caméras pour le présentateur : son nom en bas à gauche (il entre 3 s après le générique, reste 10 s), le compte à rebours en bas à droite |
 | H − 30 s | le nom de la catégorie en plein écran (10 s), puis sa liste de départ (`tv_departs`) jusqu'au premier départ |
 | premier départ | l'écran de course |
-| fin d'une catégorie | son classement (`tv_results`), le titre de la suivante, sa liste de départ, la course 1 min avant son départ |
+| fin d'une catégorie | son classement (`tv_results`), le titre de la suivante, sa liste de départ, la course 40 s avant son départ |
 | après la dernière | son classement, puis les caméras |
 
 L'écran de course est `tv_duo` quand les départs sont espacés de moins de
@@ -802,8 +802,8 @@ passe muet plutôt que pas du tout.
 |---|---|---|
 | `scenario=…` | — | le scénario |
 | `rose=5` | 5 | durée de la couleur de clé au lancement, en s |
-| `resultats=45` / `titre=10` | 45 / 10 | durée du classement et du titre de catégorie, en s |
-| `avance=60` | 60 | catégories suivantes : l'écran de course arrive tant de s avant leur premier départ |
+| `resultats=70` / `titre=10` | 70 / 10 | durée du classement et du titre de catégorie, en s |
+| `avance=40` | 40 | catégories suivantes : l'écran de course arrive tant de s avant leur premier départ |
 | `generique_avant=300` | 300 | le générique part tant de s avant le premier départ |
 | `speaker_delai=3` / `speaker_duree=10` | 3 / 10 | nom du présentateur : entrée après le générique, durée |
 | `departs_avant=30` | 30 | la liste de départ arrive tant de s avant le premier départ (le présentateur parle jusque-là) |

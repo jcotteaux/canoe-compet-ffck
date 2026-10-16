@@ -11,7 +11,8 @@
  *   libelle   nom affiché sur les titres
  *   depart    heure du premier départ, fin : heure du dernier départ
  *   nb        nombre de bateaux
- *   vue       'duo', 'inrace' ou 'kcross' ; absent = déduit de l'intervalle entre deux
+ *   vue       'duo', 'duo_kx' (tv_duo_kx, contre-la-montre kayak-cross),
+ *             'inrace' ou 'kcross' ; absent = déduit de l'intervalle entre deux
  *             départs, (fin - depart) / (nb - 1) : moins de 2 min, plusieurs
  *             bateaux sont sur l'eau en même temps, d'où tv_duo ; 2 min et
  *             plus, un seul à la fois, d'où tv_inrace.
@@ -59,9 +60,9 @@ const REGIE_SCENARIOS = {
 		phase : 'Kayak-Cross — contre-la-montre',
 		date : '2026-10-17',
 		categories : [
-			{ epreuve : 'XK1INV', libelle : 'Invités',     depart : '10:15:00', fin : '10:29:00', nb : 15 },
-			{ epreuve : 'XK1H',   libelle : 'Kayak Homme', depart : '10:33:00', fin : '11:06:00', nb : 34 },
-			{ epreuve : 'XK1D',   libelle : 'Kayak Dame',  depart : '11:10:00', fin : '11:38:00', nb : 29 },
+			{ epreuve : 'XK1INV', libelle : 'Invités',     depart : '10:15:00', fin : '10:29:00', nb : 15, vue : 'duo_kx' },
+			{ epreuve : 'XK1H',   libelle : 'Kayak Homme', depart : '10:33:00', fin : '11:06:00', nb : 34, vue : 'duo_kx' },
+			{ epreuve : 'XK1D',   libelle : 'Kayak Dame',  depart : '11:10:00', fin : '11:38:00', nb : 29, vue : 'duo_kx' },
 		],
 	},
 

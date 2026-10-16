@@ -19,9 +19,10 @@
  *              il parle jusqu'à 30 s avant le départ ;
  *   titre      à 30 s du départ, le nom de la catégorie en plein écran ;
  *   depart     puis sa liste de départ (tv_departs), jusqu'au premier départ ;
- *   course     l'écran de course : tv_duo si les départs sont rapprochés,
+ *   course     l'écran de course : tv_duo si les départs sont rapprochés
+ *              (tv_duo_kx pour le contre-la-montre kayak-cross),
  *              tv_inrace sinon (voir regie_scenarios.js) ;
- *   (catégories suivantes : titre, liste de départ, course 1 min avant)
+ *   (catégories suivantes : titre, liste de départ, course 40 s avant)
  *   resultats  la catégorie finie : son classement (tv_results), puis titre
  *              de la suivante, sa liste de départ, et retour à la course ;
  *   fin        après la dernière catégorie : la couleur de clé, les caméras.
@@ -45,8 +46,8 @@
  * Paramètres d'URL :
  *   scenario=vendredi-matin   le scénario (regie_scenarios.js)
  *   rose=5                    durée du rose au lancement, en s
- *   resultats=45 titre=10     durée des résultats et du titre de catégorie, en s
- *   avance=60                 catégories suivantes : l'écran de course arrive tant
+ *   resultats=70 titre=10     durée des résultats et du titre de catégorie, en s
+ *   avance=40                 catégories suivantes : l'écran de course arrive tant
  *                             de s avant leur premier départ
  *   generique_avant=300       le générique part tant de s avant le premier départ
  *   speaker_delai=3 speaker_duree=10     nom du présentateur : il entre tant de s
@@ -695,7 +696,8 @@ function Montrer(s)
 		rose : null, fin : null, generique : 'generique',
 		compte : 'compte', speaker : 'speaker', titre : 'titre',
 		depart : 'c_depart', resultats : 'c_resultats',
-		course : s.vue === 'inrace' ? 'c_inrace' : s.vue === 'kcross' ? 'c_kcross' : 'c_duo',
+		course : s.vue === 'inrace' ? 'c_inrace' : s.vue === 'kcross' ? 'c_kcross'
+		       : s.vue === 'duo_kx' ? 'c_duo_kx' : 'c_duo',
 	}[s.nom];
 
 	document.querySelectorAll('.couche').forEach(function(el) {
@@ -918,9 +920,9 @@ function Init()
 
 	regie.reglages = {
 		rose : num('rose', 5),
-		resultats : num('resultats', 45),
+		resultats : num('resultats', 70),
 		titre : num('titre', 10),
-		avance : num('avance', 60),
+		avance : num('avance', 40),
 		generiqueAvant : num('generique_avant', num('speaker_avant', 300)),
 		speakerDelai : num('speaker_delai', 3),
 		speakerDuree : num('speaker_duree', 10),
@@ -1009,6 +1011,7 @@ function Init()
 	const q = (document.body.classList.contains('chroma') ? '?bg=1' : '?bg=0')
 		+ (regie.reglages.anim ? '' : '&anim=0');
 	document.querySelector('#c_duo iframe').src = 'tv_duo.html' + q;
+	document.querySelector('#c_duo_kx iframe').src = 'tv_duo_kx.html' + q;
 	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html' + q;
 
 	Redimensionner();

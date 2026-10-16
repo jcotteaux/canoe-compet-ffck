@@ -1,0 +1,783 @@
+/*
+ * Palmarès plein écran (tv_palmares.html), pour l'écran derrière le podium.
+ *
+ * Charte des écrans TV : marine #09006D, indigo #1D1580, bleu #097AFF, biseau
+ * -20 deg, Calibri. Page opaque, vue de loin par le public : gros caractères,
+ * fort contraste, rien de fin.
+ */
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-regular.ttf') format('truetype');
+	font-weight: normal;
+	font-display: block;
+}
+
+@font-face
+{
+	font-family: 'Calibri';
+	src: url('../font/calibri-bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: block;
+}
+
+:root
+{
+	--ffck-navy: #09006D;
+	--ffck-indigo: #1D1580;
+	--ffck-blue: #097AFF;
+	--ffck-blue-light: #3680FF;
+	--ffck-sky: #629BF1;
+
+	--fond-haut: #05081F;
+	--fond-bas: #0A1145;
+
+	--or: #E8C33A;
+	--argent: #B9C4CF;
+	--bronze: #C98A3E;
+
+	--scale: 1;
+	--biseau: -20deg;
+
+	/* Révélation du podium : le 3e, puis le 2e et le 1er, à --pas d'écart (?revele=). */
+	--pas: 4s;
+}
+
+html, body
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	background: var(--fond-haut);
+	color: white;
+	font-family: Calibri, 'Carlito', 'Trebuchet MS', Arial, sans-serif;
+}
+
+#scene
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 1920px;
+	height: 1080px;
+	margin: -540px 0 0 -960px;
+
+	transform: scale(var(--scale));
+	transform-origin: center center;
+	overflow: hidden;
+}
+
+#fond
+{
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(ellipse 70% 60% at 50% 55%, rgba(54, 128, 255, 0.22) 0%, rgba(54, 128, 255, 0) 70%),
+		linear-gradient(180deg, var(--fond-haut) 0%, var(--fond-bas) 100%);
+}
+
+.bande
+{
+	position: absolute;
+	transform: skewX(var(--biseau));
+}
+
+#bande1
+{
+	left: -120px;
+	top: 0;
+	width: 1260px;
+	height: 14px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+}
+
+#bande2
+{
+	right: -120px;
+	bottom: 0;
+	width: 900px;
+	height: 14px;
+	background: linear-gradient(90deg, var(--ffck-indigo) 0%, var(--ffck-blue) 100%);
+}
+
+/******************** en-tête ********************/
+
+#entete
+{
+	position: absolute;
+	left: 120px;
+	top: 60px;
+	width: 1250px;
+}
+
+#titre
+{
+	font-size: 40px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#phase
+{
+	margin-top: 6px;
+	font-size: 28px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+.logos
+{
+	position: absolute;
+	right: 110px;
+	top: 46px;
+	display: flex;
+	align-items: center;
+	gap: 30px;
+}
+
+.logo_ffck
+{
+	width: 150px;
+	height: 110px;
+	background: url('../img/tv_duo/ffck.png') no-repeat center / contain;
+}
+
+.logo_club
+{
+	width: 210px;
+	height: 120px;
+	background: url('../img/tv_duo/logo_club.png') no-repeat center / contain;
+}
+
+/******************** catégorie ********************/
+
+#cat_masque
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 190px;
+	text-align: center;
+	overflow: hidden;
+}
+
+#cat
+{
+	display: inline-block;
+	font-size: 92px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	line-height: 1.1;
+}
+
+/******************** marches ********************/
+
+#marches
+{
+	position: absolute;
+	left: 210px;
+	width: 1500px;
+	top: 330px;
+	height: 440px;
+
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 36px;
+}
+
+.marche
+{
+	width: 476px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.carte
+{
+	padding: 0 10px 18px;
+	text-align: center;
+}
+
+.carte .nom
+{
+	font-size: 54px;
+	font-weight: bold;
+	line-height: 1.1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.carte .club
+{
+	margin-top: 4px;
+	font-size: 26px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #bcd4f2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.carte .temps
+{
+	margin-top: 10px;
+	font-size: 48px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+/* L'écart au premier, sous le temps des deuxième et troisième. */
+.carte .ecart
+{
+	margin-top: 4px;
+	font-size: 30px;
+	font-weight: bold;
+	font-style: italic;
+	font-variant-numeric: tabular-nums;
+	color: #bcd4f2;
+}
+
+.carte .ecart:empty { display: none; }
+
+.bloc
+{
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-top: 8px solid rgba(255, 255, 255, 0.55);
+}
+
+.m1 .bloc { height: 210px; background: linear-gradient(180deg, #f7dc63 0%, var(--or) 55%, #b8922a 100%); }
+.m2 .bloc { height: 160px; background: linear-gradient(180deg, #e6ecf2 0%, var(--argent) 55%, #8e99a5 100%); }
+.m3 .bloc { height: 120px; background: linear-gradient(180deg, #e0a860 0%, var(--bronze) 55%, #94622a 100%); }
+
+.place
+{
+	font-size: 120px;
+	font-weight: bold;
+	line-height: 1;
+	color: rgba(20, 16, 60, 0.82);
+}
+
+.m3 .place { font-size: 96px; }
+
+/* Une marche sans bateau (moins de trois classés) : le bloc, sans rien dessus. */
+.marche.libre .bloc { opacity: 0.25; }
+
+/******************** la suite ********************/
+
+#suite
+{
+	position: absolute;
+	left: 210px;
+	width: 1500px;
+	top: 806px;
+
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 8px 36px;
+}
+
+#suite.deux
+{
+	grid-template-columns: 1fr 1fr;
+	grid-auto-flow: column;
+	grid-template-rows: repeat(4, auto);
+}
+
+.ligne
+{
+	display: grid;
+	grid-template-columns: 64px 1fr 190px 118px 104px;
+	align-items: center;
+	height: 46px;
+
+	background: linear-gradient(90deg,
+		rgba(9, 0, 109, 0.92) 0%,
+		rgba(16, 10, 96, 0.82) 60%,
+		rgba(9, 18, 78, 0.70) 100%);
+	font-size: 26px;
+}
+
+.ligne > span
+{
+	padding: 0 12px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.ligne .rang
+{
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	font-weight: bold;
+	background: linear-gradient(180deg, var(--ffck-blue-light) 0%, var(--ffck-blue) 100%);
+}
+
+.ligne .nom
+{
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.ligne .club
+{
+	font-size: 18px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+.ligne .ecart
+{
+	text-align: right;
+	font-size: 22px;
+	font-weight: bold;
+	font-style: italic;
+	font-variant-numeric: tabular-nums;
+	color: #bcd4f2;
+}
+
+.ligne .temps
+{
+	text-align: right;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+/******************** attente, points ********************/
+
+/*
+ * Pas encore de résultat : un chrono qui tourne au-dessus du texte, et en bas
+ * une rivière, deux portes qui se balancent. Tout est dessiné ici (SVG en
+ * ligne, vagues en motif) : rien à charger.
+ */
+
+#attente
+{
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 300px;
+	text-align: center;
+}
+
+#attente .chrono
+{
+	display: block;
+	width: 132px;
+	height: 148px;
+	margin: 0 auto;
+	overflow: visible;
+	filter: drop-shadow(0 0 18px rgba(54, 128, 255, 0.55));
+	animation: chrono-pouls 2s ease-in-out infinite;
+}
+
+.chrono .couronne { fill: white; }
+.chrono .cadran { fill: rgba(9, 122, 255, 0.14); stroke: white; stroke-width: 6; }
+.chrono .graduations line { stroke: #9fb6dc; stroke-width: 4; stroke-linecap: round; }
+.chrono .axe { fill: var(--or); }
+.chrono .aiguille
+{
+	stroke: var(--or);
+	stroke-width: 6;
+	stroke-linecap: round;
+	transform-box: view-box;
+	transform-origin: 80px 100px;
+	animation: aiguille 4s linear infinite;
+}
+
+#attente .texte
+{
+	margin-top: 34px;
+	font-size: 44px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+#attente .pt
+{
+	display: inline-block;
+	animation: point 1.4s ease-in-out infinite;
+}
+#attente .pt:nth-child(2) { animation-delay: 0.2s; }
+#attente .pt:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes aiguille { to { transform: rotate(360deg); } }
+@keyframes chrono-pouls { 50% { transform: scale(1.05); } }
+@keyframes point
+{
+	0%, 60%, 100% { transform: translateY(0); opacity: 1; }
+	30% { transform: translateY(-12px); opacity: 0.4; }
+}
+
+/* ---- la rivière ---- */
+
+#riviere
+{
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 400px;
+	overflow: hidden;
+}
+
+body.vide #attente,
+body.vide #riviere { display: block; }
+body.vide #marches,
+body.vide #suite { visibility: hidden; }
+
+.vague
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	background-repeat: repeat-x;
+	background-size: 480px 100%;
+}
+
+.vague.v3 { bottom: 70px; height: 90px; opacity: 0.9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q60 12 120 40 T240 40 T360 40 T480 40 V80 H0 Z' fill='%231D1580'/%3E%3C/svg%3E"); animation: vague 11s linear infinite; }
+.vague.v2 { bottom: 18px; height: 90px; opacity: 0.9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q60 12 120 40 T240 40 T360 40 T480 40 V80 H0 Z' fill='%23097AFF'/%3E%3C/svg%3E"); animation: vague 7s linear infinite reverse; background-position-x: 160px; }
+.vague.v1 { bottom: 0;    height: 78px; opacity: 0.95; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40 Q60 12 120 40 T240 40 T360 40 T480 40 V80 H0 Z' fill='%233680FF'/%3E%3C/svg%3E"); animation: vague 5s linear infinite; background-position-x: 300px; }
+
+@keyframes vague { to { background-position-x: -480px; } }
+.vague.v2 { animation-name: vague2; }
+.vague.v1 { animation-name: vague1; }
+@keyframes vague2 { from { background-position-x: 160px; } to { background-position-x: -320px; } }
+@keyframes vague1 { from { background-position-x: 300px; } to { background-position-x: -180px; } }
+
+/* Les portes, suspendues au fil : vertes (descente), rouges (remontée). */
+.porte
+{
+	position: absolute;
+	bottom: 120px;
+	width: 130px;
+	height: 300px;
+}
+.porte.p1 { left: 600px; }
+.porte.p2 { left: 1200px; }
+
+.porte .fil
+{
+	position: absolute;
+	left: -40px;
+	right: -40px;
+	top: 0;
+	height: 4px;
+	background: rgba(255, 255, 255, 0.45);
+}
+
+.porte .perche
+{
+	position: absolute;
+	top: 3px;
+	width: 12px;
+	height: 250px;
+	border-radius: 0 0 6px 6px;
+	background: repeating-linear-gradient(180deg, #1FA84A 0 30px, white 30px 60px);
+	box-shadow: 0 0 14px rgba(31, 168, 74, 0.45);
+	transform-origin: top center;
+	animation: perche 3.2s ease-in-out infinite alternate;
+}
+.porte .perche:nth-of-type(2) { left: 0; }
+.porte .perche:nth-of-type(3) { right: 0; animation-delay: -1.1s; }
+.porte.remontee .perche
+{
+	background: repeating-linear-gradient(180deg, #E0262B 0 30px, white 30px 60px);
+	box-shadow: 0 0 14px rgba(224, 38, 43, 0.45);
+}
+
+@keyframes perche { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+
+#points
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 30px;
+	display: flex;
+	justify-content: center;
+	gap: 14px;
+}
+
+#points span
+{
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: rgba(159, 182, 220, 0.35);
+}
+
+#points span.actif { background: var(--ffck-blue-light); }
+
+/******************** ambiance ********************/
+
+/* Une grande lueur bleue qui dérive lentement derrière le podium. */
+#lumiere
+{
+	position: absolute;
+	left: 360px;
+	top: 160px;
+	width: 1200px;
+	height: 760px;
+	background: radial-gradient(ellipse at center, rgba(98, 155, 241, 0.20) 0%, rgba(98, 155, 241, 0) 65%);
+	animation: lumiere 14s ease-in-out infinite alternate;
+}
+
+@keyframes lumiere
+{
+	from { transform: translateX(-140px) scale(0.95); }
+	to   { transform: translateX(140px) scale(1.08); }
+}
+
+/* Paillettes dorées, posées par le JS (position, taille, durée au hasard). */
+#paillettes
+{
+	position: absolute;
+	left: 210px;
+	width: 1500px;
+	top: 280px;
+	height: 520px;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+#paillettes span
+{
+	position: absolute;
+	bottom: -10px;
+	border-radius: 50%;
+	background: radial-gradient(circle, #fff6c8 0%, #f2cf55 45%, rgba(232, 195, 58, 0) 72%);
+	opacity: 0;
+	animation-name: paillette;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+
+@keyframes paillette
+{
+	0%   { transform: translate(0, 0); opacity: 0; }
+	12%  { opacity: 0.85; }
+	80%  { opacity: 0.55; }
+	100% { transform: translate(var(--derive), -540px); opacity: 0; }
+}
+
+/* Le reflet : une bande claire qui traverse chaque marche, à tour de rôle. */
+.bloc { overflow: hidden; }
+
+.reflet
+{
+	position: absolute;
+	top: -20%;
+	left: -40%;
+	width: 26%;
+	height: 140%;
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 100%);
+	transform: skewX(var(--biseau)) translateX(0);
+	animation: reflet 7s ease-in-out infinite;
+}
+
+.m1 .reflet { animation-delay: 2.4s; }
+.m2 .reflet { animation-delay: 2.9s; }
+.m3 .reflet { animation-delay: 3.3s; }
+
+@keyframes reflet
+{
+	0%, 70% { transform: skewX(var(--biseau)) translateX(0); }
+	100%    { transform: skewX(var(--biseau)) translateX(780%); }
+}
+
+/* Le 1 rayonne doucement. */
+.m1 .place { animation: rayonne 3.5s ease-in-out infinite alternate; }
+
+@keyframes rayonne
+{
+	from { text-shadow: 0 0 0 rgba(255, 246, 200, 0); }
+	to   { text-shadow: 0 0 34px rgba(255, 246, 200, 0.95); }
+}
+
+/* Un nouveau sur le podium : sa carte s'illumine un instant. */
+.marche.maj .carte { animation: maj 1.6s ease-out; }
+
+@keyframes maj
+{
+	0%   { transform: scale(1);    text-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+	25%  { transform: scale(1.06); text-shadow: 0 0 26px rgba(255, 255, 255, 0.9); }
+	100% { transform: scale(1);    text-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/******************** entrée d'une catégorie ********************/
+
+/*
+ * Jouée une fois, quand la catégorie arrive avec ses résultats : les bandes
+ * glissent, le nom monte derrière un trait bleu, les marches poussent depuis
+ * le sol, vides. Puis la révélation : le 3e se pose sur sa marche, le 2e
+ * --pas plus tard, le 1er encore --pas après, chacun avec un éclat sur sa
+ * marche. La suite entre ensuite, ligne par ligne.
+ */
+body.entre #bande1 { animation: bande-g 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.entre #bande2 { animation: bande-d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes bande-g { from { transform: skewX(var(--biseau)) translateX(-1400px); } }
+@keyframes bande-d { from { transform: skewX(var(--biseau)) translateX(1100px); } }
+
+body.entre #entete,
+body.entre .logos  { animation: monte 0.7s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+body.entre #cat    { animation: cat-entre 0.7s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+/* Le trait bleu qui balaie le nom de la catégorie à son arrivée. */
+#cat_masque::after
+{
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	width: 0;
+	height: 6px;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+	transform: translateX(-50%) skewX(var(--biseau));
+}
+
+body.entre #cat_masque::after { animation: trait 1.1s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes trait
+{
+	0%   { width: 0; }
+	55%  { width: 760px; }
+	100% { width: 260px; }
+}
+
+body.entre .bloc   { animation: pousse 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.15) both; transform-origin: bottom center; }
+body.entre .m3 .bloc { animation-delay: 0.55s; }
+body.entre .m2 .bloc { animation-delay: 0.80s; }
+body.entre .m1 .bloc { animation-delay: 1.05s; }
+
+body.entre .carte  { animation: revele 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.entre .m3 .carte { animation-delay: 1.4s; }
+body.entre .m2 .carte { animation-delay: calc(1.4s + var(--pas)); }
+body.entre .m1 .carte { animation-delay: calc(1.4s + 2 * var(--pas)); }
+
+/* L'éclat sur la marche, au moment où son athlète apparaît. */
+.bloc::after
+{
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 70%);
+	opacity: 0;
+	pointer-events: none;
+}
+
+body.entre .bloc::after { animation: eclat 1.1s ease-out both; }
+body.entre .m3 .bloc::after { animation-delay: 1.4s; }
+body.entre .m2 .bloc::after { animation-delay: calc(1.4s + var(--pas)); }
+body.entre .m1 .bloc::after { animation-delay: calc(1.4s + 2 * var(--pas)); }
+
+@keyframes eclat
+{
+	0%   { opacity: 0; }
+	20%  { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@keyframes revele
+{
+	0%   { transform: translateY(-50px) scale(1.12); opacity: 0; text-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+	45%  { opacity: 1; text-shadow: 0 0 30px rgba(255, 255, 255, 0.9); }
+	100% { transform: none; opacity: 1; text-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+body.entre .ligne  { animation: ligne-entre 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.entre .ligne:nth-child(1) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.00s); }
+body.entre .ligne:nth-child(2) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.08s); }
+body.entre .ligne:nth-child(3) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.16s); }
+body.entre .ligne:nth-child(4) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.24s); }
+body.entre .ligne:nth-child(5) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.32s); }
+body.entre .ligne:nth-child(6) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.40s); }
+body.entre .ligne:nth-child(7) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.48s); }
+body.entre .ligne:nth-child(8) { animation-delay: calc(2.6s + 2 * var(--pas) + 0.56s); }
+
+@keyframes monte       { from { transform: translateY(-30px); opacity: 0; } }
+@keyframes cat-entre   { from { transform: translateY(110%); } }
+@keyframes pousse      { from { transform: scaleY(0); } }
+@keyframes pose        { from { transform: translateY(-40px); opacity: 0; } }
+@keyframes ligne-entre { from { transform: translateX(-60px); opacity: 0; } }
+
+/* Le reflet et le rayonnement attendent la fin de l'entrée. */
+body.entre .m1 .reflet { animation-delay: calc(3.4s + 2 * var(--pas)); }
+body.entre .m2 .reflet { animation-delay: calc(3.9s + 2 * var(--pas)); }
+body.entre .m3 .reflet { animation-delay: calc(4.3s + 2 * var(--pas)); }
+
+/******************** révélation pilotée (?pilote=1) ********************/
+
+/*
+ * Les marches montent vides ; chaque athlète attend sa classe .montre, posée
+ * par le pilote, et apparaît alors tout de suite, avec son éclat. La suite du
+ * classement attend le 1er (body.tout).
+ */
+body.pilote .carte,
+body.pilote.entre .carte          { animation: none; opacity: 0; }
+body.pilote .bloc::after,
+body.pilote.entre .bloc::after    { animation: none; }
+body.pilote .ligne,
+body.pilote.entre .ligne          { animation: none; opacity: 0; }
+
+body.pilote .marche.montre .carte,
+body.pilote.entre .marche.montre .carte        { opacity: 1; animation: revele 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: 0s; }
+body.pilote .marche.montre .bloc::after,
+body.pilote.entre .marche.montre .bloc::after  { animation: eclat 1.1s ease-out both; animation-delay: 0s; }
+
+body.pilote.tout .ligne,
+body.pilote.entre.tout .ligne     { opacity: 1; animation: ligne-entre 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.pilote.entre.tout .ligne:nth-child(1) { animation-delay: 0.90s; }
+body.pilote.entre.tout .ligne:nth-child(2) { animation-delay: 0.98s; }
+body.pilote.entre.tout .ligne:nth-child(3) { animation-delay: 1.06s; }
+body.pilote.entre.tout .ligne:nth-child(4) { animation-delay: 1.14s; }
+body.pilote.entre.tout .ligne:nth-child(5) { animation-delay: 1.22s; }
+body.pilote.entre.tout .ligne:nth-child(6) { animation-delay: 1.30s; }
+body.pilote.entre.tout .ligne:nth-child(7) { animation-delay: 1.38s; }
+body.pilote.entre.tout .ligne:nth-child(8) { animation-delay: 1.46s; }
+
+/* Le reflet tourne dès que les marches sont posées. */
+body.pilote.entre .m1 .reflet { animation-delay: 2s; }
+body.pilote.entre .m2 .reflet { animation-delay: 2.5s; }
+body.pilote.entre .m3 .reflet { animation-delay: 2.9s; }
+
+/******************** sans animation ********************/
+
+body.no-anim *,
+body.no-anim *::before,
+body.no-anim *::after
+{
+	animation: none !important;
+}
+
+body.no-anim #cat_masque::after { width: 260px; }
+body.no-anim.pilote .marche.montre .carte,
+body.no-anim.pilote.tout .ligne { opacity: 1; }
+body.no-anim #lumiere,
+body.no-anim #paillettes { display: none; }

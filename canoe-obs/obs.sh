@@ -64,6 +64,28 @@ if [[ -f $GLOBAL ]] && grep -q '^SaveProjectors=false' $GLOBAL; then
 	echo "✓ « Enregistrer les projecteurs à la sortie » activé"
 fi
 
+# La télécommande du podium (scène « Écran podium · piloté ») en dock OBS :
+# ajoutée une fois aux docks navigateur personnalisés (Docks > … pour l'afficher).
+if [[ -f $GLOBAL ]]; then
+	node -e '
+		const fs = require("fs");
+		const [fichier, url] = process.argv.slice(1);
+		const titre = "Télécommande podium";
+		let ini = fs.readFileSync(fichier, "utf8");
+		const m = ini.match(/^ExtraBrowserDocks=(.*)$/m);
+		let docks = [];
+		try { docks = m ? JSON.parse(m[1]) : []; } catch (e) { docks = []; }
+		if (docks.some(d => d.title === titre)) process.exit(0);
+		docks.push({ title: titre, url, uuid: require("crypto").randomUUID() });
+		const ligne = "ExtraBrowserDocks=" + JSON.stringify(docks);
+		if (m) ini = ini.replace(m[0], () => ligne);
+		else if (/^\[BasicWindow\]$/m.test(ini)) ini = ini.replace(/^\[BasicWindow\]$/m, s => s + "\n" + ligne);
+		else ini += "\n[BasicWindow]\n" + ligne + "\n";
+		fs.writeFileSync(fichier, ini);
+		console.log("✓ dock « " + titre + " » ajouté (menu Docks pour l’afficher)");
+	' "$GLOBAL" "http://localhost:3000/canoe/tv_podium_pilote.html"
+fi
+
 installe() {   # installe <source> <destination>
 	if [[ -f $2 ]]; then
 		cmp -s $1 $2 && return

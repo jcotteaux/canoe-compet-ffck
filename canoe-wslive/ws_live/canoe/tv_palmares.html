@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Palmarès</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_palmares.css?v8" rel="stylesheet">
+</head>
+
+<!--
+	Écran derrière le podium, 1920 x 1080, opaque : le palmarès d'une
+	catégorie — les trois premiers sur leurs marches (2 - 1 - 3), puis les
+	places suivantes. Les catégories passent l'une après l'autre, ou une seule
+	avec ?epreuve=. Voir js/tv_palmares.js pour les paramètres.
+-->
+<body>
+	<div id="scene">
+		<div id="fond"></div>
+		<div id="lumiere"></div>
+		<div id="paillettes"></div>
+		<div class="bande" id="bande1"></div>
+		<div class="bande" id="bande2"></div>
+
+		<div id="entete">
+			<div id="titre"></div>
+			<div id="phase"></div>
+		</div>
+		<div class="logos"><div class="logo_ffck"></div><div class="logo_club"></div></div>
+
+		<div id="contenu">
+			<div id="cat_masque"><div id="cat"></div></div>
+
+			<div id="marches">
+				<div class="marche m2" id="m2">
+					<div class="carte"><div class="nom"></div><div class="club"></div><div class="temps"></div><div class="ecart"></div></div>
+					<div class="bloc"><span class="place">2</span><span class="reflet"></span></div>
+				</div>
+				<div class="marche m1" id="m1">
+					<div class="carte"><div class="nom"></div><div class="club"></div><div class="temps"></div><div class="ecart"></div></div>
+					<div class="bloc"><span class="place">1</span><span class="reflet"></span></div>
+				</div>
+				<div class="marche m3" id="m3">
+					<div class="carte"><div class="nom"></div><div class="club"></div><div class="temps"></div><div class="ecart"></div></div>
+					<div class="bloc"><span class="place">3</span><span class="reflet"></span></div>
+				</div>
+			</div>
+
+			<div id="suite"></div>
+		</div>
+
+		<!-- Attente des résultats : un chrono qui tourne, au-dessus d'une
+		     rivière et de deux portes. -->
+		<div id="attente">
+			<svg class="chrono" viewBox="0 0 160 180" aria-hidden="true">
+				<rect class="couronne" x="68" y="4" width="24" height="16" rx="4" />
+				<rect class="couronne" x="124" y="30" width="16" height="12" rx="3" transform="rotate(45 132 36)" />
+				<circle class="cadran" cx="80" cy="100" r="64" />
+				<g class="graduations">
+					<line x1="80" y1="44" x2="80" y2="56" /><line x1="80" y1="144" x2="80" y2="156" />
+					<line x1="24" y1="100" x2="36" y2="100" /><line x1="124" y1="100" x2="136" y2="100" />
+					<line x1="40.4" y1="60.4" x2="46" y2="66" /><line x1="119.6" y1="60.4" x2="114" y2="66" />
+					<line x1="40.4" y1="139.6" x2="46" y2="134" /><line x1="119.6" y1="139.6" x2="114" y2="134" />
+				</g>
+				<line class="aiguille" x1="80" y1="100" x2="80" y2="52" />
+				<circle class="axe" cx="80" cy="100" r="7" />
+			</svg>
+			<div class="texte">Résultats à venir<span class="pt">.</span><span class="pt">.</span><span class="pt">.</span></div>
+		</div>
+
+		<div id="riviere" aria-hidden="true">
+			<div class="porte p1"><span class="fil"></span><span class="perche"></span><span class="perche"></span></div>
+			<div class="porte p2 remontee"><span class="fil"></span><span class="perche"></span><span class="perche"></span></div>
+			<div class="vague v3"></div>
+			<div class="vague v2"></div>
+			<div class="vague v1"></div>
+		</div>
+		<div id="points"></div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v4"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js"></script>
+	<script src="./js/regie_scenarios.js?v9"></script>
+	<script src="./js/tv_palmares.js?v8"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

@@ -33,16 +33,28 @@ voir les caméras.
 | `Régie · Vendredi matin — qualifs M1` … `Dimanche après-midi — finales` | `tv_regie.html?scenario=…` : la demi-journée entière, sans y toucher |
 | `Caméras seules` | rien : tout magenta, l'antenne montre les caméras |
 | `Sponsors · boucle` | `../sponsors/Sponsor.mp4` en boucle, plein cadre, avec son son (repart du début à chaque passage) |
+| `Sponsors · boucle avec Timer` | la même vidéo, et par-dessus `tv_prochaine.html` : le temps avant la prochaine session, en bas (pauses entre deux demi-journées) |
+| `Écran podium · attente` | `tv_podium_attente.html` : « Remise des prix », le nom de l'épreuve (lu dans competFFCK), logos et marches vides, en attendant la cérémonie (compte à rebours avec `PODIUM_HEURE`) |
+| `Écran podium · <catégorie>` | `tv_palmares.html?epreuve=<code>` : le palmarès d'une seule catégorie, sans rotation — une scène par catégorie de la demi-journée `PODIUM` |
+| `Écran podium · piloté` | `tv_palmares.html?pilote=1` : la catégorie et le 3e, le 2e, le 1er à la demande, depuis la télécommande `http://localhost:3000/canoe/tv_podium_pilote.html` (ce Mac, un téléphone, ou le dock OBS « Télécommande podium », posé par `obs.sh` : menu Docks pour l'afficher) |
+| `Écran podium · rotation` | `tv_palmares.html?sans_inv` : chaque catégorie courue (hors invités), 20 s chacune |
+| `Écran podium · fichier, piloté` / `fichier, rotation` | `tv_palmares.html?fichier…` : comme `piloté` et `rotation`, mais le palmarès vient de `canoe-wslive/ws_live/canoe/podium/podium.json`, édité à la main — sans competFFCK ni WebSocket. Enregistrer le fichier suffit, l'écran le relit toutes les 2 s |
 | `Manuel · Course duo` | `tv_duo.html?bg=1` |
+| `Manuel · Course duo KX` | `tv_duo_kx.html?bg=1` : le duo du contre-la-montre kayak-cross (samedi matin) |
 | `Manuel · Course 1 bateau` | `tv_inrace.html?bg=1` |
 | `Manuel · Bateaux en course` | `tv_oncourse.html?bg=1` |
 | `Manuel · Départs` | `tv_departs.html` |
-| `Manuel · Résultats` | `tv_results.html` |
+| `Manuel · Résultats` | `tv_results.html?no_course` (sans le bandeau des bateaux en course) |
 | `Test son · générique` | le générique lu par OBS, sur le même chemin de son que la régie : à passer avant l'antenne |
 | `Répétition · bouchon` | `tv_regie.html?scenario=test&repetition=1&ws=localhost:8080`, avec `node mock/server.js` dans `canoe-wslive` |
 
 En temps normal, une seule scène par demi-journée : la régie automatique. Les
 scènes `Manuel` sont le secours si elle ne convient pas.
+
+Les scènes `Écran podium` ne vont pas à l'antenne : elles sont faites pour
+l'écran derrière le podium, opaques et sans fond de clé. Les sortir par un
+**projecteur de scène** (clic droit sur la scène → *Projecteur plein écran
+(scène)* → l'écran du podium), pas par le programme.
 
 `Régie · Samedi après-midi` n'existe que si `SERVEUR_KX` et `CODE_KX` sont
 donnés à l'installation.
@@ -89,7 +101,7 @@ Partout :
 Le générique est joué par la page de régie ; OBS récupère son son (« Contrôler
 l'audio via OBS ») et l'envoie par l'**écoute** vers la sortie son du HDMI,
 `BMD HDMI`, qui arrive dans l'ATEM avec l'image. Seule autre source de son :
-la vidéo `Sponsors · boucle`, sur le même chemin. Ni micro ni son du bureau :
+la vidéo des scènes `Sponsors`, sur le même chemin. Ni micro ni son du bureau :
 rien d'autre du Mac ne part à l'antenne.
 
 Trois choses peuvent le casser, `obs.sh` en règle deux :
@@ -127,7 +139,9 @@ pas laisser une scène `Régie` en aperçu.
 | `FPS` | `25` | cadence, celle de l'ATEM |
 | `SON_NOM` | `BMD HDMI` | sortie son vers l'ATEM, relevée au lancement (`--sans-son` pour ne pas l'attendre) |
 | `ENREGISTREMENTS` | `~/Movies/canoe-obs` | dossier des enregistrements |
-| `SPONSORS` | `../sponsors/Sponsor.mp4` | vidéo de la scène `Sponsors · boucle` |
+| `PODIUM` | `samedi-matin` | la demi-journée (scénario de `regie_scenarios.js`) dont les catégories ont leur scène `Écran podium` |
+| `PODIUM_HEURE` | — | heure de la remise des prix (ex. `16:30`) : compte à rebours sur `Écran podium · attente` |
+| `SPONSORS` | `../sponsors/Sponsor.mp4` | vidéo des scènes `Sponsors` |
 
 Changer d'adresse de serveur = relancer `./obs.sh` avec OBS fermé : OBS
 réécrit sa configuration en quittant et écraserait l'installation. Les

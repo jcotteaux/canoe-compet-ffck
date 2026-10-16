@@ -1,0 +1,137 @@
+/*
+ * Attente de la remise des prix (tv_podium_attente.html). Le fond, les bandes,
+ * les logos, la lueur et les paillettes viennent de tv_palmares.css ; ici, le
+ * texte central et trois marches vides.
+ */
+
+#at_bloc
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 270px;
+	text-align: center;
+}
+
+#at_masque
+{
+	overflow: hidden;
+}
+
+#at_texte
+{
+	display: inline-block;
+	font-size: 120px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	line-height: 1.1;
+}
+
+#at_trait
+{
+	width: 320px;
+	height: 8px;
+	margin: 18px auto 0;
+	background: linear-gradient(90deg, var(--ffck-blue) 0%, var(--ffck-blue-light) 100%);
+	transform: skewX(var(--biseau));
+}
+
+#at_sous
+{
+	margin-top: 26px;
+	font-size: 46px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ffck-sky);
+}
+
+#at_compte
+{
+	display: none;
+	margin-top: 26px;
+	justify-content: center;
+	align-items: baseline;
+	gap: 22px;
+}
+
+body.avec-compte #at_compte { display: flex; }
+
+#at_lbl
+{
+	font-size: 34px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #9fb6dc;
+}
+
+#at_reste
+{
+	font-size: 76px;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Les marches : en bas, plus basses et plus discrètes que sur le palmarès. */
+#at_marches
+{
+	position: absolute;
+	left: 510px;
+	width: 900px;
+	bottom: 70px;
+
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 22px;
+}
+
+.at_marche
+{
+	position: relative;
+	width: 280px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	border-top: 6px solid rgba(255, 255, 255, 0.55);
+
+	font-size: 72px;
+	font-weight: bold;
+	color: rgba(20, 16, 60, 0.82);
+}
+
+.at_marche.m1 { height: 170px; background: linear-gradient(180deg, #f7dc63 0%, var(--or) 55%, #b8922a 100%); }
+.at_marche.m2 { height: 125px; background: linear-gradient(180deg, #e6ecf2 0%, var(--argent) 55%, #8e99a5 100%); }
+.at_marche.m3 { height: 90px;  background: linear-gradient(180deg, #e0a860 0%, var(--bronze) 55%, #94622a 100%); }
+
+.at_marche.m1 > span:first-child { animation: rayonne 3.5s ease-in-out infinite alternate; }
+
+#paillettes { top: 360px; height: 650px; }
+
+/******************** entrée ********************/
+
+body.entre #at_texte  { animation: cat-entre 0.8s 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.entre #at_trait  { animation: at-trait 1s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.entre #at_sous   { animation: pose 0.7s 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+body.entre #at_compte { animation: pose 0.7s 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+body.entre .at_marche { animation: pousse 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.15) both; transform-origin: bottom center; }
+body.entre .at_marche.m3 { animation-delay: 1.2s; }
+body.entre .at_marche.m2 { animation-delay: 1.4s; }
+body.entre .at_marche.m1 { animation-delay: 1.6s; }
+
+body.entre .at_marche.m1 .reflet { animation-delay: 2.6s; }
+body.entre .at_marche.m2 .reflet { animation-delay: 3.0s; }
+body.entre .at_marche.m3 .reflet { animation-delay: 3.4s; }
+
+@keyframes at-trait { from { width: 0; } }
+
+/* Le texte respire doucement, une fois installé. */
+body.entre #at_masque { animation: respire 6s 2.5s ease-in-out infinite alternate; }
+
+@keyframes respire
+{
+	from { transform: scale(1); }
+	to   { transform: scale(1.025); }
+}
