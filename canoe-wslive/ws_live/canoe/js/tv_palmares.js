@@ -191,7 +191,18 @@ function PublierCategories()
 {
 	if (!wsMain.pilote || !wsMain.pret)
 		return;
-	const cats = CategoriesAvecResultat().map(function(c) { return { code : c, libelle : NomCategorie(c) }; });
+	const cats = CategoriesAvecResultat().map(function(c) {
+		const cat = { code : c, libelle : NomCategorie(c) };
+		// Fichier : de quoi présenter une cérémonie entière à la télécommande.
+		const f = wsMain.fichier ? CategorieFichier(c) : null;
+		if (f)
+		{
+			cat.groupe = f.section || [Titre(c), Phase(c)].filter(Boolean).join(' — ');
+			cat.remis_par = f.remis_par || '';
+			cat.noms = ClassementFichier(c).slice(0, 3).map(function(r) { return r.name; });
+		}
+		return cat;
+	});
 	const cle = JSON.stringify(cats);
 	// Rien à proposer : la télécommande garde son scénario (et pas de ping-pong
 	// avec le serveur, qui renverrait une liste vide).
@@ -309,7 +320,7 @@ function ReloadEpreuve()
  * « ecart » facultatif, sinon calculé quand les temps se lisent.
  * Une catégorie peut porter son « titre » et sa « phase », qui remplacent
  * ceux du fichier : une cérémonie enchaîne des podiums de nature différente.
- * « remis_par » (facultatif) : pour le speaker, non affiché.
+ * « remis_par » et « section » (facultatifs) : pour la télécommande, non affichés.
  */
 
 /** « 1:05.32 », « 65,32 » -> ms ; null si ce n'est pas un temps. */

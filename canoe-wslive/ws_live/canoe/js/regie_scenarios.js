@@ -23,6 +23,9 @@
  *             bateaux sont sur l'eau en même temps, d'où tv_duo ; 2 min et
  *             plus, un seul à la fois, d'où tv_inrace.
  *
+ * speaker : temps de parole du présentateur avant le premier départ, en s ;
+ *   le générique part d'autant plus tôt (absent : generique_avant, 5 min).
+ *
  * date : jour du scénario (AAAA-MM-JJ) ; null = aujourd'hui (scénario de test).
  *
  * vue 'kcross' : les séries de kayak-cross, gérées par competCrossFFCK
@@ -110,6 +113,9 @@ const REGIE_SCENARIOS = {
 		// avant. Premier départ : titre à H - 100 s, liste de départ jusqu'à
 		// H - 60 s, puis la course et la carte du premier partant.
 		palmares : { avant : 60, coupe : 5, listeAvant : 100 },
+		// Le présentateur parle 3 min : générique 13:55:01,5, présentateur
+		// 13:55:20 → 13:58:20.
+		speaker : 180,
 		categories : [
 			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '14:00:00', fin : '14:22:00', nb : 12 },
 			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '14:28:00', fin : '14:50:00', nb : 12 },

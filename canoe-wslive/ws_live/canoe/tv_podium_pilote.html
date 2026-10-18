@@ -8,7 +8,7 @@
 	<link rel="shortcut icon" href="./16x16_ffck.png" />
 	<link rel="icon" href="./16x16_ffck.png" />
 
-	<link href="./css/tv_podium_pilote.css?v1" rel="stylesheet">
+	<link href="./css/tv_podium_pilote.css?v2" rel="stylesheet">
 </head>
 
 <!--
@@ -23,12 +23,13 @@
 		<div id="liaison" class="coupee">hors ligne</div>
 	</header>
 
-	<section>
-		<h2>Catégorie</h2>
-		<div id="categories" class="grille"></div>
-	</section>
-
-	<section>
+	<section id="revelation">
+		<div id="courant" hidden>
+			<div class="groupe"></div>
+			<div class="lib"></div>
+			<div class="noms"></div>
+			<div class="remis"></div>
+		</div>
 		<h2>Révélation <span id="etat"></span></h2>
 		<div class="grille etapes">
 			<button data-etape="1" class="bronze">3<sup>e</sup></button>
@@ -40,10 +41,15 @@
 		</div>
 	</section>
 
+	<section>
+		<h2>Écran du podium</h2>
+		<div id="categories"></div>
+	</section>
+
 	<p class="aide">Choisir une catégorie remet les marches à vide. L'écran suit
 	aussitôt ; s'il est rechargé, il reprend l'état d'ici.</p>
 
-	<script src="./js/regie_scenarios.js?v17"></script>
-	<script src="./js/tv_podium_pilote.js?v2"></script>
+	<script src="./js/regie_scenarios.js?v18"></script>
+	<script src="./js/tv_podium_pilote.js?v4"></script>
 </body>
 </html>

@@ -13,7 +13,8 @@
  *              rechargement en pleine course repart aussitôt sur la bonne
  *              scène, sans temporisation ni rideau (voir SANS_RIDEAU) ;
  *   compte     compte à rebours plein écran jusqu'au premier départ ;
- *   generique  5 min avant le premier départ, le générique vidéo ; recharger
+ *   generique  5 min avant le premier départ (ou de quoi laisser `speaker` s
+ *              au présentateur, voir regie_scenarios.js), le générique vidéo ; recharger
  *              la page pendant qu'il passe le reprend où il en est ; une vidéo
  *              absente ou illisible est sautée ;
  *   speaker    puis les caméras, pour le présentateur : son nom en bas à
@@ -535,8 +536,6 @@ function Calculer()
 	{
 		// Avant le premier départ : compte à rebours, générique, présentateur,
 		// liste de départ. Tout est calé sur l'heure du départ.
-		const gen = depart - R.generiqueAvant * 1000;
-		const genFin = gen + (R.generique && !regie.genKO ? Duree(regie.genDuree + 0.5) : 0);
 		// Kayak-cross avec tableauAvant : pas de titre ni de liste de départ, le
 		// présentateur parle jusqu'à H - tableauAvant, puis l'incrustation (le
 		// pilote y montre l'arbre, puis la rampe à H - rampeAvant).
@@ -546,6 +545,13 @@ function Calculer()
 		// partant, arrivent `avant` s avant le départ comme pour les suivants.
 		const palm = regie.scenario.palmares;
 		const listes = depart - (kxAvant ? kxAvant : palm && palm.listeAvant ? palm.listeAvant : R.departsAvant) * 1000;
+		// Scénario avec `speaker` (en s) : le générique part pour que le
+		// présentateur parle exactement ce temps-là jusqu'à la liste de départ.
+		const genLen = R.generique && !regie.genKO ? Duree(regie.genDuree + 0.5) : 0;
+		const gen = regie.scenario.speaker
+			? listes - Duree(regie.scenario.speaker) - genLen
+			: depart - R.generiqueAvant * 1000;
+		const genFin = gen + genLen;
 
 		if (heure < gen)
 			return { nom : 'compte', cat : cat, cible : minuit + depart };
@@ -595,7 +601,10 @@ function Calculer()
 			return { nom : 'titre', cat : cat };
 	}
 
-	if (heure < depart - R.avance * 1000)
+	// Palmarès au départ : l'écran de course arrive au plus tard `avant` s
+	// avant le premier départ, pour la carte du premier partant.
+	const palmAvant = regie.scenario.palmares ? (regie.scenario.palmares.avant || 60) : 0;
+	if (heure < depart - Math.max(R.avance, palmAvant) * 1000)
 		return { nom : 'depart', cat : cat };
 
 	return { nom : 'course', cat : cat, vue : Vue(cat) };
