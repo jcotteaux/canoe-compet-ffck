@@ -50,7 +50,7 @@ le navigateur avant : `open "<adresse>"`.
 | samedi 17 matin — kayak-cross contre-la-montre | 10h15 → 11h38 | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-matin&ws=SERVEUR:8080` |
 | samedi 17 après-midi — kayak-cross séries | 15h00 → 18h00 *(fin estimée)* | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=SERVEUR:8080&kx=http://localhost:3000/gestion_kcross_series&kx_competition=62` |
 | dimanche 18 matin — demi-finales | 9h00 → 13h03 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=SERVEUR:8080` |
-| dimanche 18 après-midi — finales | 14h00 → 15h46 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=SERVEUR:8080` |
+| dimanche 18 après-midi — finales | 14h05 → 15h51 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=SERVEUR:8080` |
 
 Remplacer `SERVEUR` par l'adresse du serveur de course (ex. `192.168.1.52`).
 Samedi après-midi : les pages kayak-cross (pilote de l'incrustation, tableau…)
@@ -774,7 +774,7 @@ competFFCK (`france-elite/planning/`, hors dépôt).
 | `samedi-matin` | kayak-cross, contre-la-montre : XK1INV, XK1H, XK1D (10h15 → 11h38) |
 | `samedi-apres-midi` | kayak-cross, séries (competCrossFFCK) : départ 15h00, fin estimée 18h00 |
 | `dimanche-matin` | demi-finales : INV, K1H, K1D, C1H, C1D (9h00 → 13h03) |
-| `dimanche-apres-midi` | finales : K1H, K1D, C1H, C1D (14h00 → 15h46) |
+| `dimanche-apres-midi` | finales : K1H, K1D, C1H, C1D (14h05 → 15h51), palmarès au départ |
 | `test` | petite répétition (3 catégories courtes, 08h50 → 09h22) : `npm run regie` |
 
 Déroulé :
