@@ -1,0 +1,4032 @@
+{
+ "titre": "Championnats de France Elite Slalom",
+ "maj": "2026-10-18",
+ "sources": [
+  "https://www.metaslalom.com (rang mondial ICF non officiel, compteurs Coupe du monde et Mondiaux)",
+  "titres : sources par ligne"
+ ],
+ "athletes": [
+  {
+   "nom": "ADISSON Gael",
+   "club": "CLUB DE CANOE-KAYAK DES ECRINS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 57,
+     "depart": "09:42:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde U23 kayak-cross – Liptovský Mikuláš 2024",
+     "source": "https://web.archive.org/web/2025/https://www.canoeicf.com/node/89590",
+     "type": "titre"
+    },
+    {
+     "ligne": "2e Coupe du monde kayak-cross – Ivrea 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_Canoe_Slalom_World_Cup",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 extreme slalom (ancêtre du kayak-cross) – Ivrea 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e Championnats d'Europe U23 extreme slalom – České Budějovice 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 podium en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1764",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 22,
+     "ligne": "22e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1764"
+    },
+    "MX1I": {
+     "rang": 23,
+     "ligne": "23e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1764"
+    },
+    "MK1": {
+     "rang": 112,
+     "ligne": "112e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1764"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1764"
+  },
+  {
+   "nom": "ADISSON Tanguy",
+   "club": "CLUB DE CANOE-KAYAK DES ECRINS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 160,
+     "depart": "11:44:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe junior C1 par équipes – 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde junior C1 par équipes – 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillé de bronze aux championnats d'Europe junior C1 – 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe U23 C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillé de bronze aux championnats du monde U23 C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 48,
+     "ligne": "48e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1636"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1636"
+  },
+  {
+   "nom": "AGNIMO SEYER Kim",
+   "club": "LANNION CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 8,
+     "depart": "09:12:00"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "AUGU Perrine",
+   "club": "VAL DE L'INDRE CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 101,
+     "depart": "10:40:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/2959"
+  },
+  {
+   "nom": "BABIN Cerise",
+   "club": "CANOE-KAYAK SAUJON",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 109,
+     "depart": "10:56:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e des championnats d'Europe junior K1 par équipes – 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WK1": {
+     "rang": 146,
+     "ligne": "146e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1665"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1665"
+  },
+  {
+   "nom": "BACHELOT Maeva",
+   "club": "CANOE KAYAK CLUB CESSENON",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 80,
+     "depart": "10:22:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7866"
+  },
+  {
+   "nom": "BARBOSA Nélia",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 85,
+     "depart": "10:42:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Double vice-championne paralympique de paracanoë KL3 – Tokyo 2020 et Paris 2024",
+     "source": "https://en.wikipedia.org/wiki/N%C3%A9lia_Barbosa",
+     "a_verifier": "paracanoë (course en ligne) : même personne que l'engagée slalom du Red Star ?",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde de paracanoë KL3 – 2022, 2023, 2025 et 2026",
+     "source": "https://en.wikipedia.org/wiki/N%C3%A9lia_Barbosa",
+     "a_verifier": "même personne ?",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/8937"
+  },
+  {
+   "nom": "BATTISTUZZI Loan",
+   "club": "TORCY CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 115,
+     "depart": "10:58:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5663"
+  },
+  {
+   "nom": "BELHADDAD Lina",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 92,
+     "depart": "10:37:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 176,
+     "depart": "12:21:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/10043"
+  },
+  {
+   "nom": "BENINI Gino",
+   "club": "V.P.A. PONT D'ARC",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 55,
+     "depart": "10:06:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e des championnats d'Europe U23 kayak-cross individuel – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 70,
+     "ligne": "70e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/9152"
+    },
+    "MX1I": {
+     "rang": 78,
+     "ligne": "78e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/9152"
+    },
+    "MX1": {
+     "rang": 86,
+     "ligne": "86e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/9152"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/9152"
+  },
+  {
+   "nom": "BERNES Mael",
+   "club": "ALCK BAGNERES DE BIGORRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 62,
+     "depart": "09:34:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/8955"
+  },
+  {
+   "nom": "BIAZIZZO Mathieu",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 59,
+     "depart": "09:56:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde K1 par équipes – 2014 et 2021",
+     "source": "https://en.wikipedia.org/wiki/Mathieu_Biazizzo",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e Championnats du monde K1 – Deep Creek Lake 2014",
+     "source": "https://en.wikipedia.org/wiki/Mathieu_Biazizzo",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueur du classement général de la Coupe du monde K1 – 2016",
+     "source": "https://en.wikipedia.org/wiki/Mathieu_Biazizzo",
+     "type": "titre"
+    },
+    {
+     "ligne": "1er Coupe du monde K1 – Liptovský Mikuláš 2015",
+     "source": "https://en.wikipedia.org/wiki/Mathieu_Biazizzo",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 K1 – 2013",
+     "source": "https://en.wikipedia.org/wiki/Mathieu_Biazizzo",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe K1 par équipes – Tacen 2017",
+     "source": "https://en.wikipedia.org/wiki/Mathieu_Biazizzo",
+     "type": "titre"
+    },
+    {
+     "ligne": "2 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/237",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 53,
+     "ligne": "53e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/237"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/237"
+  },
+  {
+   "nom": "BOLLIER Lucie",
+   "club": "CANOE KAYAK CLUB FRANCE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1D",
+     "dossard": 179,
+     "depart": "12:20:00"
+    }
+   ],
+   "classes": {
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "BOUCHARDON Tom",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 26,
+     "depart": "09:22:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "BOURHIS Jean Pierre",
+   "club": "CK DE QUIMPER CORNOUAILLE",
+   "nation": "SEN",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 136,
+     "depart": "11:21:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Afrique C1 et kayak-cross – 2026",
+     "source": "https://canoeicf.com/node/97817",
+     "type": "titre"
+    },
+    {
+     "ligne": "Olympien C1 : 17e à Tokyo 2020, 18e à Rio 2016",
+     "source": "https://en.wikipedia.org/wiki/Jean-Pierre_Bourhis",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 finale en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1629",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 95,
+     "ligne": "95e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1629"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1629"
+  },
+  {
+   "nom": "BOURHIS Yves",
+   "club": "CK DE QUIMPER CORNOUAILLE",
+   "nation": "SEN",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 147,
+     "depart": "11:36:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Finaliste olympique C1 (12e) – Paris 2024",
+     "source": "https://en.wikipedia.org/wiki/Yves_Bourhis",
+     "type": "titre"
+    },
+    {
+     "ligne": "Engagé aux JO de Paris 2024 en C1, K1 et kayak-cross pour le Sénégal",
+     "source": "https://en.wikipedia.org/wiki/Yves_Bourhis",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 65,
+     "ligne": "65e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/6698"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/6698"
+  },
+  {
+   "nom": "BROSSAT Axel",
+   "club": "EYRIEUX CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 44,
+     "depart": "09:25:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/2975"
+  },
+  {
+   "nom": "BRUCHER Alois",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 145,
+     "depart": "11:17:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5653"
+  },
+  {
+   "nom": "BRUCHER Amaury",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 35,
+     "depart": "09:29:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/8952"
+  },
+  {
+   "nom": "BRUGVIN Camille",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 112,
+     "depart": "10:25:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 185,
+     "depart": "12:26:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e des championnats du monde U23 K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde junior K1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe junior C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5645"
+  },
+  {
+   "nom": "CASTRYCK Camille",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1D",
+     "dossard": 191,
+     "depart": "12:02:40"
+    }
+   ],
+   "classes": {
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Médaillée de bronze aux championnats d'Europe junior C1 – 2020",
+     "source": "https://en.wikipedia.org/wiki/2020_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne d'Europe junior C1 par équipes – 2020",
+     "source": "https://en.wikipedia.org/wiki/2020_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillée de bronze aux championnats d'Europe U23 C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 48,
+     "ligne": "48e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1871"
+    },
+    "WX1": {
+     "rang": 58,
+     "ligne": "58e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1871"
+    },
+    "WX1I": {
+     "rang": 98,
+     "ligne": "98e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1871"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1871"
+  },
+  {
+   "nom": "CASTRYCK Titouan",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 52,
+     "depart": "10:08:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion olympique K1 – Paris 2024",
+     "source": "https://en.wikipedia.org/wiki/Titouan_Castryck",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde K1 – Penrith 2025",
+     "source": "https://en.wikipedia.org/wiki/Titouan_Castryck",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/Titouan_Castryck",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe K1 – Vaires-sur-Marne 2025",
+     "source": "https://en.wikipedia.org/wiki/Titouan_Castryck",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe K1 par équipes – Ivrea 2026",
+     "source": "https://en.wikipedia.org/wiki/Titouan_Castryck",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueur Coupe du monde K1 – La Seu d'Urgell, Prague et Tacen 2025, La Seu d'Urgell 2026",
+     "source": "https://en.wikipedia.org/wiki/Titouan_Castryck",
+     "type": "titre"
+    },
+    {
+     "ligne": "9 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1880",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 1,
+     "ligne": "1er mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1880"
+    },
+    "MX1I": {
+     "rang": 22,
+     "ligne": "22e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1880"
+    },
+    "MX1": {
+     "rang": 41,
+     "ligne": "41e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1880"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1880"
+  },
+  {
+   "nom": "CHAREL Coline",
+   "club": "V.P.A. PONT D'ARC",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 121,
+     "depart": "11:10:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Championne du monde U23 K1 – Tacen 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne du monde U23 K1 par équipes – Tacen 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne d'Europe K1 par équipes – Tacen 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_European_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e Championnats du monde U23 K1 – Cracovie 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne d'Europe U23 K1 par équipes – Bratislava 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 podium en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1649",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "WK1": {
+     "rang": 32,
+     "ligne": "32e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1649"
+    },
+    "WX1I": {
+     "rang": 35,
+     "ligne": "35e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1649"
+    },
+    "WX1": {
+     "rang": 39,
+     "ligne": "39e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1649"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1649"
+  },
+  {
+   "nom": "CHETOUI Theo",
+   "club": "VAL DE L'INDRE CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 133,
+     "depart": "11:14:40"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion du monde junior K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe juniors K1 – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde juniors C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe juniors K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5660"
+  },
+  {
+   "nom": "CHEVALLIER Felix",
+   "club": "ASSOCIATION VEZERE CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 122,
+     "depart": "11:33:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5657"
+  },
+  {
+   "nom": "COLLET Titouan",
+   "club": "CANOE CLUB DU LIE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 7,
+     "depart": "09:14:40"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "COMBES Irene",
+   "club": "CANOE KAYAK CLUB FRANCE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 11,
+     "depart": "09:09:20"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "COMPAN Charlotte",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 99,
+     "depart": "10:30:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e des championnats d'Europe junior K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/8762"
+  },
+  {
+   "nom": "CORNU Martin",
+   "club": "LANNION CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 65,
+     "depart": "10:10:40"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 158,
+     "depart": "11:52:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe K1 par équipes – Ivrea 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_Paddle_Europe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e Coupe du monde K1 – Vaires-sur-Marne 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_Canoe_Slalom_World_Cup",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 K1 et C1 par équipes – Cracovie 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 K1 – Solkan 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde junior K1 et C1 – 2023 et 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe junior K1 – 2023 et 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 podium en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/4649",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 22,
+     "ligne": "22e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/4649"
+    },
+    "MC1": {
+     "rang": 57,
+     "ligne": "57e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/4649"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/4649"
+  },
+  {
+   "nom": "COTE Marie Lou",
+   "club": "ANNONAY CANOE KAYAK CLUB",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 2,
+     "depart": "09:00:00"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "COURRECH DU PONT Adelie",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 108,
+     "depart": "10:26:40"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 175,
+     "depart": "12:10:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/10042"
+  },
+  {
+   "nom": "COUZI Ameli",
+   "club": "CANOE KAYAK JARNAC SPORTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1D",
+     "dossard": 165,
+     "depart": "11:57:20"
+    }
+   ],
+   "classes": {
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "DAILLE Etienne",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 22,
+     "depart": "09:49:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vainqueur de la Coupe du monde K1, n°1 mondial – 2012",
+     "source": "https://en.wikipedia.org/wiki/%C3%89tienne_Daille",
+     "a_verifier": "même personne que l'engagé de Golbey Épinal ? la page ne cite pas de club",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe K1 par équipes – 2012",
+     "source": "https://en.wikipedia.org/wiki/%C3%89tienne_Daille",
+     "a_verifier": "même personne ?",
+     "type": "titre"
+    },
+    {
+     "ligne": "7e des Jeux olympiques de Londres K1 – 2012",
+     "source": "https://en.wikipedia.org/wiki/%C3%89tienne_Daille",
+     "a_verifier": "même personne ?",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde K1 par équipes – 2013",
+     "source": "https://en.wikipedia.org/wiki/%C3%89tienne_Daille",
+     "a_verifier": "même personne ?",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 finale en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1747",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 138,
+     "ligne": "138e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1747"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1747"
+  },
+  {
+   "nom": "DAILLE Viviana",
+   "club": "CKC VALLEE DE L'AIN",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 78,
+     "depart": "10:34:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1356"
+  },
+  {
+   "nom": "DAVY Clément",
+   "club": "F.L.CANOE KAYAK CHALONNES",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 56,
+     "depart": "10:05:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion d'Europe junior K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde juniors kayak-cross individuel – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe juniors kayak-cross individuel – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5676"
+  },
+  {
+   "nom": "DAVY Maxence",
+   "club": "F.L.CANOE KAYAK CHALONNES",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 49,
+     "depart": "10:00:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "DE SCHOUWER Alan",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 15,
+     "depart": "09:04:00"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "DEBLIQUY Elouan",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 64,
+     "depart": "10:04:00"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 150,
+     "depart": "11:42:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe U23 C1 – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde junior C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde junior K1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde U23 C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe junior C1 – 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 34,
+     "ligne": "34e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/5651"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/5651"
+  },
+  {
+   "nom": "DEBLIQUY Mewen",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 151,
+     "depart": "11:50:40"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde C1 par équipes – Penrith 2025",
+     "source": "https://en.wikipedia.org/wiki/Mewen_Debliquy",
+     "type": "titre"
+    },
+    {
+     "ligne": "2e Coupe du monde C1 – Prague 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_Canoe_Slalom_World_Cup",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 C1 – 2022 et 2026",
+     "source": "https://web.archive.org/web/2026/https://www.canoeicf.com/node/98200",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 C1 et K1 par équipes – Cracovie 2026",
+     "source": "https://web.archive.org/web/2026/https://www.canoeicf.com/node/98200",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 C1 – Cracovie 2024",
+     "source": "https://en.wikipedia.org/wiki/Mewen_Debliquy",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe junior C1 – 2020 et 2021",
+     "source": "https://en.wikipedia.org/wiki/Mewen_Debliquy",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 podium en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1634",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 8,
+     "ligne": "8e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1634"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1634"
+  },
+  {
+   "nom": "DELAFOY Corentin",
+   "club": "LANNION CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 5,
+     "depart": "09:10:40"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "DELAHAYE Clara",
+   "club": "TORCY CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 106,
+     "depart": "11:00:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-championne d'Europe junior K1 par équipes – 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe junior K1 par équipes – 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/2786"
+  },
+  {
+   "nom": "DELASSUS Anatole",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 69,
+     "depart": "10:09:20"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 155,
+     "depart": "11:48:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde K1 par équipes – Penrith 2025",
+     "source": "https://en.wikipedia.org/wiki/Anatole_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde kayak-cross – Augsbourg 2022",
+     "source": "https://en.wikipedia.org/wiki/Anatole_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe K1 par équipes – Ivrea 2026",
+     "source": "https://en.wikipedia.org/wiki/Anatole_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueur Coupe du monde K1 – Augsbourg 2025",
+     "source": "https://en.wikipedia.org/wiki/Anatole_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 K1 – 2022 et 2024",
+     "source": "https://en.wikipedia.org/wiki/Anatole_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde junior K1 – 2019",
+     "source": "https://en.wikipedia.org/wiki/Anatole_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "9 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1063",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 2,
+     "ligne": "2e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1063"
+    },
+    "MX1I": {
+     "rang": 60,
+     "ligne": "60e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1063"
+    },
+    "MX1": {
+     "rang": 68,
+     "ligne": "68e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1063"
+    },
+    "MC1": {
+     "rang": 71,
+     "ligne": "71e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1063"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1063"
+  },
+  {
+   "nom": "DELASSUS Doriane",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 117,
+     "depart": "10:49:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 190,
+     "depart": "12:28:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e Championnats du monde C1 par équipes – Oklahoma City 2026",
+     "source": "https://en.wikipedia.org/wiki/Doriane_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne d'Europe C1 – Ivrea 2026",
+     "source": "https://en.wikipedia.org/wiki/Doriane_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e Championnats d'Europe C1 – Vaires-sur-Marne 2025",
+     "source": "https://en.wikipedia.org/wiki/Doriane_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e finale de Coupe du monde C1 – Augsbourg 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_Canoe_Slalom_World_Cup",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne du monde U23 kayak-cross – Foix 2025",
+     "source": "https://en.wikipedia.org/wiki/Doriane_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne olympique de la Jeunesse C1 – Buenos Aires 2018",
+     "source": "https://en.wikipedia.org/wiki/Doriane_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 podium en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1060",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 21,
+     "ligne": "21e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1060"
+    },
+    "WX1": {
+     "rang": 131,
+     "ligne": "131e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1060"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1060"
+  },
+  {
+   "nom": "DELASSUS Marjorie",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 119,
+     "depart": "11:08:00"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 189,
+     "depart": "12:29:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "4e des Jeux olympiques C1 – Tokyo 2020",
+     "source": "https://en.wikipedia.org/wiki/Marjorie_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/Marjorie_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne d'Europe C1 – 2022",
+     "source": "https://en.wikipedia.org/wiki/Marjorie_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe C1 – Tacen 2024",
+     "source": "https://en.wikipedia.org/wiki/Marjorie_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueure de la Coupe du monde kayak-cross contre-la-montre – 2026",
+     "source": "https://en.wikipedia.org/wiki/Marjorie_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne des Jeux européens K1 par équipes – Cracovie 2023",
+     "source": "https://en.wikipedia.org/wiki/Marjorie_Delassus",
+     "type": "titre"
+    },
+    {
+     "ligne": "6 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/420",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 23,
+     "ligne": "23e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/420"
+    },
+    "WX1": {
+     "rang": 32,
+     "ligne": "32e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/420"
+    },
+    "WK1": {
+     "rang": 45,
+     "ligne": "45e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/420"
+    },
+    "WX1I": {
+     "rang": 55,
+     "ligne": "55e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/420"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/420"
+  },
+  {
+   "nom": "DESCOT Valerian",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 143,
+     "depart": "11:29:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5658"
+  },
+  {
+   "nom": "DESVIGNES Theo",
+   "club": "ANGOULEME CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 46,
+     "depart": "09:45:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e finale de Coupe du monde kayak-cross (extreme slalom) – La Seu 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_Canoe_Slalom_World_Cup",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e du classement général de la Coupe du monde kayak-cross (extreme slalom) – 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_Canoe_Slalom_World_Cup",
+     "type": "titre"
+    },
+    {
+     "ligne": "2 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1750",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1750"
+  },
+  {
+   "nom": "ESTANGUET Rozmarina",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 98,
+     "depart": "10:48:00"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 183,
+     "depart": "12:12:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {
+    "WC1": {
+     "rang": 73,
+     "ligne": "73e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/2961"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/2961"
+  },
+  {
+   "nom": "ESTANGUET Titouan",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 70,
+     "depart": "10:14:40"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 154,
+     "depart": "11:46:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe U23 C1 – Épinal 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 K1 et C1 par équipes – Cracovie 2026",
+     "source": "https://web.archive.org/web/2026/https://www.canoeicf.com/node/98200",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e Championnats du monde junior C1 et K1 – Foix 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde junior C1 par équipes – Foix 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde junior C1 et K1 par équipes – Liptovský Mikuláš 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 28,
+     "ligne": "28e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/2968"
+    },
+    "MC1": {
+     "rang": 38,
+     "ligne": "38e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/2968"
+    },
+    "MX1I": {
+     "rang": 52,
+     "ligne": "52e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/2968"
+    },
+    "MX1": {
+     "rang": 62,
+     "ligne": "62e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/2968"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/2968"
+  },
+  {
+   "nom": "ESTANGUET Youlia",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 95,
+     "depart": "10:33:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 182,
+     "depart": "12:18:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Sélectionnée aux championnats du monde U23 C1 – 2026",
+     "source": "https://www.canoeslalom.net/doku.php/en_sportler/spo_24110e",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 75,
+     "ligne": "75e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1659"
+    },
+    "WK1": {
+     "rang": 113,
+     "ligne": "113e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1659"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1659"
+  },
+  {
+   "nom": "FISCHER Adrien",
+   "club": "EAUX VIVES OYONNAX C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 146,
+     "depart": "11:26:40"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde U23 C1 par équipes – 2022",
+     "source": "https://en.wikipedia.org/wiki/2022_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde junior C1 par équipes – 2019",
+     "source": "https://en.wikipedia.org/wiki/2019_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillé de bronze aux championnats du monde junior C1 – 2019",
+     "source": "https://en.wikipedia.org/wiki/2019_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe U23 C1 par équipes – 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueur de la Coupe d'Europe C1 à Bratislava – 2023",
+     "source": "https://paddle-europe.eu/news/last-eca-open-canoe-slalom-european-cup-wins-of-the-year-to-france-slovakia-and-germany-2798",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 finale en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1390",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 51,
+     "ligne": "51e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1390"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1390"
+  },
+  {
+   "nom": "FRANCOISE Achille",
+   "club": "C.K.C. BEAURAINVILLOIS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 6,
+     "depart": "09:16:00"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "GESTIN Nicolas",
+   "club": "CANOE KAYAK DE QUIMPERLE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 159,
+     "depart": "11:49:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion olympique C1 – Paris 2024",
+     "source": "https://en.wikipedia.org/wiki/Nicolas_Gestin",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde C1 – 2025",
+     "source": "https://en.wikipedia.org/wiki/Nicolas_Gestin",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde C1 – 2023",
+     "source": "https://en.wikipedia.org/wiki/Nicolas_Gestin",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde C1 par équipes – 2021, 2023 et 2025",
+     "source": "https://en.wikipedia.org/wiki/Nicolas_Gestin",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe C1 – 2025",
+     "source": "https://en.wikipedia.org/wiki/Nicolas_Gestin",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueur Coupe du monde C1 – Prague 2026",
+     "source": "https://en.wikipedia.org/wiki/Nicolas_Gestin",
+     "type": "titre"
+    },
+    {
+     "ligne": "15 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1009",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 1,
+     "ligne": "1er mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1009"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1009"
+  },
+  {
+   "nom": "GHARBI-LOUYER Morgane",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 10,
+     "depart": "09:05:20"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/10045"
+  },
+  {
+   "nom": "GOLIARD Youri",
+   "club": "CLUB CANOE KAYAK L'ISLOIS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 9,
+     "depart": "09:18:40"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/8945"
+  },
+  {
+   "nom": "GOVART Samael",
+   "club": "CANOE KAYAK MONTREUIL",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 23,
+     "depart": "09:58:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "GRANZOW Fransiska",
+   "club": "KAYAK CLUB DE METZ",
+   "nation": "GER",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 97,
+     "depart": "10:41:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-championne d'Allemagne K1 par équipes – 2022",
+     "source": "https://www.canoeslalom.net/doku.php/en_sportler/spo_15197g",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/2244"
+  },
+  {
+   "nom": "GRAPOTTE Pierre",
+   "club": "EAUX VIVES OYONNAX C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 53,
+     "depart": "09:37:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1120"
+  },
+  {
+   "nom": "GUERIN REDON Marius",
+   "club": "CANOE KAYAK TOULOUSAIN",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 30,
+     "depart": "09:38:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/4460"
+  },
+  {
+   "nom": "GUERNE Antoine",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 135,
+     "depart": "11:20:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5656"
+  },
+  {
+   "nom": "HANRAHAN Jonah",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "GBR",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 61,
+     "depart": "09:30:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde U23 K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe U23 K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde juniors kayak-cross – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe U23 K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 70,
+     "ligne": "70e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/4451"
+    },
+    "MK1": {
+     "rang": 76,
+     "ligne": "76e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/4451"
+    },
+    "MX1I": {
+     "rang": 82,
+     "ligne": "82e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/4451"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/4451"
+  },
+  {
+   "nom": "HELLO Joris",
+   "club": "ORTHEZ NAUTIQUE C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 71,
+     "depart": "10:02:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "2e Coupe du monde kayak-cross – Tacen 2026",
+     "source": "https://dicodusport.fr/blog/angele-hug-et-joris-hello-sur-le-podium-en-coupe-du-monde-de-kayak-cross-a-tacen/",
+     "type": "titre"
+    },
+    {
+     "ligne": "2 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1759",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 30,
+     "ligne": "30e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1759"
+    },
+    "MX1I": {
+     "rang": 48,
+     "ligne": "48e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1759"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1759"
+  },
+  {
+   "nom": "HUET Theo",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 14,
+     "depart": "09:13:20"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "HUGUENIN Nathan",
+   "club": "TORCY CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 54,
+     "depart": "09:26:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/6452"
+  },
+  {
+   "nom": "JACOB Lucas",
+   "club": "ASS. SPORTIVE MANTAISE",
+   "nation": "POR",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 34,
+     "depart": "09:41:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Sélectionné pour le Portugal aux Jeux européens de Cracovie – 2023",
+     "source": "https://www.record.pt/modalidades/jogos-europeus/detalhe/lucas-jacob-fica-se-pelas-eliminatorias-de-kayak-cross-nos-jogos-europeus",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 98,
+     "ligne": "98e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/2604"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/2604"
+  },
+  {
+   "nom": "JOUBERT Perrine",
+   "club": "EAUX VIVES OYONNAX C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 100,
+     "depart": "10:45:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 178,
+     "depart": "12:13:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1791"
+  },
+  {
+   "nom": "JUNG Britta",
+   "club": "KAYAK CLUB DE METZ",
+   "nation": "GER",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 107,
+     "depart": "10:36:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Championne d'Europe junior de kayak-cross – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior de kayak-cross – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde et d'Europe junior K1 par équipes – 2026",
+     "source": "https://www.canoeslalom.net/doku.php/en_sportler/spo_15305j",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde junior de kayak-cross individuel – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7767"
+  },
+  {
+   "nom": "LALY Laurette",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 105,
+     "depart": "10:57:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 184,
+     "depart": "12:09:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Championne d'Europe junior C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne d'Europe junior de kayak-cross – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe junior K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WX1": {
+     "rang": 77,
+     "ligne": "77e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/5650"
+    },
+    "WX1I": {
+     "rang": 80,
+     "ligne": "80e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/5650"
+    },
+    "WC1": {
+     "rang": 105,
+     "ligne": "105e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/5650"
+    },
+    "WK1": {
+     "rang": 124,
+     "ligne": "124e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/5650"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/5650"
+  },
+  {
+   "nom": "LAPEZE Margot",
+   "club": "ORTHEZ NAUTIQUE C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 114,
+     "depart": "11:02:40"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 186,
+     "depart": "12:01:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Championne d'Europe junior C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior C1 par équipes – 2024 et 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde juniors C1 – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde juniors K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WX1I": {
+     "rang": 92,
+     "ligne": "92e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/6435"
+    },
+    "WK1": {
+     "rang": 95,
+     "ligne": "95e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/6435"
+    },
+    "WX1": {
+     "rang": 101,
+     "ligne": "101e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/6435"
+    },
+    "WC1": {
+     "rang": 108,
+     "ligne": "108e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/6435"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/6435"
+  },
+  {
+   "nom": "LATIMIER Hugo",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 149,
+     "depart": "11:24:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1391"
+  },
+  {
+   "nom": "LATIMIER Jules",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 161,
+     "depart": "11:37:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {
+    "MC1": {
+     "rang": 68,
+     "ligne": "68e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/6000"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/6000"
+  },
+  {
+   "nom": "LATIMIER Lucas",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 68,
+     "depart": "10:01:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vainqueur du kayak-cross de la manche ICF de classement mondial d'Épinal – 2025",
+     "source": "https://paddleworldwide.com/news/de-coster-and-cornu-continue-fine-form-icf-canoe-slalom-world-ranking-event-epinal",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 38,
+     "ligne": "38e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1446"
+    },
+    "MX1I": {
+     "rang": 67,
+     "ligne": "67e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1446"
+    },
+    "MK1": {
+     "rang": 123,
+     "ligne": "123e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1446"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1446"
+  },
+  {
+   "nom": "LAURENT Zoe",
+   "club": "ANCERVILLE-BAR LE DUC",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 113,
+     "depart": "11:04:00"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 188,
+     "depart": "12:24:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e des championnats du monde U23 C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe U23 C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/4841"
+  },
+  {
+   "nom": "LE GUEN Jonas",
+   "club": "LANNION CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 32,
+     "depart": "09:24:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "LE MEUR Glen",
+   "club": "CANOE KAYAK DU PAYS DE BROCELIANDE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 141,
+     "depart": "11:28:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1632"
+  },
+  {
+   "nom": "LE TOUZE Liam",
+   "club": "LANNION CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 48,
+     "depart": "09:40:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion du monde junior K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe juniors K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/6213"
+  },
+  {
+   "nom": "LEBLOND Yvan",
+   "club": "C.K.C. BEAURAINVILLOIS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 132,
+     "depart": "11:16:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "LEROY Callie",
+   "club": "C.K.C. BEAURAINVILLOIS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 79,
+     "depart": "10:20:00"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 172,
+     "depart": "12:06:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "LESCHES Laura",
+   "club": "CANOE KAYAK TAIN TOURNON",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 89,
+     "depart": "10:29:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "MADORE Mathurin",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 66,
+     "depart": "10:13:20"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 123,
+     "depart": "11:45:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion du monde kayak-cross – Penrith 2025",
+     "source": "https://en.wikipedia.org/wiki/Mathurin_Mador%C3%A9",
+     "type": "titre"
+    },
+    {
+     "ligne": "Double vice-champion d'Europe kayak-cross (cross et contre-la-montre) – Ivrea 2026",
+     "source": "https://en.wikipedia.org/wiki/Mathurin_Mador%C3%A9",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe kayak-cross contre-la-montre – Vaires-sur-Marne 2025",
+     "source": "https://en.wikipedia.org/wiki/Mathurin_Mador%C3%A9",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe K1 par équipes – Prague 2020",
+     "source": "https://en.wikipedia.org/wiki/Mathurin_Mador%C3%A9",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueur Coupe du monde kayak-cross – Augsbourg 2024 et Tacen 2025",
+     "source": "https://en.wikipedia.org/wiki/Mathurin_Mador%C3%A9",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 K1 par équipes – 2018 et 2019",
+     "source": "https://en.wikipedia.org/wiki/Mathurin_Mador%C3%A9",
+     "type": "titre"
+    },
+    {
+     "ligne": "12 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/492",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 3,
+     "ligne": "3e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/492"
+    },
+    "MX1I": {
+     "rang": 6,
+     "ligne": "6e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/492"
+    },
+    "MK1": {
+     "rang": 21,
+     "ligne": "21e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/492"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/492"
+  },
+  {
+   "nom": "MALARD Arthur",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 16,
+     "depart": "09:17:20"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "MALVAL Zoe",
+   "club": "CANOE KAYAK CLISSON",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 76,
+     "depart": "10:44:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "MARGERIE Romain",
+   "club": "J.S.P.A. MAYENNE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 37,
+     "depart": "09:36:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "MARTEIL Valentin",
+   "club": "EAUX VIVES OYONNAX C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 152,
+     "depart": "11:30:40"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/969"
+  },
+  {
+   "nom": "MEGRET Lou",
+   "club": "CANOE KAYAK MONTREUIL",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 13,
+     "depart": "09:08:00"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "MENUAT Cyrian",
+   "club": "CANOE KAYAK CLUB DE MEHUN",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 140,
+     "depart": "11:40:00"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion d'Europe junior C1 – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde junior C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7115"
+  },
+  {
+   "nom": "MESNIL Gabin",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 4,
+     "depart": "09:02:40"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7863"
+  },
+  {
+   "nom": "METAY Maxime",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 130,
+     "depart": "11:25:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/6200"
+  },
+  {
+   "nom": "NARDUZZI Ester",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1D",
+     "dossard": 170,
+     "depart": "12:17:20"
+    }
+   ],
+   "classes": {
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/4440"
+  },
+  {
+   "nom": "OTEIZA Unai",
+   "club": "UR TIPULA",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 72,
+     "depart": "09:48:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe U23 K1 – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 95,
+     "ligne": "95e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/5072"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/5072"
+  },
+  {
+   "nom": "OULHEN Corentin",
+   "club": "LES ALLIGATORS - LANDERNEAU",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 139,
+     "depart": "11:38:40"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "PAJAUD Julien",
+   "club": "CADPA HUNINGUE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 73,
+     "depart": "10:12:00"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 144,
+     "depart": "11:22:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde junior K1 par équipes – 2018",
+     "source": "https://en.wikipedia.org/wiki/2018_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe junior K1 par équipes – 2018",
+     "source": "https://en.wikipedia.org/wiki/2018_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 58,
+     "ligne": "58e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/673"
+    },
+    "MX1I": {
+     "rang": 126,
+     "ligne": "126e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/673"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/673"
+  },
+  {
+   "nom": "PELLICER Laura",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "AND",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 103,
+     "depart": "10:53:20"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 174,
+     "depart": "12:14:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Représente Andorre aux Jeux européens (K1, C1, kayak-cross) – 2023",
+     "source": "https://en.wikipedia.org/wiki/Andorra_at_the_2023_European_Games",
+     "type": "titre"
+    },
+    {
+     "ligne": "Jeux olympiques de la jeunesse de Nankin K1 – 2014",
+     "source": "https://en.wikipedia.org/wiki/Andorra_at_the_2014_Summer_Youth_Olympics",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 77,
+     "ligne": "77e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/394"
+    },
+    "WK1": {
+     "rang": 85,
+     "ligne": "85e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/394"
+    },
+    "WX1": {
+     "rang": 113,
+     "ligne": "113e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/394"
+    },
+    "WX1I": {
+     "rang": 114,
+     "ligne": "114e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/394"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/394"
+  },
+  {
+   "nom": "PERREAU Leni",
+   "club": "TORCY CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 58,
+     "depart": "09:28:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {
+    "MK1": {
+     "rang": 88,
+     "ligne": "88e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/5670"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/5670"
+  },
+  {
+   "nom": "PERRIN Margot",
+   "club": "C.K.C. NANCY TOMBLAINE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 93,
+     "depart": "10:28:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "PESCE-ROUE Nina",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 120,
+     "depart": "11:06:40"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 193,
+     "depart": "12:22:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Championne d'Europe U23 kayak-cross – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior kayak-cross – 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne d'Europe U23 K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde U23 K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillée de bronze aux championnats du monde U23 C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 43,
+     "ligne": "43e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/5644"
+    },
+    "WK1": {
+     "rang": 60,
+     "ligne": "60e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/5644"
+    },
+    "WX1I": {
+     "rang": 72,
+     "ligne": "72e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/5644"
+    },
+    "WX1": {
+     "rang": 91,
+     "ligne": "91e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/5644"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/5644"
+  },
+  {
+   "nom": "PETIT Tao",
+   "club": "C.K.C. BEAURAINVILLOIS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 36,
+     "depart": "09:57:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-champion d'Europe junior K1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7760"
+  },
+  {
+   "nom": "PICHARD Honorine",
+   "club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 87,
+     "depart": "10:32:00"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 180,
+     "depart": "12:00:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Sélectionnée aux championnats du monde et d'Europe juniors – 2025",
+     "source": "https://www.canoeslalom.net/doku.php/en_sportler/spo_23162p",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/6207"
+  },
+  {
+   "nom": "PIEL Jules",
+   "club": "KAYAK CLUB DE RENNES",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 12,
+     "depart": "09:01:20"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "POUILLY Emma",
+   "club": "C.K.C. BEAURAINVILLOIS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 88,
+     "depart": "10:24:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "PRIGENT Camille",
+   "club": "KAYAK CLUB DE RENNES",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 94,
+     "depart": "11:09:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-championne du monde kayak-cross – 2023 et 2025",
+     "source": "https://en.wikipedia.org/wiki/Camille_Prigent",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne du monde K1 par équipes – 2018",
+     "source": "https://en.wikipedia.org/wiki/Camille_Prigent",
+     "type": "titre"
+    },
+    {
+     "ligne": "Double championne d'Europe kayak-cross (cross et contre-la-montre) – Vaires-sur-Marne 2025",
+     "source": "https://en.wikipedia.org/wiki/Camille_Prigent",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vainqueure de la Coupe du monde kayak-cross – 2026 (contre-la-montre en 2025)",
+     "source": "https://en.wikipedia.org/wiki/Camille_Prigent",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne du monde U23 K1 – 2018",
+     "source": "https://en.wikipedia.org/wiki/Camille_Prigent",
+     "type": "titre"
+    },
+    {
+     "ligne": "Championne olympique de la jeunesse K1 – Nankin 2014",
+     "source": "https://en.wikipedia.org/wiki/Camille_Prigent",
+     "type": "titre"
+    },
+    {
+     "ligne": "23 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/319",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "WX1": {
+     "rang": 3,
+     "ligne": "3e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/319"
+    },
+    "WK1": {
+     "rang": 5,
+     "ligne": "5e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/319"
+    },
+    "WX1I": {
+     "rang": 6,
+     "ligne": "6e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/319"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/319"
+  },
+  {
+   "nom": "QUEMERAIS Léna",
+   "club": "LANNION CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 111,
+     "depart": "10:46:40"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 187,
+     "depart": "12:25:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-championne du monde junior C1 – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior C1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats d'Europe U23 de kayak-cross – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde junior K1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "WC1": {
+     "rang": 78,
+     "ligne": "78e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/4844"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/4844"
+  },
+  {
+   "nom": "REGNIER Hugo",
+   "club": "KAYAK CLUB DE RENNES",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 38,
+     "depart": "09:32:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "REGNIER Romane",
+   "club": "KAYAK CLUB DE RENNES",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 102,
+     "depart": "10:52:00"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 181,
+     "depart": "12:16:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Vice-championne d'Europe junior K1 par équipes – 2021",
+     "source": "https://en.wikipedia.org/wiki/2021_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/1655"
+  },
+  {
+   "nom": "RENOUX Amal",
+   "club": "RED STAR CLUB CHAMPIGNY",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 90,
+     "depart": "10:38:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/10044"
+  },
+  {
+   "nom": "RIVAL-NEGREVERGNE Quentin",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 45,
+     "depart": "09:53:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/4447"
+  },
+  {
+   "nom": "ROUX Adeline",
+   "club": "EAUX VIVES OYONNAX C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 104,
+     "depart": "11:01:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "ROYE Léo",
+   "club": "TORCY CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 41,
+     "depart": "09:46:40"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 142,
+     "depart": "11:34:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe junior C1 – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde junior K1 – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde junior K1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "3e des championnats du monde juniors C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7062"
+  },
+  {
+   "nom": "ROYE Mathilde",
+   "club": "TORCY CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1D",
+     "dossard": 168,
+     "depart": "12:04:00"
+    }
+   ],
+   "classes": {
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "SAUT-DICKENS Avril",
+   "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 86,
+     "depart": "10:21:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": null
+  },
+  {
+   "nom": "SEDRUE Clara",
+   "club": "CANOE KAYAK JARNAC SPORTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1D",
+     "dossard": 173,
+     "depart": "12:05:20"
+    }
+   ],
+   "classes": {
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7125"
+  },
+  {
+   "nom": "SENECHAULT Mathéo",
+   "club": "CANOE KAYAK CLUB FRANCE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 148,
+     "depart": "11:18:40"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde junior C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe junior C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/5654"
+  },
+  {
+   "nom": "SENECHAULT Yohann",
+   "club": "CANOE KAYAK CLUB FRANCE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 18,
+     "depart": "09:44:00"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 157,
+     "depart": "11:53:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion d'Europe C1 – Ivrea 2026",
+     "source": "https://en.wikipedia.org/wiki/Yohann_Senechault",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde C1 par équipes – Penrith 2025",
+     "source": "https://en.wikipedia.org/wiki/Yohann_Senechault",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/Yohann_Senechault",
+     "type": "titre"
+    },
+    {
+     "ligne": "2e Coupe du monde C1 – Ivrea 2024, Pau et Tacen 2025",
+     "source": "https://en.wikipedia.org/wiki/Yohann_Senechault",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde U23 C1 – 2024",
+     "source": "https://en.wikipedia.org/wiki/Yohann_Senechault",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 C1 – 2023",
+     "source": "https://en.wikipedia.org/wiki/Yohann_Senechault",
+     "type": "titre"
+    },
+    {
+     "ligne": "4 podiums en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/1621",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 3,
+     "ligne": "3e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/1621"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1621"
+  },
+  {
+   "nom": "SILVIN Marie Amelie",
+   "club": "CANOE KAYAK HAUTE ISERE",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 116,
+     "depart": "10:54:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [],
+   "rangs": {
+    "WK1": {
+     "rang": 122,
+     "ligne": "122e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/2517"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/2517"
+  },
+  {
+   "nom": "SOUDI Mathis",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "MAR",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 50,
+     "depart": "09:54:40"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e Championnats du monde K1 – Londres 2023 (premier médaillé africain aux Mondiaux)",
+     "source": "https://en.wikipedia.org/wiki/Mathis_Soudi",
+     "type": "titre"
+    },
+    {
+     "ligne": "Olympien : 16e K1 – Paris 2024",
+     "source": "https://en.wikipedia.org/wiki/Mathis_Soudi",
+     "type": "titre"
+    },
+    {
+     "ligne": "Olympien : 18e K1 – Tokyo 2020",
+     "source": "https://en.wikipedia.org/wiki/Mathis_Soudi",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaille d'or aux Championnats arabes – Égypte 2019",
+     "source": "https://fr.wikipedia.org/wiki/Mathis_Soudi",
+     "type": "titre"
+    },
+    {
+     "ligne": "1 podium en Coupe du monde et aux Mondiaux",
+     "source": "https://www.metaslalom.com/paddlers/556",
+     "type": "compteur"
+    }
+   ],
+   "rangs": {
+    "MK1": {
+     "rang": 75,
+     "ligne": "75e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/556"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/556"
+  },
+  {
+   "nom": "TRIOMPHE Ianis",
+   "club": "CHAMBERY LE BOURGET CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 60,
+     "depart": "09:52:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde U23 kayak-cross – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 kayak-cross – 2026",
+     "source": "https://dicodusport.fr/blog/lequipe-de-france-cartonne-aux-championnats-deurope-jeunes-de-canoe-kayak-slalom-a-epinal/",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillé de bronze aux championnats d'Europe kayak-cross – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillé de bronze aux championnats d'Europe U23 kayak-cross – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion du monde junior K1 par équipes – 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 33,
+     "ligne": "33e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/2969"
+    },
+    "MX1I": {
+     "rang": 34,
+     "ligne": "34e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/2969"
+    },
+    "MK1": {
+     "rang": 93,
+     "ligne": "93e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/2969"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/2969"
+  },
+  {
+   "nom": "TRIOMPHE Timeo",
+   "club": "CHAMBERY LE BOURGET CANOE KAYAK",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 40,
+     "depart": "09:50:40"
+    },
+    {
+     "cat": "C1H",
+     "dossard": 138,
+     "depart": "11:32:00"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1",
+    "C1H": "MC1"
+   },
+   "palmares": [],
+   "rangs": {
+    "MC1": {
+     "rang": 106,
+     "ligne": "106e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/6487"
+    },
+    "MX1I": {
+     "rang": 125,
+     "ligne": "125e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/6487"
+    },
+    "MX1": {
+     "rang": 145,
+     "ligne": "145e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/6487"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/6487"
+  },
+  {
+   "nom": "ULMER Leo",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "C1H",
+     "dossard": 153,
+     "depart": "11:41:20"
+    }
+   ],
+   "classes": {
+    "C1H": "MC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde junior C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe junior C1 par équipes – 2025",
+     "source": "https://en.wikipedia.org/wiki/2025_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MC1": {
+     "rang": 116,
+     "ligne": "116e mondial C1",
+     "source": "https://www.metaslalom.com/paddlers/5661"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/5661"
+  },
+  {
+   "nom": "ULMER Lili",
+   "club": "GOLBEY EPINAL ST NABORD",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 77,
+     "depart": "10:50:40"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 177,
+     "depart": "11:58:40"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [
+    {
+     "ligne": "Championne d'Europe junior C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-championne du monde junior C1 par équipes – 2026",
+     "source": "https://en.wikipedia.org/wiki/2026_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7804"
+  },
+  {
+   "nom": "VRIGNAUD Ana",
+   "club": "CANOE KAYAK JARNAC SPORTS",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "INV",
+     "dossard": 3,
+     "depart": "09:06:40"
+    }
+   ],
+   "classes": {
+    "INV": null
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7129"
+  },
+  {
+   "nom": "VUILLEUMIER Lou Ann",
+   "club": "SPCOC LA COLLE SUR LOUP",
+   "nation": "SUI",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 91,
+     "depart": "10:18:40"
+    },
+    {
+     "cat": "C1D",
+     "dossard": 171,
+     "depart": "12:08:00"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1",
+    "C1D": "WC1"
+   },
+   "palmares": [],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/7127"
+  },
+  {
+   "nom": "VUITTON Camille",
+   "club": "MURET OLYMPIQUE C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1D",
+     "dossard": 110,
+     "depart": "11:05:20"
+    }
+   ],
+   "classes": {
+    "K1D": "WK1"
+   },
+   "palmares": [
+    {
+     "ligne": "3e des championnats du monde juniors K1 par équipes – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {},
+   "metaslalom": "https://www.metaslalom.com/paddlers/4439"
+  },
+  {
+   "nom": "VUITTON Leo",
+   "club": "MURET OLYMPIQUE C.K.",
+   "nation": "FRA",
+   "engagements": [
+    {
+     "cat": "K1H",
+     "dossard": 67,
+     "depart": "09:33:20"
+    }
+   ],
+   "classes": {
+    "K1H": "MK1"
+   },
+   "palmares": [
+    {
+     "ligne": "Champion du monde U23 K1 – 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion du monde U23 K1 par équipes – 2023 et 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_World_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Champion d'Europe U23 kayak-cross – 2024",
+     "source": "https://paddle-europe.eu/news/french-domination-in-kayak-cross-individual-race-3033",
+     "type": "titre"
+    },
+    {
+     "ligne": "Vice-champion d'Europe U23 K1 – 2024",
+     "source": "https://en.wikipedia.org/wiki/2024_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    },
+    {
+     "ligne": "Médaillé de bronze aux championnats d'Europe U23 K1 – 2023",
+     "source": "https://en.wikipedia.org/wiki/2023_European_Junior_and_U23_Canoe_Slalom_Championships",
+     "type": "titre"
+    }
+   ],
+   "rangs": {
+    "MX1": {
+     "rang": 39,
+     "ligne": "39e mondial kayak-cross",
+     "source": "https://www.metaslalom.com/paddlers/1786"
+    },
+    "MK1": {
+     "rang": 52,
+     "ligne": "52e mondial K1",
+     "source": "https://www.metaslalom.com/paddlers/1786"
+    },
+    "MX1I": {
+     "rang": 85,
+     "ligne": "85e mondial kayak-cross individuel",
+     "source": "https://www.metaslalom.com/paddlers/1786"
+    }
+   },
+   "metaslalom": "https://www.metaslalom.com/paddlers/1786"
+  }
+ ]
+}

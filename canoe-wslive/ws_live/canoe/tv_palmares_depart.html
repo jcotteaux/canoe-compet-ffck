@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>TV Palmarès au départ</title>
+
+	<link rel="shortcut icon" href="./16x16_ffck.png" />
+	<link rel="icon" href="./16x16_ffck.png" />
+
+	<link href="./css/tv_palmares_depart.css?v1" rel="stylesheet">
+</head>
+
+<!--
+	Au départ : le palmarès du prochain partant, en carte en haut à gauche
+	(l'écran de course tv_inrace tient le bas de l'image). La carte entre
+	?avant= s avant son heure de départ et sort ?coupe= s avant, quand il
+	s'élance. Le palmarès vient de palmares/palmares_slalom.json.
+	Voir js/tv_palmares_depart.js.
+-->
+<body>
+	<div id="scene">
+		<div id="carte">
+			<div id="c_tete">
+				<div id="c_dossard"></div>
+				<div id="c_ident">
+					<div id="c_nom"></div>
+					<div id="c_club"><span id="c_club_nom"></span><span id="c_cat"></span></div>
+				</div>
+				<div id="c_rebours"><span>Départ</span><b id="c_rebours_val"></b></div>
+			</div>
+			<ul id="c_palmares"></ul>
+		</div>
+	</div>
+
+	<script src="../adv/ws_params.js"></script>
+	<script src="../adv/ws.js?v4"></script>
+	<script src="../adv/adv.js"></script>
+	<script src="../adv/adv_table.js"></script>
+	<script src="../adv/canoe.js"></script>
+
+	<script src="./js/categories.js?v2"></script>
+	<script src="./js/tv_palmares_depart.js?v2"></script>
+
+	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
+</body>
+</html>

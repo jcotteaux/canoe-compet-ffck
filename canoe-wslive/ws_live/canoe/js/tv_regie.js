@@ -26,6 +26,9 @@
  *              en plein cadre),
  *              tv_inrace sinon (voir regie_scenarios.js) ;
  *   (catégories suivantes : titre, liste de départ, course 40 s avant)
+ *   palmares   (scénario avec palmares) pendant la course, par-dessus : la carte
+ *              du prochain partant, de `avant` à `coupe` s avant son départ
+ *              (tv_palmares_depart, palmares/palmares_slalom.json) ;
  *   resultats  la catégorie finie : son classement (tv_results), puis titre
  *              de la suivante, sa liste de départ, et retour à la course ;
  *   fin        après la dernière catégorie : la couleur de clé, les caméras.
@@ -738,8 +741,10 @@ function Montrer(s)
 		       : s.vue === 'duo_kx' ? 'c_duo_kx' : s.vue === 'plein_kx' ? 'c_plein_kx' : 'c_duo',
 	}[s.nom];
 
+	// Le palmarès du prochain partant se superpose à l'écran de course.
+	const palmares = s.nom === 'course' && !!regie.scenario.palmares;
 	document.querySelectorAll('.couche').forEach(function(el) {
-		el.classList.toggle('visible', el.id === couche);
+		el.classList.toggle('visible', el.id === couche || (palmares && el.id === 'c_palmares'));
 	});
 
 	// Les animations d'entrée repartent à chaque apparition.
@@ -1069,6 +1074,15 @@ function Init()
 	document.querySelector('#c_duo_kx iframe').src = 'tv_duo_kx.html' + q;
 	document.querySelector('#c_plein_kx iframe').src = 'tv_duo_kx.html' + q + '&plein=1';
 	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html' + q;
+	// Palmarès au départ : transparent, posé sur l'écran de course ; il entre
+	// `avant` s avant chaque départ et sort `coupe` s avant.
+	if (regie.scenario.palmares)
+	{
+		const p = regie.scenario.palmares;
+		document.querySelector('#c_palmares iframe').src = 'tv_palmares_depart.html?bg=0'
+			+ (regie.reglages.anim ? '' : '&anim=0')
+			+ '&avant=' + (p.avant || 60) + '&coupe=' + (p.coupe || 5);
+	}
 
 	Redimensionner();
 	window.addEventListener('resize', Redimensionner);

@@ -11,6 +11,10 @@
  *   libelle   nom affiché sur les titres
  *   depart    heure du premier départ, fin : heure du dernier départ
  *   nb        nombre de bateaux
+ * palmares : { avant : 60, coupe : 5 } — pendant la course, la carte du
+ *   prochain partant et son palmarès (tv_palmares_depart), de `avant` à
+ *   `coupe` s avant son départ.
+ *
  *   vue       'duo', 'duo_kx' (tv_duo_kx, contre-la-montre kayak-cross),
  *             'plein_kx' (tv_duo_kx?plein=1 : une caméra plein cadre, macro
  *             « Plein ecran » de l'ATEM),
@@ -101,6 +105,8 @@ const REGIE_SCENARIOS = {
 		titre : 'Championnats de France Elite Slalom',
 		phase : 'Finales',
 		date : '2026-10-18',
+		// Le palmarès du prochain partant, au départ : 60 s avant, coupé 5 s avant.
+		palmares : { avant : 60, coupe : 5 },
 		categories : [
 			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '14:00:00', fin : '14:22:00', nb : 12 },
 			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '14:28:00', fin : '14:50:00', nb : 12 },

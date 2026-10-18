@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Vérification des palmarès</title>
+	<link rel="icon" href="./16x16_ffck.png" />
+	<style>
+		:root { --fond: #0d1230; --carte: #161d4a; --ligne: #232c66; --texte: #eef2ff; --doux: #9fb0de; --bleu: #097AFF; --or: #F2C200; --rouge: #E8202A; }
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--fond); color: var(--texte); font: 15px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+		header { position: sticky; top: 0; z-index: 2; background: #0a0e26; padding: 12px 16px; border-bottom: 1px solid var(--ligne); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+		h1 { margin: 0 12px 0 0; font-size: 18px; }
+		.onglets { display: flex; flex-wrap: wrap; gap: 4px; }
+		.onglets button { background: var(--carte); color: var(--texte); border: 1px solid var(--ligne); padding: 6px 12px; border-radius: 6px; cursor: pointer; font: inherit; }
+		.onglets button.actif { background: var(--bleu); border-color: var(--bleu); }
+		input[type=search] { flex: 1 1 200px; min-width: 0; background: var(--carte); color: var(--texte); border: 1px solid var(--ligne); border-radius: 6px; padding: 7px 10px; font: inherit; }
+		#stats { color: var(--doux); font-size: 13px; width: 100%; }
+		main { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 16px; padding: 16px; }
+		@media (max-width: 1100px) { main { grid-template-columns: 1fr; } #apercu { position: static !important; } }
+		.ath { background: var(--carte); border: 1px solid var(--ligne); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; }
+		.ath:hover, .ath.choisi { border-color: var(--bleu); }
+		.ath.vide { opacity: 0.7; }
+		.tete { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+		.nom { font-weight: 700; font-size: 16px; }
+		.club { color: var(--doux); font-size: 13px; }
+		.eng { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+		.eng span { background: #26307a; padding: 1px 7px; border-radius: 4px; font-size: 12px; white-space: nowrap; }
+		.nation { background: var(--rouge); padding: 0 6px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+		ul { margin: 6px 0 0; padding-left: 18px; }
+		li { margin: 2px 0; }
+		li .src { color: var(--doux); font-size: 12px; margin-left: 6px; word-break: break-all; }
+		li.compteur, li.rang { color: #cfd8f7; }
+		li .tag { font-size: 11px; color: var(--or); margin-right: 6px; text-transform: uppercase; }
+		li.douteux { color: #ff9a9a; }
+		li.douteux .tag { color: var(--rouge); }
+		.rien { color: var(--doux); font-style: italic; margin-top: 4px; }
+		a { color: #7fb4ff; }
+		#apercu { position: sticky; top: 90px; align-self: start; }
+		#apercu .cadre { width: 100%; aspect-ratio: 16 / 9; background: #CC00CC; border-radius: 6px; overflow: hidden; }
+		#apercu iframe { width: 100%; height: 100%; border: 0; }
+		#apercu p { color: var(--doux); font-size: 13px; }
+	</style>
+</head>
+<body>
+	<header>
+		<h1>Palmarès — vérification</h1>
+		<div class="onglets" id="onglets"></div>
+		<input type="search" id="cherche" placeholder="Rechercher un nom, un club…" />
+		<div id="stats"></div>
+	</header>
+	<main>
+		<section id="liste"></section>
+		<aside id="apercu">
+			<div class="cadre"><iframe id="cadre" title="aperçu à l'antenne"></iframe></div>
+			<p>Cliquer sur un athlète : sa carte telle qu'elle passe à l'antenne au départ (catégorie de l'onglet, sinon sa première). Les lignes viennent de
+				<code>palmares/palmares_slalom.json</code> ; chaque ligne garde sa source. Fichier relu à chaque chargement de cette page.</p>
+		</aside>
+	</main>
+
+<script>
+	const CATS = ['Tous', 'K1H', 'K1D', 'C1H', 'C1D', 'INV'];
+	const CLASSE = { K1H : 'MK1', K1D : 'WK1', C1H : 'MC1', C1D : 'WC1' };
+	let doc = null, onglet = 'Tous', choisi = null;
+
+	const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&' : '&amp;', '<' : '&lt;', '>' : '&gt;', '"' : '&quot;' })[c]);
+
+	function rendre() {
+		const q = document.getElementById('cherche').value.trim().toLowerCase();
+		const liste = doc.athletes.filter((a) => (onglet === 'Tous' || a.engagements.some((e) => e.cat === onglet))
+			&& (!q || (a.nom + ' ' + a.club).toLowerCase().includes(q)));
+		// Dans un onglet de catégorie : l'ordre de départ des demi-finales.
+		if (onglet !== 'Tous')
+			liste.sort((x, y) => x.engagements.find((e) => e.cat === onglet).depart.localeCompare(y.engagements.find((e) => e.cat === onglet).depart));
+
+		const avec = liste.filter((a) => a.palmares.length || Object.keys(a.rangs).length).length;
+		document.getElementById('stats').textContent = `${liste.length} athlètes · ${avec} avec au moins une ligne · ${liste.length - avec} sans · mis à jour ${doc.maj}`;
+
+		document.getElementById('liste').innerHTML = liste.map((a) => {
+			const lignes = a.palmares.map((p) => `<li class="${esc(p.type)}${p.a_verifier ? ' douteux' : ''}" title="${esc(p.a_verifier || '')}"><span class="tag">${p.a_verifier ? 'à vérifier — hors antenne' : p.type === 'compteur' ? 'MetaSlalom' : 'titre'}</span>${esc(p.ligne)}${p.a_verifier ? ` <em>(${esc(p.a_verifier)})</em>` : ''}${p.source ? ` <a class="src" href="${esc(p.source)}" target="_blank" rel="noopener">${esc(p.source)}</a>` : ''}</li>`)
+				.concat(Object.entries(a.rangs).map(([c, r]) => `<li class="rang"><span class="tag">rang ${esc(c)}</span>${esc(r.ligne)}</li>`));
+			const vide = lignes.length === 0;
+			return `<div class="ath${vide ? ' vide' : ''}${choisi === a ? ' choisi' : ''}" data-nom="${esc(a.nom)}">
+				<div class="tete">
+					<span class="nom">${esc(a.nom)}</span>
+					${a.nation && a.nation !== 'FRA' ? `<span class="nation">${esc(a.nation)}</span>` : ''}
+					<span class="club">${esc(a.club)}</span>
+					<span class="eng">${a.engagements.map((e) => `<span>${esc(e.cat)} n°${e.dossard} · ${esc(e.depart.slice(0, 5))}</span>`).join('')}</span>
+				</div>
+				${vide ? '<div class="rien">Aucun palmarès trouvé : la carte montrera le bateau seul.</div>' : `<ul>${lignes.join('')}</ul>`}
+				${a.metaslalom ? `<div class="club"><a href="${esc(a.metaslalom)}" target="_blank" rel="noopener">fiche MetaSlalom</a></div>` : ''}
+			</div>`;
+		}).join('');
+
+		document.querySelectorAll('.ath').forEach((el) => el.addEventListener('click', () => {
+			choisi = doc.athletes.find((a) => a.nom === el.dataset.nom);
+			const cat = onglet !== 'Tous' ? onglet : choisi.engagements[0].cat;
+			document.getElementById('cadre').src = `tv_palmares_depart.html?bg=1&apercu=${encodeURIComponent(choisi.nom)}&cat=${encodeURIComponent(cat)}`;
+			document.querySelectorAll('.ath').forEach((x) => x.classList.toggle('choisi', x === el));
+		}));
+	}
+
+	document.getElementById('onglets').innerHTML = CATS.map((c) => `<button data-c="${c}" class="${c === onglet ? 'actif' : ''}">${c}</button>`).join('');
+	document.getElementById('onglets').addEventListener('click', (e) => {
+		const c = e.target.dataset.c;
+		if (!c) return;
+		onglet = c;
+		document.querySelectorAll('#onglets button').forEach((b) => b.classList.toggle('actif', b.dataset.c === c));
+		rendre();
+	});
+	document.getElementById('cherche').addEventListener('input', rendre);
+
+	fetch('palmares/palmares_slalom.json?t=' + Date.now(), { cache : 'no-store' })
+		.then((r) => r.json())
+		.then((j) => { doc = j; rendre(); })
+		.catch((e) => { document.getElementById('liste').textContent = 'palmares_slalom.json illisible : ' + e.message; });
+</script>
+</body>
+</html>

@@ -72,6 +72,27 @@ open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=$SERV
 open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=$SERVEUR:8080"
 ```
 
+### Palmarès au départ (finales du dimanche)
+
+Pendant la course des finales, la régie superpose à l'écran de course la carte
+du **prochain partant** : nom, club, dossard, compte à rebours et palmarès. Elle
+entre 60 s avant son heure de départ et sort 5 s avant (`palmares` dans le
+scénario `dimanche-apres-midi`). Rien à piloter : la carte suit les heures de
+départ de competFFCK.
+
+| page | rôle |
+|---|---|
+| `tv_palmares_depart.html` | la carte seule (`?avant=60&coupe=5&bg=1`) ; `?apercu=NOM Prénom&cat=K1H` la montre en continu |
+| `palmares_verif.html` | **à relire avant l'antenne** : chaque athlète, ses lignes et leur source, l'aperçu de sa carte |
+| `palmares/palmares_slalom.json` | les données, retrouvées par le nom du bateau (accents et casse ignorés) |
+
+Le fichier est fabriqué par `python3 tools/palmares_build.py tools/palmares`, à
+partir de la liste de départ des demi-finales (`depart.txt`), des fiches
+MetaSlalom (`athletes.json` : rang mondial ICF non officiel, compteurs Coupe du
+monde et Mondiaux) et des titres vérifiés (`titres.json`, une source par ligne).
+Corriger une ligne : modifier `titres.json`, relancer le script ; les pages
+relisent le fichier toutes les 30 s.
+
 ### 4. Vérifier au lancement
 
 - **la bonne scène tout de suite** : plus de rose ni de rideau au lancement, la
