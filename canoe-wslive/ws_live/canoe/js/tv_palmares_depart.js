@@ -4,7 +4,9 @@
  * Entre deux bateaux d'une finale, la caméra est sur le départ : on y montre
  * qui va partir et ce qu'il a déjà gagné. La carte entre `avant` secondes
  * avant l'heure de départ du prochain partant et sort `coupe` secondes avant,
- * quand il s'élance : à l'antenne, on ne doit plus voir que lui.
+ * quand il s'élance : à l'antenne, on ne doit plus voir que lui. Tant qu'un
+ * bateau est en course (flux <on_course> de moins de 3 s), pas de carte : la
+ * réalisation suit le bateau, pas le départ.
  *
  * Prochain partant : celui qui n'a ni résultat ni chrono en cours et dont
  * l'heure de départ est la plus proche, d'après le classement de competFFCK
@@ -126,6 +128,7 @@ function OnFlowOnCourse(objJSON)
 	for (let i = 0; i < t.GetNbRows(); i++)
 		surLeau.add(String(t.GetCell('bib', i)));
 	wsMain.surLeau = surLeau;
+	wsMain.surLeauRecu = Date.now();
 
 	const clock = adv.toNumber(objJSON.clock);
 	if (clock !== null && clock > 0)
@@ -215,6 +218,13 @@ function Rafraichir()
 		Remplir({ bib : '', nom : a ? a.nom : wsMain.apercu, club : a ? a.club : '', epreuve : wsMain.apercuCat });
 		document.getElementById('c_rebours_val').textContent = '0:42';
 		Montrer(true);
+		return;
+	}
+
+	// Un bateau en course : l'antenne est à lui. Flux sans nouvelle depuis 3 s : rivière vide.
+	if (wsMain.surLeau.size > 0 && Date.now() - wsMain.surLeauRecu < 3000)
+	{
+		Montrer(false);
 		return;
 	}
 

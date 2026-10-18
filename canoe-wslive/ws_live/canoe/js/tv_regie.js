@@ -1095,7 +1095,7 @@ function Init()
 	if (regie.scenario.palmares)
 	{
 		const p = regie.scenario.palmares;
-		document.querySelector('#c_palmares iframe').src = 'tv_palmares_depart.html?bg=0'
+		document.querySelector('#c_palmares iframe').src = 'tv_palmares_depart.html?v3&bg=0'
 			+ (regie.reglages.anim ? '' : '&anim=0')
 			+ '&avant=' + (p.avant || 60) + '&coupe=' + (p.coupe || 5);
 	}
