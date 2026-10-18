@@ -117,10 +117,10 @@ const REGIE_SCENARIOS = {
 		// 13:55:20 → 13:58:20.
 		speaker : 180,
 		categories : [
-			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '14:00:00', fin : '14:22:00', nb : 12 },
-			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '14:28:00', fin : '14:50:00', nb : 12 },
-			{ epreuve : 'C1H', libelle : 'Canoë Homme',  depart : '14:56:00', fin : '15:18:00', nb : 12 },
-			{ epreuve : 'C1D', libelle : 'Canoë Dame',   depart : '15:24:00', fin : '15:46:00', nb : 12 },
+			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '14:05:00', fin : '14:27:00', nb : 12 },
+			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '14:33:00', fin : '14:55:00', nb : 12 },
+			{ epreuve : 'C1H', libelle : 'Canoë Homme',  depart : '15:01:00', fin : '15:23:00', nb : 12 },
+			{ epreuve : 'C1D', libelle : 'Canoë Dame',   depart : '15:29:00', fin : '15:51:00', nb : 12 },
 		],
 	},
 

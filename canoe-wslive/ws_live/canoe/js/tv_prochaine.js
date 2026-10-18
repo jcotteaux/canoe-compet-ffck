@@ -55,7 +55,7 @@ const SESSIONS_SECOURS = {
 	'samedi-matin'        : { date : '2026-10-17', phase : 'Kayak-Cross — contre-la-montre',  categories : [{ libelle : 'Invités',     depart : '10:15:00' }] },
 	'samedi-apres-midi'   : { date : '2026-10-17', phase : 'Kayak-Cross — phases finales',    categories : [{ libelle : 'Kayak-Cross', depart : '15:00:00' }] },
 	'dimanche-matin'      : { date : '2026-10-18', phase : 'Demi-finales',                    categories : [{ libelle : 'Invités',     depart : '09:00:00' }] },
-	'dimanche-apres-midi' : { date : '2026-10-18', phase : 'Finales',                         categories : [{ libelle : 'Kayak Homme', depart : '14:00:00' }] },
+	'dimanche-apres-midi' : { date : '2026-10-18', phase : 'Finales',                         categories : [{ libelle : 'Kayak Homme', depart : '14:05:00' }] },
 };
 
 /** Les scénarios : ceux de la régie, sinon le secours. */
