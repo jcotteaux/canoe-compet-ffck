@@ -50,7 +50,9 @@ function LireFichier()
 					// La section de la cérémonie, sinon le titre et la phase de l'écran.
 					groupe : c.section || [c.titre || doc.titre, c.phase || doc.phase].filter(Boolean).join(' — '),
 					remis_par : c.remis_par || '',
-					noms : (c.classement || []).slice(0, 3).map(function(r) { return r && r.nom ? String(r.nom) : ''; }),
+					// En direct de competFFCK : les noms viendront de la finale.
+					noms : c.competffck ? ['classement competFFCK ' + c.competffck + (c.places == 1 ? ' (vainqueur)' : '')]
+						: (c.classement || []).slice(0, 3).map(function(r) { return r && r.nom ? String(r.nom) : ''; }),
 				};
 			});
 			Boutons();

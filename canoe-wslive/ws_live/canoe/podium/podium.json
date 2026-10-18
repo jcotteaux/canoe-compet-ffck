@@ -9,7 +9,7 @@
 		"4. Podium du Championnat de France des clubs (classement combiné slalom et kayak-cross 2026 au 31/07) : trophée remis par Sébastien Chaplais, élu à la CNA Slalom",
 		"5. Podium des bénévoles"
 	],
-	"a_completer": "Slalom Elite et champions slalom : après les finales (competFFCK). Coupe de France N1 et bénévoles : noms à fournir. Les lignes « À COMPLÉTER » sont fictives.",
+	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; les noms « À COMPLÉTER » ne servent que tant que competFFCK n'a rien. Coupe de France N1 et bénévoles : à saisir.",
 	"categories": [
 		{
 			"epreuve": "SLA_K1H",
@@ -29,7 +29,8 @@
 					"club": "Club"
 				}
 			],
-			"section": "1. Podiums France Elite Slalom"
+			"section": "1. Podiums France Elite Slalom",
+			"competffck": "K1H"
 		},
 		{
 			"epreuve": "SLA_K1D",
@@ -49,7 +50,8 @@
 					"club": "Club"
 				}
 			],
-			"section": "1. Podiums France Elite Slalom"
+			"section": "1. Podiums France Elite Slalom",
+			"competffck": "K1D"
 		},
 		{
 			"epreuve": "SLA_C1H",
@@ -69,7 +71,8 @@
 					"club": "Club"
 				}
 			],
-			"section": "1. Podiums France Elite Slalom"
+			"section": "1. Podiums France Elite Slalom",
+			"competffck": "C1H"
 		},
 		{
 			"epreuve": "SLA_C1D",
@@ -89,7 +92,8 @@
 					"club": "Club"
 				}
 			],
-			"section": "1. Podiums France Elite Slalom"
+			"section": "1. Podiums France Elite Slalom",
+			"competffck": "C1D"
 		},
 		{
 			"epreuve": "REP_XK1H",
@@ -128,7 +132,9 @@
 					"club": "Club"
 				}
 			],
-			"section": "2. Médailles de la République"
+			"section": "2. Médailles de la République",
+			"competffck": "K1H",
+			"places": 1
 		},
 		{
 			"epreuve": "REP_K1D",
@@ -141,7 +147,9 @@
 					"club": "Club"
 				}
 			],
-			"section": "2. Médailles de la République"
+			"section": "2. Médailles de la République",
+			"competffck": "K1D",
+			"places": 1
 		},
 		{
 			"epreuve": "REP_C1H",
@@ -154,7 +162,9 @@
 					"club": "Club"
 				}
 			],
-			"section": "2. Médailles de la République"
+			"section": "2. Médailles de la République",
+			"competffck": "C1H",
+			"places": 1
 		},
 		{
 			"epreuve": "REP_C1D",
@@ -167,7 +177,9 @@
 					"club": "Club"
 				}
 			],
-			"section": "2. Médailles de la République"
+			"section": "2. Médailles de la République",
+			"competffck": "C1D",
+			"places": 1
 		},
 		{
 			"epreuve": "N1_K1H",

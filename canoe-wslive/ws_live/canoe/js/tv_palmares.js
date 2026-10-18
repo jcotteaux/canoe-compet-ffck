@@ -280,8 +280,21 @@ function OnCommandEpreuveLoad(objJSON)
 {
 	canoe.SetRanking(objJSON);
 	canoe.SetColumnNameRanking(canoe.GetTableRanking());
-	wsMain.pret = true;
+	wsMain.wsPret = true;
+	// En mode fichier, `pret` dit que le fichier est lu ; competFFCK ne sert
+	// qu'aux catégories qui y renvoient (« competffck »).
+	if (!wsMain.fichier)
+		wsMain.pret = true;
 	Render();
+}
+
+/** La liaison competFFCK, ouverte une seule fois. */
+function OuvrirCompet()
+{
+	if (wsMain.wsOuvert)
+		return;
+	wsMain.wsOuvert = true;
+	wsMain.OpenWebSocketCommand(OnOpenWebSocketCommand);
 }
 
 /** Redemande le classement, groupé : une arrivée envoie plusieurs trames coup sur coup. */
@@ -321,6 +334,9 @@ function ReloadEpreuve()
  * Une catégorie peut porter son « titre » et sa « phase », qui remplacent
  * ceux du fichier : une cérémonie enchaîne des podiums de nature différente.
  * « remis_par » et « section » (facultatifs) : pour la télécommande, non affichés.
+ * « competffck » : "K1H" prend le classement en direct de cette épreuve dans
+ * competFFCK (la page s'y connecte alors), « places » : 1 pour le seul
+ * vainqueur ; « classement » sert tant que competFFCK n'a rien.
  */
 
 /** « 1:05.32 », « 65,32 » -> ms ; null si ce n'est pas un temps. */
@@ -346,6 +362,8 @@ function LireFichier()
 			wsMain.fichierTexte = txt;
 			wsMain.donnees = data && typeof data === 'object' ? data : {};
 			wsMain.pret = true;
+			if (CategoriesFichier().some(function(c) { return c.competffck; }))
+				OuvrirCompet();
 			Render();
 		})
 		.catch(function(e) { console.warn(e.message); });
@@ -361,6 +379,15 @@ function CategoriesFichier()
 function ClassementFichier(epreuve)
 {
 	const cat = CategoriesFichier().find(function(c) { return String(c.epreuve) === epreuve; });
+	// « competffck » : le classement en direct de cette épreuve dans competFFCK
+	// (la phase chargée, la finale le soir), « places » premiers seulement ;
+	// tant que competFFCK n'a rien, celui du fichier.
+	if (cat && cat.competffck)
+	{
+		const live = GetClassementCompet(String(cat.competffck));
+		if (live.length > 0)
+			return live.slice(0, parseInt(cat.places, 10) > 0 ? parseInt(cat.places, 10) : wsMain.max);
+	}
 	if (!cat || !Array.isArray(cat.classement))
 		return [];
 	return cat.classement.filter(function(r) { return r && r.nom; }).map(function(r, i) {
@@ -389,9 +416,14 @@ function GetClassement(epreuve)
 {
 	if (wsMain.fichier)
 		return wsMain.pret ? ClassementFichier(epreuve) : [];
+	return wsMain.pret ? GetClassementCompet(epreuve) : [];
+}
 
+/** Le classement d'une épreuve dans la phase chargée de competFFCK. */
+function GetClassementCompet(epreuve)
+{
 	const tRanking = canoe.GetTableRanking();
-	if (!wsMain.pret || typeof tRanking !== 'object' || tRanking === null)
+	if (!wsMain.wsPret || typeof tRanking !== 'object' || tRanking === null)
 		return [];
 
 	const cp = canoe.GetCodeCoursePhase();
@@ -763,13 +795,15 @@ function Init()
 	wsMain.mapCommand.set('<run_erase>', function() { ReloadEpreuve(); });
 	wsMain.mapCommand.set('<mode_chrono>', function() { ReloadEpreuve(); });
 
+	wsMain.wsPret = false;
+	wsMain.wsOuvert = false;
 	if (wsMain.fichier)
 	{
 		LireFichier();
 		setInterval(LireFichier, 2000);
 	}
 	else
-		wsMain.OpenWebSocketCommand(OnOpenWebSocketCommand);
+		OuvrirCompet();
 	if (wsMain.pilote)
 		EcouterPilote();
 
