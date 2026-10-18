@@ -1063,3 +1063,57 @@ body.no-anim *::after
 	animation: none !important;
 	transition: none !important;
 }
+
+/******************** ?plein=1 : une caméra plein cadre ********************/
+
+/*
+ * La macro « Plein ecran » de canoe-atem met la fenêtre 1 seule, plein cadre.
+ * Plus de fond percé : la vidéo est partout, et les deux blocs deviennent des
+ * encarts réduits dans les coins opposés. Leur fond est OPAQUE : une ligne
+ * semi-transparente posée sur le magenta de clé virerait au violet à
+ * l'antenne au lieu de laisser voir la caméra.
+ */
+body.plein #fond,
+body.plein .cadre
+{
+	display: none;
+}
+
+body.plein #classement,
+body.plein #encourse
+{
+	box-sizing: content-box;
+	padding: 18px 22px 18px 30px;
+	background: linear-gradient(160deg, var(--fond-haut) 0%, var(--fond-bas) 100%);
+	border-left: 6px solid var(--ffck-blue);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+body.plein #ec_attente
+{
+	left: 30px;
+}
+
+/* Le classement plus discret que le bateau en course : plus petit, collé au
+   coin, et à la hauteur de ses lignes plutôt qu'à celle du duo. */
+body.plein #classement
+{
+	left: auto;
+	right: 24px;
+	top: 24px;
+	height: auto;
+	padding-bottom: 12px;
+	transform: scale(0.55);
+	transform-origin: top right;
+}
+
+body.plein #encourse
+{
+	top: auto;
+	bottom: 36px;
+	left: 40px;
+	height: auto;
+	transform: scale(0.68);
+	transform-origin: bottom left;
+}

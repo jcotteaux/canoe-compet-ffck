@@ -7,9 +7,11 @@
  * remet donc d'elle-même au bon endroit.
  *
  * Déroulé
- *   rose       quelques secondes de couleur de clé au lancement : à l'antenne
- *              on ne voit que les caméras, c'est la preuve que l'incrustation
- *              marche ;
+ *   rose       sur demande (?rose=5), quelques secondes de couleur de clé au
+ *              lancement : à l'antenne on ne voit que les caméras, c'est la
+ *              preuve que l'incrustation marche. Par défaut aucun : un
+ *              rechargement en pleine course repart aussitôt sur la bonne
+ *              scène, sans temporisation ni rideau (voir SANS_RIDEAU) ;
  *   compte     compte à rebours plein écran jusqu'au premier départ ;
  *   generique  5 min avant le premier départ, le générique vidéo ; recharger
  *              la page pendant qu'il passe le reprend où il en est ; une vidéo
@@ -20,7 +22,8 @@
  *   titre      à 30 s du départ, le nom de la catégorie en plein écran ;
  *   depart     puis sa liste de départ (tv_departs), jusqu'au premier départ ;
  *   course     l'écran de course : tv_duo si les départs sont rapprochés
- *              (tv_duo_kx pour le contre-la-montre kayak-cross),
+ *              (tv_duo_kx pour le contre-la-montre kayak-cross, en duo ou
+ *              en plein cadre),
  *              tv_inrace sinon (voir regie_scenarios.js) ;
  *   (catégories suivantes : titre, liste de départ, course 40 s avant)
  *   resultats  la catégorie finie : son classement (tv_results), puis titre
@@ -45,7 +48,7 @@
  *
  * Paramètres d'URL :
  *   scenario=vendredi-matin   le scénario (regie_scenarios.js)
- *   rose=5                    durée du rose au lancement, en s
+ *   rose=0                    durée du rose au lancement, en s (0 = aucun)
  *   resultats=70 titre=10     durée des résultats et du titre de catégorie, en s
  *   avance=40                 catégories suivantes : l'écran de course arrive tant
  *                             de s avant leur premier départ
@@ -345,7 +348,10 @@ async function LireKcross()
 		// ce n'est pas une réponse, on garde le dernier état connu.
 		if (!r.ok || j.success === false)
 			return;
-		kx.heats = (j.heats || []).filter(function(h) { return h.name !== '_TEST_RESEAU_' && h.globalHeatNumber; });
+		const ignorer = (regie.scenario.kcross && regie.scenario.kcross.ignorer) || [];
+		kx.heats = (j.heats || []).filter(function(h) {
+			return h.name !== '_TEST_RESEAU_' && h.globalHeatNumber && ignorer.indexOf(h.categoryKey) < 0;
+		});
 		kx.recu = Date.now();
 	}
 	catch (e)
@@ -528,7 +534,11 @@ function Calculer()
 		// liste de départ. Tout est calé sur l'heure du départ.
 		const gen = depart - R.generiqueAvant * 1000;
 		const genFin = gen + (R.generique && !regie.genKO ? Duree(regie.genDuree + 0.5) : 0);
-		const listes = depart - R.departsAvant * 1000;
+		// Kayak-cross avec tableauAvant : pas de titre ni de liste de départ, le
+		// présentateur parle jusqu'à H - tableauAvant, puis l'incrustation (le
+		// pilote y montre l'arbre, puis la rampe à H - rampeAvant).
+		const kxAvant = cat.vue === 'kcross' && regie.scenario.kcross && regie.scenario.kcross.tableauAvant;
+		const listes = depart - (kxAvant ? kxAvant : R.departsAvant) * 1000;
 
 		if (heure < gen)
 			return { nom : 'compte', cat : cat, cible : minuit + depart };
@@ -540,6 +550,9 @@ function Calculer()
 			return { nom : 'speaker', cat : cat, cible : minuit + depart,
 			         avecNom : heure >= nomDebut && heure < nomDebut + Duree(R.speakerDuree) };
 		}
+
+		if (kxAvant)
+			return { nom : 'course', cat : cat, vue : 'kcross' };
 
 		// Le nom de la catégorie, puis sa liste de départ jusqu'au premier
 		// départ : c'est lui qui amène la course.
@@ -623,8 +636,11 @@ function Piloter()
 	if (regie.rideau)
 		return;
 
-	// Au lancement, le rose apparaît sans rideau.
-	if (regie.scene === null)
+	// Au lancement, la première scène apparaît sans rideau, et les
+	// changements des premières secondes aussi : c'est le temps que la course
+	// arrive du serveur, et la scène calculée sur la seule horloge se corrige
+	// alors sans rideau parasite.
+	if (regie.scene === null || Date.now() - regie.charge < regie.reglages.rose * 1000 + SANS_RIDEAU)
 	{
 		Montrer(s);
 		return;
@@ -639,6 +655,9 @@ function Piloter()
  * marine couvre toute l'image (voir @keyframes rideau dans tv_regie.css).
  */
 const RIDEAU_DUREE = 1200;
+
+/** Après le lancement (et le rose), la régie se cale sans rideau pendant ce temps, en ms. */
+const SANS_RIDEAU = 3000;
 
 function Rideau()
 {
@@ -716,7 +735,7 @@ function Montrer(s)
 		compte : 'compte', speaker : 'speaker', titre : 'titre',
 		depart : 'c_depart', resultats : 'c_resultats',
 		course : s.vue === 'inrace' ? 'c_inrace' : s.vue === 'kcross' ? 'c_kcross'
-		       : s.vue === 'duo_kx' ? 'c_duo_kx' : 'c_duo',
+		       : s.vue === 'duo_kx' ? 'c_duo_kx' : s.vue === 'plein_kx' ? 'c_plein_kx' : 'c_duo',
 	}[s.nom];
 
 	document.querySelectorAll('.couche').forEach(function(el) {
@@ -773,7 +792,7 @@ function PreparerCadres(s)
 	// dernier arrivé est déjà dans le classement), et plus de lignes. Les
 	// écrans TV fixes gardent leur tv_results habituel.
 	// Kayak-cross contre-la-montre : tv_results_kx (pénalités FLT, rang du contre-la-montre).
-	Cadre('c_resultats', res ? (res.vue === 'duo_kx' ? 'tv_results_kx.html' : 'tv_results.html')
+	Cadre('c_resultats', res ? (res.vue === 'duo_kx' || res.vue === 'plein_kx' ? 'tv_results_kx.html' : 'tv_results.html')
 		+ '?epreuve=' + encodeURIComponent(res.epreuve) + '&no_course&max=12' : null);
 	Cadre('c_depart', dep ? 'tv_departs.html?epreuve=' + encodeURIComponent(dep.epreuve) : null);
 }
@@ -946,7 +965,7 @@ function Init()
 	}
 
 	regie.reglages = {
-		rose : num('rose', 5),
+		rose : num('rose', 0),
 		resultats : num('resultats', 70),
 		titre : num('titre', 10),
 		avance : num('avance', 40),
@@ -1021,8 +1040,17 @@ function Init()
 			document.querySelector('#c_kcross iframe').src = base + '/video/video_incrustation.html' + q;
 			// Le pilote décale son tableau de la durée du titre de bloc de la régie.
 			if (urlParams.get('kx_pilote') !== '0')
+			{
+				const k = regie.scenario.kcross || {};
+				const premiere = regie.scenario.categories.find(function(c) { return c.vue === 'kcross'; });
 				document.getElementById('kx_pilote').src = base + '/video/video_pilote.html' + q
-					+ '&maintien=' + regie.reglages.kxMaintien + '&titre=' + regie.reglages.titre;
+					+ '&maintien=' + regie.reglages.kxMaintien + '&titre=' + regie.reglages.titre
+					+ (k.ignorer ? '&ignorer=' + encodeURIComponent(k.ignorer.join(',')) : '')
+					// L'arbre jusqu'à H - rampeAvant, en heure absolue : le pilote
+					// suit l'horloge de competCrossFFCK, pas ?maintenant= ; en
+					// répétition, le départ lui est donc ramené de l'écart simulé.
+					+ (k.rampeAvant ? '&depart=' + (MinuitScenario() + Heure(premiere.depart) - regie.decalage) + '&rampe_avant=' + k.rampeAvant : '');
+			}
 
 			HeureKcross();
 			setInterval(HeureKcross, 60000);
@@ -1039,6 +1067,7 @@ function Init()
 		+ (regie.reglages.anim ? '' : '&anim=0');
 	document.querySelector('#c_duo iframe').src = 'tv_duo.html' + q;
 	document.querySelector('#c_duo_kx iframe').src = 'tv_duo_kx.html' + q;
+	document.querySelector('#c_plein_kx iframe').src = 'tv_duo_kx.html' + q + '&plein=1';
 	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html' + q;
 
 	Redimensionner();

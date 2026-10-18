@@ -12,6 +12,8 @@
  *   depart    heure du premier départ, fin : heure du dernier départ
  *   nb        nombre de bateaux
  *   vue       'duo', 'duo_kx' (tv_duo_kx, contre-la-montre kayak-cross),
+ *             'plein_kx' (tv_duo_kx?plein=1 : une caméra plein cadre, macro
+ *             « Plein ecran » de l'ATEM),
  *             'inrace' ou 'kcross' ; absent = déduit de l'intervalle entre deux
  *             départs, (fin - depart) / (nb - 1) : moins de 2 min, plusieurs
  *             bateaux sont sur l'eau en même temps, d'où tv_duo ; 2 min et
@@ -60,9 +62,9 @@ const REGIE_SCENARIOS = {
 		phase : 'Kayak-Cross — contre-la-montre',
 		date : '2026-10-17',
 		categories : [
-			{ epreuve : 'XK1INV', libelle : 'Invités',     depart : '10:15:00', fin : '10:29:00', nb : 15, vue : 'duo_kx' },
-			{ epreuve : 'XK1H',   libelle : 'Kayak Homme', depart : '10:33:00', fin : '11:06:00', nb : 34, vue : 'duo_kx' },
-			{ epreuve : 'XK1D',   libelle : 'Kayak Dame',  depart : '11:10:00', fin : '11:38:00', nb : 29, vue : 'duo_kx' },
+			{ epreuve : 'XK1INV', libelle : 'Invités',     depart : '10:15:00', fin : '10:29:00', nb : 15, vue : 'plein_kx' },
+			{ epreuve : 'XK1H',   libelle : 'Kayak Homme', depart : '10:33:00', fin : '11:06:00', nb : 34, vue : 'plein_kx' },
+			{ epreuve : 'XK1D',   libelle : 'Kayak Dame',  depart : '11:10:00', fin : '11:38:00', nb : 29, vue : 'plein_kx' },
 		],
 	},
 
@@ -72,9 +74,13 @@ const REGIE_SCENARIOS = {
 		titre : 'Championnats de France Elite Kayak-Cross',
 		phase : 'Kayak-Cross — phases finales',
 		date : '2026-10-17',
-		kcross : { competition : '62' },		// competCrossFFCK sur 192.168.1.65
+		// competCrossFFCK sur 192.168.1.65. Les invités courent mais ne sont pas
+		// suivis : la régie et l'incrustation ignorent leurs séries. Avant le
+		// premier départ : le présentateur, puis l'arbre à H - 2 min, puis la
+		// caméra et la rampe des premiers Kayak Homme à H - 1 min.
+		kcross : { competition : '62', ignorer : ['XK1INV'], tableauAvant : 120, rampeAvant : 60 },
 		categories : [
-			{ epreuve : 'KX', libelle : 'Kayak-Cross', depart : '14:00:00', fin : '17:00:00', nb : 0, vue : 'kcross' },
+			{ epreuve : 'KX', libelle : 'Kayak-Cross', depart : '15:00:00', fin : '18:00:00', nb : 0, vue : 'kcross' },
 		],
 	},
 

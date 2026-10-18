@@ -1,0 +1,29 @@
+{
+	"titre": "Championnats de France Elite Kayak-Cross",
+	"phase": "Kayak-Cross — contre-la-montre",
+	"categories": [
+		{
+			"epreuve": "XK1H",
+			"libelle": "Kayak Homme",
+			"classement": [
+				{ "nom": "DELASSUS Anatole", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE", "temps": "53.31" },
+				{ "nom": "MADORE Mathurin", "club": "RED STAR CLUB CHAMPIGNY", "temps": "53.40" },
+				{ "nom": "CORNU Martin", "club": "LANNION CANOE KAYAK", "temps": "54.02" }
+			]
+		},
+		{
+			"epreuve": "XK1D",
+			"libelle": "Kayak Dame",
+			"classement": [
+				{ "nom": "PRIGENT Camille", "club": "KAYAK CLUB DE RENNES", "temps": "57.46" },
+				{ "nom": "DELASSUS Marjorie", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE", "temps": "59.43" },
+				{ "nom": "DELASSUS Doriane", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE", "temps": "59.65" }
+			]
+		},
+		{
+			"epreuve": "XK1INV",
+			"libelle": "Invités",
+			"classement": []
+		}
+	]
+}

@@ -42,6 +42,11 @@
  *                        (-8,00 ; +4,50) et (+8,00 ; -4,50), soit les quarts
  *                        haut gauche et bas droit, sans recadrage.
  *   bg=1                 fenêtres remplies de la couleur de clé (ATEM)
+ *   plein=1              une seule caméra plein cadre (macro « Plein ecran ») :
+ *                        plus de fond percé, le classement et les bateaux en
+ *                        course deviennent deux encarts opaques réduits, en
+ *                        haut à droite et en bas à gauche. Par défaut alors
+ *                        max_course=1 (le bateau en course seul) et max=5.
  *   epreuve=K1H          fige l'épreuve du classement
  *   max=8 fixes=3        lignes du classement, dont figées en haut
  *   vitesse=40           défilement de la suite du classement, en px/s
@@ -1301,7 +1306,8 @@ function Init()
 	};
 
 	wsMain.lang = 'fr';
-	wsMain.max = Math.max(1, num('max', 8));
+	const plein = urlParams.get('plein') === '1';
+	wsMain.max = Math.max(1, num('max', plein ? 5 : 8));
 	wsMain.fixes = Math.max(0, num('fixes', 3));
 	wsMain.vitesse = Math.max(5, num('vitesse', 40));		// px/s de la suite
 	wsMain.pause = num('pause', 4000);						// ms en haut et en bas
@@ -1328,7 +1334,7 @@ function Init()
 	wsMain.onCourse = [];
 	wsMain.finished = new Map();
 	wsMain.inters = new Map();
-	wsMain.maxCourse = Math.max(1, Math.min(3, num('max_course', 3)));
+	wsMain.maxCourse = Math.max(1, Math.min(3, num('max_course', plein ? 1 : 3)));
 	wsMain.affiches = [];
 	wsMain.cartes = new Map();
 	wsMain.attentes = new Map();
@@ -1351,10 +1357,14 @@ function Init()
 	if (urlParams.has('no_partenaire'))
 		document.body.classList.add('sans-partenaire');
 
-	PoserFenetres([
-		LireFenetre(urlParams, 'v1', { x : 0, y : 0, w : 960, h : 540 }),
-		LireFenetre(urlParams, 'v2', { x : 960, y : 540, w : 960, h : 540 }),
-	]);
+	// Plein cadre : rien à percer, la caméra est partout derrière les encarts.
+	if (plein)
+		document.body.classList.add('plein');
+	else
+		PoserFenetres([
+			LireFenetre(urlParams, 'v1', { x : 0, y : 0, w : 960, h : 540 }),
+			LireFenetre(urlParams, 'v2', { x : 960, y : 540, w : 960, h : 540 }),
+		]);
 
 	document.body.classList.add('cl-vide', 'riviere-vide');
 

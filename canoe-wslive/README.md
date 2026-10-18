@@ -48,7 +48,7 @@ le navigateur avant : `open "<adresse>"`.
 | vendredi 16 matin — qualifs manche 1 | 9h00 → 12h18 | `http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-matin&ws=SERVEUR:8080` |
 | vendredi 16 après-midi — qualifs manche 2 | 14h00 → 15h20 | `http://localhost:3000/canoe/tv_regie.html?scenario=vendredi-apres-midi&ws=SERVEUR:8080` |
 | samedi 17 matin — kayak-cross contre-la-montre | 10h15 → 11h38 | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-matin&ws=SERVEUR:8080` |
-| samedi 17 après-midi — kayak-cross séries | 14h00 → 17h00 *(à confirmer)* | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=SERVEUR:8080&kx=http://localhost:3000/gestion_kcross_series&kx_competition=62` |
+| samedi 17 après-midi — kayak-cross séries | 15h00 → 18h00 *(fin estimée)* | `http://localhost:3000/canoe/tv_regie.html?scenario=samedi-apres-midi&ws=SERVEUR:8080&kx=http://localhost:3000/gestion_kcross_series&kx_competition=62` |
 | dimanche 18 matin — demi-finales | 9h00 → 13h03 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-matin&ws=SERVEUR:8080` |
 | dimanche 18 après-midi — finales | 14h00 → 15h46 | `http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=SERVEUR:8080` |
 
@@ -74,8 +74,10 @@ open "http://localhost:3000/canoe/tv_regie.html?scenario=dimanche-apres-midi&ws=
 
 ### 4. Vérifier au lancement
 
-- **quelques secondes de rose** : à l'antenne, les caméras seules, l'incrustation
-  chroma (`#CC00CC`) marche ;
+- **la bonne scène tout de suite** : plus de rose ni de rideau au lancement, la
+  régie se cale sur l'heure et la course dès les premières secondes. Pour
+  vérifier l'incrustation chroma (`#CC00CC`), ajouter `&rose=5` : 5 s de caméras
+  seules au lancement ;
 - **pastille en haut à droite** : verte 5 s = connecté au serveur ; rouge qui
   pulse = pas de liaison (vérifier `SERVEUR`, le câble, `nc -vz $SERVEUR 8080`) ;
 - avant l'heure : le compte à rebours ; à H − 5 min : le générique.
@@ -749,7 +751,7 @@ competFFCK (`france-elite/planning/`, hors dépôt).
 | `vendredi-matin` | qualifications manche 1 : INV, K1H, K1D, C1H, C1D (9h00 → 12h18) |
 | `vendredi-apres-midi` | qualifications manche 2 : K1H, K1D, C1H, C1D (14h00 → 15h20) |
 | `samedi-matin` | kayak-cross, contre-la-montre : XK1INV, XK1H, XK1D (10h15 → 11h38) |
-| `samedi-apres-midi` | kayak-cross, séries (competCrossFFCK) : horaires estimés 14h00 → 17h00, à confirmer |
+| `samedi-apres-midi` | kayak-cross, séries (competCrossFFCK) : départ 15h00, fin estimée 18h00 |
 | `dimanche-matin` | demi-finales : INV, K1H, K1D, C1H, C1D (9h00 → 13h03) |
 | `dimanche-apres-midi` | finales : K1H, K1D, C1H, C1D (14h00 → 15h46) |
 | `test` | petite répétition (3 catégories courtes, 08h50 → 09h22) : `npm run regie` |
@@ -805,7 +807,7 @@ passe muet plutôt que pas du tout.
 | paramètre | défaut | rôle |
 |---|---|---|
 | `scenario=…` | — | le scénario |
-| `rose=5` | 5 | durée de la couleur de clé au lancement, en s |
+| `rose=5` | 0 | durée de la couleur de clé au lancement, en s (0 = aucune) |
 | `resultats=70` / `titre=10` | 70 / 10 | durée du classement et du titre de catégorie, en s |
 | `avance=40` | 40 | catégories suivantes : l'écran de course arrive tant de s avant leur premier départ |
 | `generique_avant=300` | 300 | le générique part tant de s avant le premier départ |
@@ -851,7 +853,7 @@ choses :
 
 Répétition : `npm run kcross` (bouchon kayak-cross, port 3001), couper sa
 régie automatique dans son panneau (le pilote de la régie prend la main), puis
-`tv_regie.html?scenario=samedi-apres-midi&maintenant=2026-10-17T14:05:00`.
+`tv_regie.html?scenario=samedi-apres-midi&maintenant=2026-10-17T15:05:00`.
 
 ### Répéter une demi-journée avec le bouchon
 
