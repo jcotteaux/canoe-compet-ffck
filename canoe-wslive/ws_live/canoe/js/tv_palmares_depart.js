@@ -6,7 +6,8 @@
  * avant l'heure de départ du prochain partant et sort `coupe` secondes avant,
  * quand il s'élance : à l'antenne, on ne doit plus voir que lui. Tant qu'un
  * bateau est en course (flux <on_course> de moins de 3 s), pas de carte : la
- * réalisation suit le bateau, pas le départ.
+ * réalisation suit le bateau, pas le départ. Il arrive : la carte du suivant
+ * entre `apres` s plus tard, jusqu'à `plafond` s de son départ.
  *
  * Prochain partant : celui qui n'a ni résultat ni chrono en cours et dont
  * l'heure de départ est la plus proche, d'après le classement de competFFCK
@@ -23,6 +24,8 @@
  * Paramètres d'URL :
  *   avant=60        la carte entre tant de s avant le départ
  *   coupe=5         et sort tant de s avant
+ *   apres=5         après l'arrivée du bateau précédent, la carte entre tant de s plus tard
+ *   plafond=150     ... si le départ du suivant est à moins de tant de s
  *   max=5           lignes de palmarès au plus
  *   epreuve=K1H     seulement cette épreuve
  *   fichier=...     autre fichier de palmarès (chemin relatif à la page)
@@ -127,6 +130,10 @@ function OnFlowOnCourse(objJSON)
 	const surLeau = new Set();
 	for (let i = 0; i < t.GetNbRows(); i++)
 		surLeau.add(String(t.GetCell('bib', i)));
+	if (surLeau.size > 0)
+		wsMain.videDepuis = 0;
+	else if (wsMain.surLeau.size > 0 || !wsMain.videDepuis)
+		wsMain.videDepuis = wsMain.surLeau.size > 0 ? Date.now() : (wsMain.videDepuis || -1);
 	wsMain.surLeau = surLeau;
 	wsMain.surLeauRecu = Date.now();
 
@@ -227,6 +234,10 @@ function Rafraichir()
 		Montrer(false);
 		return;
 	}
+	// Depuis quand la rivière est vide : arrivée vue (ms), ou -1 (aucun bateau vu, ou flux muet).
+	let vide = wsMain.surLeau.size > 0 ? wsMain.surLeauRecu + 3000 : wsMain.videDepuis;
+	if (!(vide > 0))
+		vide = -1;
 
 	const maintenant = Maintenant();
 	const b = ProchainPartant(maintenant);
@@ -236,8 +247,12 @@ function Rafraichir()
 		return;
 	}
 	const reste = (b.heure - maintenant) / 1000;
-	// Dans la fenêtre : entrée à `avant` s, sortie à `coupe` s du départ.
-	if (reste > wsMain.avant || reste <= wsMain.coupe)
+	// Entrée `apres` s après l'arrivée du précédent (départ à moins de `plafond` s),
+	// sinon à `avant` s du départ ; sortie à `coupe` s du départ.
+	const entree = vide > 0
+		? (Date.now() - vide >= wsMain.apres * 1000 && reste <= Math.max(wsMain.plafond, wsMain.avant))
+		: reste <= wsMain.avant;
+	if (!entree || reste <= wsMain.coupe)
 	{
 		Montrer(false);
 		return;
@@ -260,6 +275,8 @@ function Init()
 
 	wsMain.avant = num('avant', 60);
 	wsMain.coupe = num('coupe', 5);
+	wsMain.apres = num('apres', 5);
+	wsMain.plafond = num('plafond', 150);
 	wsMain.max = Math.max(1, num('max', 5));
 	wsMain.epreuve = urlParams.get('epreuve') || '';
 	const fichier = urlParams.get('fichier') || 'palmares/palmares_slalom.json';
@@ -268,6 +285,8 @@ function Init()
 	wsMain.apercuCat = urlParams.get('cat') || '';
 	wsMain.palmares = new Map();
 	wsMain.surLeau = new Set();
+	wsMain.surLeauRecu = 0;
+	wsMain.videDepuis = 0;
 	wsMain.clock = 0;
 	wsMain.clockRecu = 0;
 	wsMain.charge = false;

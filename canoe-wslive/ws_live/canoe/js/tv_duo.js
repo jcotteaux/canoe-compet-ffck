@@ -839,7 +839,12 @@ function SyncCarte(el, item, fmt, now)
 	if (fini)
 		txt = adv.GetChrono(fini.time, fmt);
 	else if (item.enCourse)
-		txt = adv.GetChrono(wsMain.timePena ? item.enCourse.time + racer.pena * 1000 : item.enCourse.time, fmt);
+	{
+		// Tournant : au dixième ; le temps d'arrivée reste au centième.
+		const ms = wsMain.timePena ? item.enCourse.time + racer.pena * 1000 : item.enCourse.time;
+		const d = Math.floor(ms / 100);
+		txt = ms >= adv.chrono.OK ? Math.floor(d / 10) + ',' + (d % 10) : adv.GetChrono(ms, fmt);
+	}
 	el.querySelector('.k_chrono').textContent = txt;
 
 	el.querySelector('.k_etat').textContent = fini ? 'Arrivée' : 'En course';

@@ -555,6 +555,16 @@ function ForceBibInter(bib, inter)
 	}
 }
 
+/** Chrono qui tourne : au dixième (« 87,4 ») ; les temps d'arrivée restent au centième. */
+function ChronoDixiemes(ms)
+{
+	ms = adv.toNumber(ms);
+	if (ms === null || ms < adv.chrono.OK)
+		return adv.GetChronoStatus(ms, '-');
+	const d = Math.floor(ms / 100);
+	return Math.floor(d / 10) + ',' + (d % 10);
+}
+
 function OnBroadcastModeChrono(objJSON)
 {
 	Reload();
@@ -647,12 +657,12 @@ function OnFlowOnCourse(objJSON)
 					{
 						const tps_pena = canoe.GetCurrentSlalomTotalPena(tRanking, row)*1000;
 						//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running+tps_pena, 'HHMMSSCC');
-						document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running+tps_pena, 'XSCC');
+						document.querySelector("#block_running .time").innerHTML = ChronoDixiemes(time_running+tps_pena);
 					}
 					else
 					{
 						//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'HHMMSSCC');
-						document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'XSCC');
+						document.querySelector("#block_running .time").innerHTML = ChronoDixiemes(time_running);
 					}
 					
 					const course_phase = canoe.GetCodeCoursePhase();
@@ -665,7 +675,7 @@ function OnFlowOnCourse(objJSON)
 				else
 				{
 					//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'HHMMSSCC');
-					document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'XSCC');
+					document.querySelector("#block_running .time").innerHTML = ChronoDixiemes(time_running);
 					RequestResync();
 				}
 			}

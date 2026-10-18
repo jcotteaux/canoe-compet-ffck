@@ -1086,16 +1086,16 @@ function Init()
 	// tv_duo, se mélangent au magenta de la régie (voile violet à l'antenne).
 	const q = (document.body.classList.contains('chroma') ? '?bg=1' : '?bg=0')
 		+ (regie.reglages.anim ? '' : '&anim=0');
-	document.querySelector('#c_duo iframe').src = 'tv_duo.html' + q;
+	document.querySelector('#c_duo iframe').src = 'tv_duo.html' + q + '&v=10';
 	document.querySelector('#c_duo_kx iframe').src = 'tv_duo_kx.html' + q;
 	document.querySelector('#c_plein_kx iframe').src = 'tv_duo_kx.html' + q + '&plein=1';
-	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html' + q;
+	document.querySelector('#c_inrace iframe').src = 'tv_inrace.html' + q + '&v=8';
 	// Palmarès au départ : transparent, posé sur l'écran de course ; il entre
 	// `avant` s avant chaque départ et sort `coupe` s avant.
 	if (regie.scenario.palmares)
 	{
 		const p = regie.scenario.palmares;
-		document.querySelector('#c_palmares iframe').src = 'tv_palmares_depart.html?v3&bg=0'
+		document.querySelector('#c_palmares iframe').src = 'tv_palmares_depart.html?v4&bg=0'
 			+ (regie.reglages.anim ? '' : '&anim=0')
 			+ '&avant=' + (p.avant || 60) + '&coupe=' + (p.coupe || 5);
 	}
