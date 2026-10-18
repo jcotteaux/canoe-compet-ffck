@@ -307,6 +307,9 @@ function ReloadEpreuve()
  * Le classement est dans l'ordre des places. « rang » (facultatif) pour un ex
  * aequo ; « temps » facultatif, en 65.32, 1:05.32 ou tel quel (« 1er série ») ;
  * « ecart » facultatif, sinon calculé quand les temps se lisent.
+ * Une catégorie peut porter son « titre » et sa « phase », qui remplacent
+ * ceux du fichier : une cérémonie enchaîne des podiums de nature différente.
+ * « remis_par » (facultatif) : pour le speaker, non affiché.
  */
 
 /** « 1:05.32 », « 65,32 » -> ms ; null si ce n'est pas un temps. */
@@ -477,23 +480,41 @@ function NomCategorie(code)
 	return typeof Categorie_name === 'function' ? Categorie_name(code) : code;
 }
 
-function Titre()
+/** La catégorie du fichier, pour ses champs propres (titre, phase). */
+function CategorieFichier(code)
+{
+	return code ? CategoriesFichier().find(function(c) { return String(c.epreuve) === code; }) || null : null;
+}
+
+function Titre(cat)
 {
 	if (wsMain.titre !== '')
 		return wsMain.titre;
 	if (wsMain.fichier)
+	{
+		// Une cérémonie mêle plusieurs podiums (élite, Coupe de France, clubs…) :
+		// chaque catégorie peut porter son titre, sinon celui du fichier.
+		const c = CategorieFichier(cat);
+		if (c && c.titre)
+			return String(c.titre);
 		return wsMain.donnees && wsMain.donnees.titre ? String(wsMain.donnees.titre) : '';
+	}
 	const t = canoe.GetTable('Competition');
 	return t && t.GetNbRows() > 0 ? String(t.GetCell('Nom', 0)) : '';
 }
 
 /** Le libellé de la phase chargée dans competFFCK (« Qualification Manche 2 »…). */
-function Phase()
+function Phase(cat)
 {
 	if (wsMain.phase !== '')
 		return wsMain.phase;
 	if (wsMain.fichier)
+	{
+		const c = CategorieFichier(cat);
+		if (c && c.phase)
+			return String(c.phase);
 		return wsMain.donnees && wsMain.donnees.phase ? String(wsMain.donnees.phase) : '';
+	}
 	const t = canoe.GetTable('Competition_Course_Phase');
 	if (!t || t.GetNbRows() === 0)
 		return '';
@@ -556,8 +577,8 @@ function Render()
 
 		const code = cats[wsMain.index] || '';
 
-		SetTexte(document.getElementById('titre'), Titre());
-		SetTexte(document.getElementById('phase'), Phase());
+		SetTexte(document.getElementById('titre'), Titre(code));
+		SetTexte(document.getElementById('phase'), Phase(code));
 		SetTexte(document.getElementById('cat'), code ? NomCategorie(code) : '');
 
 		const cl = code ? GetClassement(code) : [];

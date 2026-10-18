@@ -1,0 +1,24 @@
+{
+	"titre": "Championnats de France Elite Kayak-Cross",
+	"phase": "Kayak-Cross — finales",
+	"categories": [
+		{
+			"epreuve": "XK1H",
+			"libelle": "Kayak Homme",
+			"classement": [
+				{ "nom": "TRIOMPHE Ianis", "club": "CHAMBERY LE BOURGET CANOE KAYAK" },
+				{ "nom": "DELASSUS Anatole", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE" },
+				{ "nom": "ADISSON Gael", "club": "CLUB DE CANOE-KAYAK DES ECRINS" }
+			]
+		},
+		{
+			"epreuve": "XK1D",
+			"libelle": "Kayak Dame",
+			"classement": [
+				{ "nom": "CHAREL Coline", "club": "V.P.A. PONT D'ARC" },
+				{ "nom": "PRIGENT Camille", "club": "KAYAK CLUB DE RENNES" },
+				{ "nom": "DELASSUS Marjorie", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE" }
+			]
+		}
+	]
+}

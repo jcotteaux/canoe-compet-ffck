@@ -1,24 +1,54 @@
 {
-	"titre": "Championnats de France Elite Kayak-Cross",
-	"phase": "Kayak-Cross — finales",
+	"titre": "Championnats de France Elite 2026",
+	"phase": "Cérémonie des podiums — Cesson-Sévigné",
+	"deroule": [
+		"Prises de parole (micro, son + table haute) : 1. Julien Issoulié, DTN ; 2. JPS, maire de Cesson-Sévigné ; 3. Julie, présidente du CSCKPV ; 4. Marie Argouarc'h, secrétaire générale du cabinet de la préfète d'Ille-et-Vilaine (ou le directeur du cabinet)",
+		"1. Podiums France Elite Slalom : K1H, K1D, C1H, C1D",
+		"2. Médailles de la République aux 6 champion·nes de France Elite (2 kayak-cross + 4 slalom), remises par l'intervenant 4",
+		"3. Podiums Coupe de France N1 : médailles remises par 1er Julien Issoulié, 2e JPS (maire), 3e Sébastien Chaplais (élu à la CNA)",
+		"4. Podium du Championnat de France des clubs (classement combiné slalom et kayak-cross 2026 au 31/07) : trophée remis par Sébastien Chaplais, élu à la CNA Slalom",
+		"5. Podium des bénévoles"
+	],
+	"a_completer": "Slalom Elite et champions slalom : après les finales (competFFCK). Coupe de France N1 et bénévoles : noms à fournir. Les lignes « À COMPLÉTER » sont fictives.",
 	"categories": [
-		{
-			"epreuve": "XK1H",
-			"libelle": "Kayak Homme",
-			"classement": [
-				{ "nom": "TRIOMPHE Ianis", "club": "CHAMBERY LE BOURGET CANOE KAYAK" },
-				{ "nom": "DELASSUS Anatole", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE" },
-				{ "nom": "ADISSON Gael", "club": "CLUB DE CANOE-KAYAK DES ECRINS" }
-			]
-		},
-		{
-			"epreuve": "XK1D",
-			"libelle": "Kayak Dame",
-			"classement": [
-				{ "nom": "CHAREL Coline", "club": "V.P.A. PONT D'ARC" },
-				{ "nom": "PRIGENT Camille", "club": "KAYAK CLUB DE RENNES" },
-				{ "nom": "DELASSUS Marjorie", "club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE" }
-			]
-		}
+		{ "epreuve": "SLA_K1H", "libelle": "Kayak Homme", "phase": "France Elite Slalom — finale", "classement": [
+			{ "nom": "À COMPLÉTER 1er K1H", "club": "Club" }, { "nom": "À COMPLÉTER 2e K1H", "club": "Club" }, { "nom": "À COMPLÉTER 3e K1H", "club": "Club" } ] },
+		{ "epreuve": "SLA_K1D", "libelle": "Kayak Dame", "phase": "France Elite Slalom — finale", "classement": [
+			{ "nom": "À COMPLÉTER 1re K1D", "club": "Club" }, { "nom": "À COMPLÉTER 2e K1D", "club": "Club" }, { "nom": "À COMPLÉTER 3e K1D", "club": "Club" } ] },
+		{ "epreuve": "SLA_C1H", "libelle": "Canoë Homme", "phase": "France Elite Slalom — finale", "classement": [
+			{ "nom": "À COMPLÉTER 1er C1H", "club": "Club" }, { "nom": "À COMPLÉTER 2e C1H", "club": "Club" }, { "nom": "À COMPLÉTER 3e C1H", "club": "Club" } ] },
+		{ "epreuve": "SLA_C1D", "libelle": "Canoë Dame", "phase": "France Elite Slalom — finale", "classement": [
+			{ "nom": "À COMPLÉTER 1re C1D", "club": "Club" }, { "nom": "À COMPLÉTER 2e C1D", "club": "Club" }, { "nom": "À COMPLÉTER 3e C1D", "club": "Club" } ] },
+
+		{ "epreuve": "REP_XK1H", "libelle": "Kayak-cross Homme", "phase": "Médaille de la République — champion de France Elite", "remis_par": "Marie Argouarc'h (cabinet de la préfète)", "classement": [
+			{ "nom": "TRIOMPHE Ianis", "club": "CHAMBERY LE BOURGET CANOE KAYAK" } ] },
+		{ "epreuve": "REP_XK1D", "libelle": "Kayak-cross Dame", "phase": "Médaille de la République — championne de France Elite", "remis_par": "Marie Argouarc'h (cabinet de la préfète)", "classement": [
+			{ "nom": "CHAREL Coline", "club": "V.P.A. PONT D'ARC" } ] },
+		{ "epreuve": "REP_K1H", "libelle": "Slalom Kayak Homme", "phase": "Médaille de la République — champion de France Elite", "remis_par": "Marie Argouarc'h (cabinet de la préfète)", "classement": [
+			{ "nom": "À COMPLÉTER champion K1H", "club": "Club" } ] },
+		{ "epreuve": "REP_K1D", "libelle": "Slalom Kayak Dame", "phase": "Médaille de la République — championne de France Elite", "remis_par": "Marie Argouarc'h (cabinet de la préfète)", "classement": [
+			{ "nom": "À COMPLÉTER championne K1D", "club": "Club" } ] },
+		{ "epreuve": "REP_C1H", "libelle": "Slalom Canoë Homme", "phase": "Médaille de la République — champion de France Elite", "remis_par": "Marie Argouarc'h (cabinet de la préfète)", "classement": [
+			{ "nom": "À COMPLÉTER champion C1H", "club": "Club" } ] },
+		{ "epreuve": "REP_C1D", "libelle": "Slalom Canoë Dame", "phase": "Médaille de la République — championne de France Elite", "remis_par": "Marie Argouarc'h (cabinet de la préfète)", "classement": [
+			{ "nom": "À COMPLÉTER championne C1D", "club": "Club" } ] },
+
+		{ "epreuve": "N1_K1H", "libelle": "Kayak Homme", "titre": "Coupe de France N1 2026", "phase": "Classement final", "remis_par": "1er Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais", "classement": [
+			{ "nom": "À COMPLÉTER 1er N1 K1H", "club": "Club" }, { "nom": "À COMPLÉTER 2e N1 K1H", "club": "Club" }, { "nom": "À COMPLÉTER 3e N1 K1H", "club": "Club" } ] },
+		{ "epreuve": "N1_K1D", "libelle": "Kayak Dame", "titre": "Coupe de France N1 2026", "phase": "Classement final", "remis_par": "1re Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais", "classement": [
+			{ "nom": "À COMPLÉTER 1re N1 K1D", "club": "Club" }, { "nom": "À COMPLÉTER 2e N1 K1D", "club": "Club" }, { "nom": "À COMPLÉTER 3e N1 K1D", "club": "Club" } ] },
+		{ "epreuve": "N1_C1H", "libelle": "Canoë Homme", "titre": "Coupe de France N1 2026", "phase": "Classement final", "remis_par": "1er Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais", "classement": [
+			{ "nom": "À COMPLÉTER 1er N1 C1H", "club": "Club" }, { "nom": "À COMPLÉTER 2e N1 C1H", "club": "Club" }, { "nom": "À COMPLÉTER 3e N1 C1H", "club": "Club" } ] },
+		{ "epreuve": "N1_C1D", "libelle": "Canoë Dame", "titre": "Coupe de France N1 2026", "phase": "Classement final", "remis_par": "1re Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais", "classement": [
+			{ "nom": "À COMPLÉTER 1re N1 C1D", "club": "Club" }, { "nom": "À COMPLÉTER 2e N1 C1D", "club": "Club" }, { "nom": "À COMPLÉTER 3e N1 C1D", "club": "Club" } ] },
+
+		{ "epreuve": "CLUBS", "libelle": "Championnat de France des clubs", "titre": "Championnat de France des clubs 2026", "phase": "Classement combiné slalom et kayak-cross au 31 juillet", "remis_par": "Trophée : Sébastien Chaplais, élu à la CNA Slalom", "classement": [
+			{ "nom": "METZ", "club": "" }, { "nom": "PAU", "club": "" }, { "nom": "CHAMPIGNY", "club": "" },
+			{ "nom": "ÉPINAL", "club": "" }, { "nom": "OYONNAX", "club": "" }, { "nom": "ILL SÉLESTAT", "club": "" },
+			{ "nom": "CESSON-SÉVIGNÉ", "club": "" }, { "nom": "VAL DE L'INDRE", "club": "" }, { "nom": "NANCY", "club": "" },
+			{ "nom": "TORCY", "club": "" } ] },
+
+		{ "epreuve": "BENEVOLES", "libelle": "Podium des bénévoles", "titre": "Merci aux bénévoles", "phase": "Championnats de France Elite — Cesson-Sévigné", "classement": [
+			{ "nom": "À COMPLÉTER bénévole 1", "club": "" }, { "nom": "À COMPLÉTER bénévole 2", "club": "" }, { "nom": "À COMPLÉTER bénévole 3", "club": "" } ] }
 	]
 }
