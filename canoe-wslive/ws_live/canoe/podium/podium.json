@@ -9,7 +9,7 @@
 		"4. Podium du Championnat de France des clubs (classement combiné slalom et kayak-cross 2026 au 31/07) : trophée remis par Sébastien Chaplais, élu à la CNA Slalom",
 		"5. Podium des bénévoles"
 	],
-	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; les noms « À COMPLÉTER » ne servent que tant que competFFCK n'a rien. Coupe de France N1 : K1H, K1D, C1H saisis le 18/10 ; C1D et bénévoles : à saisir.",
+	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; classement de secours relevé sur competFFCK le 18/10 à 16h05, s'il ne répond pas. Coupe de France N1 : K1H, K1D, C1H saisis le 18/10 ; C1D et bénévoles : à saisir.",
 	"categories": [
 		{
 			"epreuve": "SLA_K1H",
@@ -17,16 +17,22 @@
 			"phase": "France Elite Slalom — finale",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1er K1H",
-					"club": "Club"
+					"rang": 1,
+					"nom": "DELASSUS Anatole",
+					"club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+					"temps": "86,72"
 				},
 				{
-					"nom": "À COMPLÉTER 2e K1H",
-					"club": "Club"
+					"rang": 2,
+					"nom": "BENINI Gino",
+					"club": "V.P.A. PONT D'ARC",
+					"temps": "89,25"
 				},
 				{
-					"nom": "À COMPLÉTER 3e K1H",
-					"club": "Club"
+					"rang": 3,
+					"nom": "CASTRYCK Titouan",
+					"club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS",
+					"temps": "89,30"
 				}
 			],
 			"section": "1. Podiums France Elite Slalom",
@@ -38,16 +44,22 @@
 			"phase": "France Elite Slalom — finale",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1re K1D",
-					"club": "Club"
+					"rang": 1,
+					"nom": "PRIGENT Camille",
+					"club": "KAYAK CLUB DE RENNES",
+					"temps": "97,86"
 				},
 				{
-					"nom": "À COMPLÉTER 2e K1D",
-					"club": "Club"
+					"rang": 2,
+					"nom": "DELASSUS Marjorie",
+					"club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+					"temps": "107,02"
 				},
 				{
-					"nom": "À COMPLÉTER 3e K1D",
-					"club": "Club"
+					"rang": 3,
+					"nom": "QUEMERAIS Léna",
+					"club": "LANNION CANOE KAYAK",
+					"temps": "107,56"
 				}
 			],
 			"section": "1. Podiums France Elite Slalom",
@@ -59,16 +71,22 @@
 			"phase": "France Elite Slalom — finale",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1er C1H",
-					"club": "Club"
+					"rang": 1,
+					"nom": "SENECHAULT Yohann",
+					"club": "CANOE KAYAK CLUB FRANCE",
+					"temps": "89,99"
 				},
 				{
-					"nom": "À COMPLÉTER 2e C1H",
-					"club": "Club"
+					"rang": 2,
+					"nom": "ADISSON Tanguy",
+					"club": "CLUB DE CANOE-KAYAK DES ECRINS",
+					"temps": "93,73"
 				},
 				{
-					"nom": "À COMPLÉTER 3e C1H",
-					"club": "Club"
+					"rang": 3,
+					"nom": "GESTIN Nicolas",
+					"club": "CANOE KAYAK DE QUIMPERLE",
+					"temps": "95,91"
 				}
 			],
 			"section": "1. Podiums France Elite Slalom",
@@ -80,16 +98,22 @@
 			"phase": "France Elite Slalom — finale",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1re C1D",
-					"club": "Club"
+					"rang": 1,
+					"nom": "PESCE-ROUE Nina",
+					"club": "RED STAR CLUB CHAMPIGNY",
+					"temps": "114,01"
 				},
 				{
-					"nom": "À COMPLÉTER 2e C1D",
-					"club": "Club"
+					"rang": 2,
+					"nom": "LAURENT Zoe",
+					"club": "ANCERVILLE-BAR LE DUC",
+					"temps": "114,45"
 				},
 				{
-					"nom": "À COMPLÉTER 3e C1D",
-					"club": "Club"
+					"rang": 3,
+					"nom": "BRUGVIN Camille",
+					"club": "RED STAR CLUB CHAMPIGNY",
+					"temps": "114,68"
 				}
 			],
 			"section": "1. Podiums France Elite Slalom",
@@ -128,8 +152,10 @@
 			"remis_par": "Marie Argouarc'h (cabinet de la préfète)",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER champion K1H",
-					"club": "Club"
+					"rang": 1,
+					"nom": "DELASSUS Anatole",
+					"club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE",
+					"temps": "86,72"
 				}
 			],
 			"section": "2. Médailles de la République",
@@ -143,8 +169,10 @@
 			"remis_par": "Marie Argouarc'h (cabinet de la préfète)",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER championne K1D",
-					"club": "Club"
+					"rang": 1,
+					"nom": "PRIGENT Camille",
+					"club": "KAYAK CLUB DE RENNES",
+					"temps": "97,86"
 				}
 			],
 			"section": "2. Médailles de la République",
@@ -158,8 +186,10 @@
 			"remis_par": "Marie Argouarc'h (cabinet de la préfète)",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER champion C1H",
-					"club": "Club"
+					"rang": 1,
+					"nom": "SENECHAULT Yohann",
+					"club": "CANOE KAYAK CLUB FRANCE",
+					"temps": "89,99"
 				}
 			],
 			"section": "2. Médailles de la République",
@@ -173,8 +203,10 @@
 			"remis_par": "Marie Argouarc'h (cabinet de la préfète)",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER championne C1D",
-					"club": "Club"
+					"rang": 1,
+					"nom": "PESCE-ROUE Nina",
+					"club": "RED STAR CLUB CHAMPIGNY",
+					"temps": "114,01"
 				}
 			],
 			"section": "2. Médailles de la République",
