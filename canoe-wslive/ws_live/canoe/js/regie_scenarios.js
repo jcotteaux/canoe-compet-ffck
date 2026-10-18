@@ -106,8 +106,10 @@ const REGIE_SCENARIOS = {
 		titre : 'Championnats de France Elite Slalom',
 		phase : 'Finales',
 		date : '2026-10-18',
-		// Le palmarès du prochain partant, au départ : 60 s avant, coupé 5 s avant.
-		palmares : { avant : 60, coupe : 5 },
+		// Le palmarès du prochain partant, au départ : 60 s avant, coupé 5 s
+		// avant. Premier départ : titre à H - 100 s, liste de départ jusqu'à
+		// H - 60 s, puis la course et la carte du premier partant.
+		palmares : { avant : 60, coupe : 5, listeAvant : 100 },
 		categories : [
 			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '14:00:00', fin : '14:22:00', nb : 12 },
 			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '14:28:00', fin : '14:50:00', nb : 12 },

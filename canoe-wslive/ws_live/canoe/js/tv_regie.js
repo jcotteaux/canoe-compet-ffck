@@ -541,7 +541,11 @@ function Calculer()
 		// présentateur parle jusqu'à H - tableauAvant, puis l'incrustation (le
 		// pilote y montre l'arbre, puis la rampe à H - rampeAvant).
 		const kxAvant = cat.vue === 'kcross' && regie.scenario.kcross && regie.scenario.kcross.tableauAvant;
-		const listes = depart - (kxAvant ? kxAvant : R.departsAvant) * 1000;
+		// Palmarès au départ : le titre et la liste passent plus tôt
+		// (listeAvant), pour que l'écran de course, et la carte du premier
+		// partant, arrivent `avant` s avant le départ comme pour les suivants.
+		const palm = regie.scenario.palmares;
+		const listes = depart - (kxAvant ? kxAvant : palm && palm.listeAvant ? palm.listeAvant : R.departsAvant) * 1000;
 
 		if (heure < gen)
 			return { nom : 'compte', cat : cat, cible : minuit + depart };
@@ -572,6 +576,9 @@ function Calculer()
 		// Kayak-cross : l'incrustation montre elle-même le tableau puis la rampe.
 		if (cat.vue === 'kcross')
 			return { nom : 'course', cat : cat, vue : 'kcross' };
+
+		if (palm && heure >= depart - (palm.avant || 60) * 1000)
+			return { nom : 'course', cat : cat, vue : Vue(cat) };
 
 		return { nom : 'depart', cat : cat };
 	}
