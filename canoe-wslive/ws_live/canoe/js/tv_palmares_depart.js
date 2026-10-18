@@ -249,9 +249,15 @@ function Rafraichir()
 	const reste = (b.heure - maintenant) / 1000;
 	// Entrée `apres` s après l'arrivée du précédent (départ à moins de `plafond` s),
 	// sinon à `avant` s du départ ; sortie à `coupe` s du départ.
-	const entree = vide > 0
+	// Carte coupée au départ d'un bateau : pas de suivant tant que ce bateau
+	// n'est pas arrivé (sinon, entre son heure de départ et son apparition sur
+	// l'eau, la carte du suivant passait en éclair), 3 min au plus.
+	const bloque = wsMain.coupeA > 0 && Date.now() - wsMain.coupeA < 180000 && !(vide > wsMain.coupeA);
+	const entree = !bloque && (vide > 0
 		? (Date.now() - vide >= wsMain.apres * 1000 && reste <= Math.max(wsMain.plafond, wsMain.avant))
-		: reste <= wsMain.avant;
+		: reste <= wsMain.avant);
+	if (reste <= wsMain.coupe)
+		wsMain.coupeA = Date.now();
 	if (!entree || reste <= wsMain.coupe)
 	{
 		Montrer(false);
@@ -287,6 +293,7 @@ function Init()
 	wsMain.surLeau = new Set();
 	wsMain.surLeauRecu = 0;
 	wsMain.videDepuis = 0;
+	wsMain.coupeA = 0;
 	wsMain.clock = 0;
 	wsMain.clockRecu = 0;
 	wsMain.charge = false;

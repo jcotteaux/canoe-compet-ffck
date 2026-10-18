@@ -555,6 +555,151 @@ function ForceBibInter(bib, inter)
 	}
 }
 
+/*
+ * Chrono tournant fluide : competFFCK envoie <on_course> environ toutes les
+ * 110 ms, irrégulièrement (parfois deux trames collées). Affiché tel quel au
+ * dixième, il saute. On garde le dernier temps reçu et l'instant de réception,
+ * et une boucle d'affichage fait tourner le chrono entre deux trames (au plus
+ * 1 s sans nouvelle, puis il se fige). Jamais en arrière, sauf changement de
+ * bateau ou recul franc (manche effacée).
+ */
+function SetRunningTime(ms)
+{
+	ms = adv.toNumber(ms);
+	if (ms === null || ms < adv.chrono.OK)
+	{
+		wsMain.tick = null;
+		document.querySelector('#block_running .time').textContent = ChronoDixiemes(ms);
+		return;
+	}
+	if (!wsMain.tick || wsMain.tick.bib != wsMain.bib_select)
+		wsMain.affiche = 0;
+	wsMain.tick = { bib : wsMain.bib_select, time : ms, at : performance.now() };
+	TickRunning();
+}
+
+function TickRunning()
+{
+	const t = wsMain.tick;
+	let ms = t.time + Math.min(performance.now() - t.at, 1000);
+	// Trame un peu en retard : on tient l'affichage plutôt que de reculer.
+	if (ms < wsMain.affiche && wsMain.affiche - ms < 1000)
+		ms = wsMain.affiche;
+	wsMain.affiche = ms;
+	const txt = ChronoDixiemes(ms);
+	const el = document.querySelector('#block_running .time');
+	if (el.textContent !== txt)
+		el.textContent = txt;
+}
+
+function BoucleChrono()
+{
+	if (wsMain.tick && wsMain.timeoutInter == null && wsMain.timeoutFinish == null)
+		TickRunning();
+	window.requestAnimationFrame(BoucleChrono);
+}
+
+/*
+ * Partant annoncé : `attente` s (5) avant son heure de départ, rivière vide,
+ * le prochain partant prend l'écran (dossard, nom, chrono à 0,0 en attente),
+ * même si l'arrivée du précédent est encore affichée. Il y reste jusqu'à ce
+ * qu'il soit sur l'eau, ou 60 s après son heure (départ annulé, décalé).
+ */
+function NoterRiviere(objJSON, tOnCourse)
+{
+	const bibs = new Set();
+	for (let i = 0; i < tOnCourse.GetNbRows(); i++)
+		bibs.add(String(tOnCourse.GetCell('bib', i)));
+	wsMain.surLeau = bibs;
+	wsMain.surLeauRecu = Date.now();
+	bibs.forEach(function(b) { wsMain.vuSurLeau.set(b, Date.now()); });
+	const clock = adv.toNumber(objJSON.clock);
+	if (clock !== null && clock > 0)
+	{
+		wsMain.clock = clock;
+		wsMain.clockRecu = Date.now();
+	}
+}
+
+function Maintenant()
+{
+	if (wsMain.clock > 0 && Date.now() - wsMain.clockRecu < 15000)
+		return wsMain.clock + (Date.now() - wsMain.clockRecu);
+	const d = new Date();
+	return ((d.getHours() * 60 + d.getMinutes()) * 60 + d.getSeconds()) * 1000 + d.getMilliseconds();
+}
+
+function ProchainPartant(maintenant)
+{
+	const tRanking = canoe.GetTableRanking();
+	if (typeof tRanking !== 'object')
+		return null;
+	const phase = canoe.GetCodeCoursePhase();
+	let best = null;
+	for (let row = 0; row < tRanking.GetNbRows(); row++)
+	{
+		if (tRanking.GetCellInt('Tps_chrono'+phase, row, adv.chrono.KO) != adv.chrono.KO)
+			continue;
+		const bib = tRanking.GetCellInt('Dossard', row);
+		if (wsMain.surLeau.has(String(bib)))
+			continue;
+		const heure = tRanking.GetCellInt('Heure_depart'+phase, row, 0);
+		if (!(heure > 0) || heure < maintenant - 60000)
+			continue;
+		if (!best || heure < best.heure)
+			best = { bib : bib, heure : heure };
+	}
+	return best;
+}
+
+function AttenteDepart()
+{
+	if (!wsMain.rankingReady || wsMain.timeoutInter != null || wsMain.bib_force > 0 || wsMain.next_start > 0 || !(wsMain.attenteAvant > 0))
+		return;
+	const riviereVide = wsMain.surLeau.size == 0 || Date.now() - wsMain.surLeauRecu > 3000;
+	if (!riviereVide)
+		return;	// un bateau court : le flux <on_course> s'en occupe
+
+	const maintenant = Maintenant();
+	const b = ProchainPartant(maintenant);
+	const reste = b ? b.heure - maintenant : Infinity;
+	if (b && reste <= wsMain.attenteAvant * 1000)
+	{
+		if (wsMain.attente == b.bib && wsMain.bib_select == b.bib)
+			return;
+		// Priorité au bateau précédent : sorti du flux à l'arrivée mais sans
+		// temps encore (la trame <bib_time> suit), on attend son résultat.
+		if (wsMain.bib_select > 0 && wsMain.bib_select != b.bib && wsMain.timeoutFinish == null
+			&& Date.now() - (wsMain.vuSurLeau.get(String(wsMain.bib_select)) || 0) < 10000)
+			return;
+		// Arrivée toute fraîche : on la laisse au moins delay_finish_min (8 s).
+		if (wsMain.timeoutFinish != null && Date.now() - wsMain.finishShownAt < wsMain.timeoutFinishMinDelay)
+			return;
+		if (wsMain.timeoutFinish != null)
+			EndFinish();
+		wsMain.attente = b.bib;
+		wsMain.bib_select = b.bib;
+		wsMain.bib_select_tick = Date.now();
+		HideBlockInter();
+		ClearRunning();
+		ForceBibStart(b.bib);
+		document.querySelector('#block_running .time').textContent = '0,0';
+		document.getElementById('block_running').style.display = 'block';
+		UpdateRunnerLine();
+		return;
+	}
+	// Annoncé mais toujours pas parti, 60 s après son heure : on rend l'écran.
+	if (wsMain.attente > 0 && wsMain.bib_select == wsMain.attente)
+	{
+		wsMain.attente = 0;
+		wsMain.bib_select = -1;
+		ClearRunning();
+		const el = document.getElementById('block_start');
+		if (el != null)
+			el.style.display = 'none';
+	}
+}
+
 /** Chrono qui tourne : au dixième (« 87,4 ») ; les temps d'arrivée restent au centième. */
 function ChronoDixiemes(ms)
 {
@@ -613,6 +758,8 @@ function OnFlowOnCourse(objJSON)
 	if (tOnCourse == null || typeof tOnCourse !== 'object')
 		return;
 
+	NoterRiviere(objJSON, tOnCourse);
+
 	if (wsMain.timeoutFinish != null)
 	{
 		if (!FinishCanEnd(tOnCourse))
@@ -645,6 +792,11 @@ function OnFlowOnCourse(objJSON)
 		if (i >= 0)
 		{
 			// Dossard en Course ...
+			if (wsMain.attente == wsMain.bib_select)
+			{
+				wsMain.attente = 0;
+				wsMain.bib_select_tick = Date.now();
+			}
 			const time_running = tOnCourse.GetCellInt('time', i);
 			if (canoe.GetCodeActivite() == 'SLA')
 			{
@@ -657,12 +809,12 @@ function OnFlowOnCourse(objJSON)
 					{
 						const tps_pena = canoe.GetCurrentSlalomTotalPena(tRanking, row)*1000;
 						//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running+tps_pena, 'HHMMSSCC');
-						document.querySelector("#block_running .time").innerHTML = ChronoDixiemes(time_running+tps_pena);
+						SetRunningTime(time_running+tps_pena);
 					}
 					else
 					{
 						//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'HHMMSSCC');
-						document.querySelector("#block_running .time").innerHTML = ChronoDixiemes(time_running);
+						SetRunningTime(time_running);
 					}
 					
 					const course_phase = canoe.GetCodeCoursePhase();
@@ -675,7 +827,7 @@ function OnFlowOnCourse(objJSON)
 				else
 				{
 					//document.querySelector("#block_running .time").innerHTML = adv.GetChrono(time_running, 'HHMMSSCC');
-					document.querySelector("#block_running .time").innerHTML = ChronoDixiemes(time_running);
+					SetRunningTime(time_running);
 					RequestResync();
 				}
 			}
@@ -833,6 +985,7 @@ function ClearRunning()
 	const el = document.getElementById('block_running');
 	if (el != null)
 		el.style.display = 'none';
+	wsMain.tick = null;
 	ResetPenalties();
 }
 
@@ -1398,6 +1551,20 @@ function Init()
 	
 	// Flow Notification
 	wsMain.mapCommand.set('<on_course>', OnFlowOnCourse);
+
+	wsMain.tick = null;
+	wsMain.affiche = 0;
+	window.requestAnimationFrame(BoucleChrono);
+
+	// Partant annoncé `attente` s avant son départ (0 : jamais).
+	wsMain.attenteAvant = urlParams.has('attente') ? parseFloat(urlParams.get('attente')) : 5;
+	wsMain.attente = 0;
+	wsMain.surLeau = new Set();
+	wsMain.surLeauRecu = 0;
+	wsMain.vuSurLeau = new Map();
+	wsMain.clock = 0;
+	wsMain.clockRecu = 0;
+	setInterval(AttenteDepart, 200);
 
 	// Ouverture ws 
 	wsMain.OpenWebSocketCommand(OnOpenWebSocketCommand);
