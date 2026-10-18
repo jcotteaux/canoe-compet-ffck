@@ -92,12 +92,13 @@ const REGIE_SCENARIOS = {
 		titre : 'Championnats de France Elite Slalom',
 		phase : 'Demi-finales',
 		date : '2026-10-18',
+		// Heures de la liste de départ competFFCK (éditée le 16/10, départs toutes les 80 s).
 		categories : [
-			{ epreuve : 'INV', libelle : 'Invités',      depart : '09:00:00', fin : '09:21:00', nb : 15 },
-			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '09:25:30', fin : '10:24:00', nb : 40 },
-			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '10:28:30', fin : '11:27:00', nb : 40 },
-			{ epreuve : 'C1H', libelle : 'Canoë Homme',  depart : '11:31:30', fin : '12:15:00', nb : 30 },
-			{ epreuve : 'C1D', libelle : 'Canoë Dame',   depart : '12:19:30', fin : '13:03:00', nb : 30 },
+			{ epreuve : 'INV', libelle : 'Invités',      depart : '09:00:00', fin : '09:18:40', nb : 15 },
+			{ epreuve : 'K1H', libelle : 'Kayak Homme',  depart : '09:22:40', fin : '10:14:40', nb : 40 },
+			{ epreuve : 'K1D', libelle : 'Kayak Dame',   depart : '10:18:40', fin : '11:10:40', nb : 40 },
+			{ epreuve : 'C1H', libelle : 'Canoë Homme',  depart : '11:14:40', fin : '11:53:20', nb : 30 },
+			{ epreuve : 'C1D', libelle : 'Canoë Dame',   depart : '11:57:20', fin : '12:29:20', nb : 25 },
 		],
 	},
 
