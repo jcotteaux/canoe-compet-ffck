@@ -9,7 +9,7 @@
 		"4. Podium du Championnat de France des clubs (classement combiné slalom et kayak-cross 2026 au 31/07) : trophée remis par Sébastien Chaplais, élu à la CNA Slalom",
 		"5. Podium des bénévoles"
 	],
-	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; classement de secours relevé sur competFFCK le 18/10 à 16h05, s'il ne répond pas. Coupe de France N1 : K1H, K1D, C1H saisis le 18/10 ; C1D : à saisir. Bénévoles : écran « merci » (missions en ballons, des noms peuvent s'y ajouter).",
+	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; classement de secours relevé sur competFFCK le 18/10 à 16h05, s'il ne répond pas. Coupe de France N1 : saisie le 18/10. Bénévoles : écran « merci » (missions en ballons, des noms peuvent s'y ajouter).",
 	"categories": [
 		{
 			"epreuve": "SLA_K1H",
@@ -287,16 +287,16 @@
 			"remis_par": "1re Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1re N1 C1D",
-					"club": "Club"
+					"nom": "CASTRYCK Camille",
+					"club": "CESSON SEVIGNE CANOE KAYAK LES POISSONS VOLANTS"
 				},
 				{
-					"nom": "À COMPLÉTER 2e N1 C1D",
-					"club": "Club"
+					"nom": "PESCE-ROUE Nina",
+					"club": "RED STAR CLUB CHAMPIGNY"
 				},
 				{
-					"nom": "À COMPLÉTER 3e N1 C1D",
-					"club": "Club"
+					"nom": "QUEMERAIS Léna",
+					"club": "LANNION CANOE KAYAK"
 				}
 			],
 			"section": "3. Coupe de France N1"
