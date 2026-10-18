@@ -9,7 +9,7 @@
 		"4. Podium du Championnat de France des clubs (classement combiné slalom et kayak-cross 2026 au 31/07) : trophée remis par Sébastien Chaplais, élu à la CNA Slalom",
 		"5. Podium des bénévoles"
 	],
-	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; les noms « À COMPLÉTER » ne servent que tant que competFFCK n'a rien. Coupe de France N1 et bénévoles : à saisir.",
+	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; les noms « À COMPLÉTER » ne servent que tant que competFFCK n'a rien. Coupe de France N1 : K1H, K1D, C1H saisis le 18/10 ; C1D et bénévoles : à saisir.",
 	"categories": [
 		{
 			"epreuve": "SLA_K1H",
@@ -189,16 +189,16 @@
 			"remis_par": "1er Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1er N1 K1H",
-					"club": "Club"
+					"nom": "HANRAHAN Jonah",
+					"club": "PAU CANOE-KAYAK CLUB UNIVERSITAIRE"
 				},
 				{
-					"nom": "À COMPLÉTER 2e N1 K1H",
-					"club": "Club"
+					"nom": "BENINI Gino",
+					"club": "V.P.A. PONT D'ARC"
 				},
 				{
-					"nom": "À COMPLÉTER 3e N1 K1H",
-					"club": "Club"
+					"nom": "OTEIZA Unai",
+					"club": "UR TIPULA"
 				}
 			],
 			"section": "3. Coupe de France N1"
@@ -211,16 +211,16 @@
 			"remis_par": "1re Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1re N1 K1D",
-					"club": "Club"
+					"nom": "CHAREL Coline",
+					"club": "V.P.A. PONT D'ARC"
 				},
 				{
-					"nom": "À COMPLÉTER 2e N1 K1D",
-					"club": "Club"
+					"nom": "LAPEZE Margot",
+					"club": "ORTHEZ NAUTIQUE C.K."
 				},
 				{
-					"nom": "À COMPLÉTER 3e N1 K1D",
-					"club": "Club"
+					"nom": "BRUGVIN Camille",
+					"club": "RED STAR CLUB CHAMPIGNY"
 				}
 			],
 			"section": "3. Coupe de France N1"
@@ -233,16 +233,16 @@
 			"remis_par": "1er Julien Issoulié · 2e JPS (maire) · 3e Sébastien Chaplais",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER 1er N1 C1H",
-					"club": "Club"
+					"nom": "ADISSON Tanguy",
+					"club": "CLUB DE CANOE-KAYAK DES ECRINS"
 				},
 				{
-					"nom": "À COMPLÉTER 2e N1 C1H",
-					"club": "Club"
+					"nom": "LATIMIER Jules",
+					"club": "GOLBEY EPINAL ST NABORD"
 				},
 				{
-					"nom": "À COMPLÉTER 3e N1 C1H",
-					"club": "Club"
+					"nom": "MARTEIL Valentin",
+					"club": "EAUX VIVES OYONNAX C.K."
 				}
 			],
 			"section": "3. Coupe de France N1"
