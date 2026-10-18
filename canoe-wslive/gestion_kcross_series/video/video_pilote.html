@@ -23,9 +23,12 @@
   ?tableau=12      tableau des phases finales avant la rampe, en s (0 = jamais)
   ?titre=10        au changement de bloc (1/8 Dames -> 1/8 Hommes), le tableau
                    attend tant de s : le titre de la régie TV couvre l'écran
+  ?ignorer=XK1INV  catégories dont les séries ne passent pas à l'incrustation
+  ?depart=…        heure du premier départ (ms) : avant toute série courue,
+  ?rampe_avant=60  le tableau jusqu'à tant de s du départ, puis la rampe
 -->
 <p>Pilote automatique de l'incrustation — compétition <code id="comp"></code></p>
 <p id="etat">démarrage…</p>
-<script type="module" src="js/video_pilote.js?v=2.2.3"></script>
+<script type="module" src="js/video_pilote.js?v=2.2.5"></script>
 </body>
 </html>

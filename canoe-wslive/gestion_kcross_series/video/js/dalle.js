@@ -1,7 +1,7 @@
 // Dalles LED du kayak cross : une série, ses 4 couloirs. Voir dalle.html.
 
 import { FORMATS_COMPETITION } from '../../js/format_competition.js?v=2.2.0';
-import { ConfigurationPenalites } from '../../js/engine.js?v=2.2.0';
+import { ConfigurationPenalites, PenaltyEncoder } from '../../js/engine.js?v=2.2.0';
 import { genreOf, variantOf } from './tableau_model.js?v=2.2.0';
 
 const params = new URLSearchParams(window.location.search);
@@ -13,6 +13,8 @@ const POLL_MS = 1500;
 const LANES = ['R', 'V', 'B', 'J'];
 const SHORT_ROUND = { HUITIEMES: '1/8', QUARTS: '1/4', DEMI: '1/2', FINALE: 'Finale' };
 const GENRE = { dames: 'Dames', hommes: 'Hommes' };
+// js/constants.js, statusOrder : sans statut d'abord, puis DNF, DSQ, DNS, DQB.
+const STATUS_ORDER = { DNF: 1, DSQ: 2, DNS: 3, DQB: 4 };
 
 let heats = [];
 let clockOffset = 0; // heure serveur - heure locale, pour mesurer le maintien
@@ -110,26 +112,41 @@ function vue(h) {
   const etat = h.etat === 5 ? 'resultats' : h.etat === 3 || h.etat === 4 || h.etat === 6 ? 'course' : 'attente';
   const { isFinal, qualifies } = regleDuTour(h);
 
-  let lignes = LANES.map((lane, i) => {
+  // Une ligne par couloir, toujours dans l'ordre des couloirs : c'est `pos`,
+  // sa place à l'écran, qui la fait glisser (voir peindre).
+  const lignes = LANES.map((lane, i) => {
     const slot = h.slots.find((s) => s.prioDepart === i + 1);
-    return { lane, p: slot?.participant || null };
+    return { lane, i, p: slot?.participant || null };
   });
 
-  if (etat === 'resultats') {
-    lignes = lignes.filter((l) => l.p);
-    lignes.sort((a, b) => (parseInt(a.p.finalRank, 10) || 99) - (parseInt(b.p.finalRank, 10) || 99));
-  }
+  // L'ordre de l'écran. Résultats : le classement officiel. En course : celui
+  // de l'instant, d'après les pénalités déjà jugées (statut, RAL, FLT et leur
+  // position, place d'arrivée, couloir), comme l'incrustation. Couloir vide en
+  // bas. Avant le départ : les couloirs.
+  const vide = (l) => (l.p ? 0 : 1);
+  const tri = etat === 'resultats'
+    ? (a, b) => vide(a) - vide(b) || (parseInt(a.p?.finalRank, 10) || 99) - (parseInt(b.p?.finalRank, 10) || 99) || a.i - b.i
+    : etat === 'course'
+    ? (a, b) => vide(a) - vide(b)
+      || (STATUS_ORDER[a.p?.specialStatus] || 0) - (STATUS_ORDER[b.p?.specialStatus] || 0)
+      || PenaltyEncoder.encode(a.p?.penalite) - PenaltyEncoder.encode(b.p?.penalite)
+      || (parseInt(a.p?.ordre_arrivee, 10) || Infinity) - (parseInt(b.p?.ordre_arrivee, 10) || Infinity)
+      || a.i - b.i
+    : (a, b) => a.i - b.i;
+  [...lignes].sort(tri).forEach((l, pos) => { l.pos = pos; });
 
   const noms = lignes.filter((l) => l.p).map((l) => l.p.name);
 
   return {
+    cle: h.id,
     etat,
     genre: genreOf(h.categoryKey) || '',
     tour: SHORT_ROUND[h.roundKey] || h.roundKey,
     serie: h.roundKey === 'FINALE' ? '' : h.name,
     categorie: GENRE[genreOf(h.categoryKey)] || h.categoryKey,
-    lignes: lignes.map(({ lane, p }) => {
-      if (!p) return { lane, vide: true, zones: zones(h, null, false) };
+    lignes: lignes.map(({ lane, p, pos }) => {
+      // Aux résultats, un couloir vide disparaît (en bas, sans bande).
+      if (!p) return { lane, pos, vide: true, absente: etat === 'resultats', zones: zones(h, null, false) };
       const rank = parseInt(p.finalRank, 10);
       const statut = p.specialStatus || '';
       let place = '';
@@ -145,6 +162,7 @@ function vue(h) {
       }
       return {
         lane,
+        pos,
         nom: nomDistinct(p.name, noms.filter((x) => x !== p.name)),
         statut,
         zones: zones(h, p, etat !== 'attente'),
@@ -203,6 +221,11 @@ function peindre(copie, v) {
   classe(el, `dalle ${v ? v.etat : 'vide'} ${v?.genre || ''}`);
   if (!v) return;
 
+  // Nouvelle série : les lignes se posent sans glisser depuis les places de
+  // la précédente.
+  const nouvelle = copie.cle !== v.cle;
+  copie.cle = v.cle;
+
   const tete = el.querySelector('.kx-tete');
   // « Finale », « Hommes » rétrécissent pour tenir dans la largeur de la tête.
   [['.kx-tour', v.tour], ['.kx-genre', v.categorie], ['.kx-serie', v.serie]].forEach(([sel, t]) => {
@@ -215,9 +238,23 @@ function peindre(copie, v) {
 
   el.querySelectorAll('.kx-ligne').forEach((ligne, i) => {
     const l = v.lignes[i];
-    if (!l) {
+    if (!l || l.absente) {
       classe(ligne, 'kx-ligne absente');
       return;
+    }
+
+    // La ligne i est celle du couloir i ; elle glisse jusqu'à sa place (la
+    // transition est dans dalle.css). Celle qui monte passe au-dessus.
+    const avant = Number(ligne.dataset.pos);
+    if (avant !== l.pos || nouvelle) {
+      ligne.style.zIndex = Number.isFinite(avant) && l.pos < avant ? '2' : '1';
+      ligne.dataset.pos = l.pos;
+      if (nouvelle) ligne.style.transition = 'none';
+      ligne.style.transform = l.pos === i ? '' : `translateY(calc(${l.pos - i} * var(--u25)))`;
+      if (nouvelle) {
+        void ligne.offsetHeight;
+        ligne.style.transition = '';
+      }
     }
     classe(ligne, `kx-ligne ${l.vide ? 'vide' : ''} ${l.classe || ''}`.trim().replace(/\s+/g, ' '));
 
@@ -226,12 +263,13 @@ function peindre(copie, v) {
     classe(lane, `kx-lane lane-${l.lane}`);
     texte(lane, l.lane);
 
-    // Les zones en carrés : vert jugée sans pénalité, jaune FLT, rouge RAL ;
-    // la zone est écrite dans le carré pénalisé. Un statut les remplace.
+    // Une case par zone du parcours, comme les portes de tv_duo_kx : sombre
+    // pas encore jugée, verte sans pénalité, « F » sur jaune pour une FLT,
+    // « R » sur rouge pour un RAL. Un statut les remplace.
     const pena = ligne.querySelector('.kx-pena');
     const penaHtml = l.statut
       ? `<span class="kx-statut">${l.statut}</span>`
-      : l.zones.map((z) => `<span class="${z.etat}">${z.etat === 'flt' || z.etat === 'ral' ? z.label : ''}</span>`).join('');
+      : l.zones.map((z) => `<span class="${z.etat}">${z.etat === 'flt' ? 'F' : z.etat === 'ral' ? 'R' : ''}</span>`).join('');
     if (pena._html !== penaHtml) {
       pena._html = penaHtml;
       pena.innerHTML = penaHtml;

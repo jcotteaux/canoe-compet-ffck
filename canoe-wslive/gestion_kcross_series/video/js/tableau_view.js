@@ -12,10 +12,14 @@ const TROPHY = '<svg class="tb-trophy" viewBox="0 0 64 64" aria-hidden="true"><p
  * Dessine l'arbre dans `board` (qui contient .tb-stage > svg.tb-links + .tb-grid)
  * et pose sur lui les classes de taille.
  *   full    arbre entier ; sinon la branche de `focus` (par défaut la prochaine course)
+ *   trim    avec full, de gauche à droite : l'arbre part du premier tour pas
+ *           encore entièrement couru (ses places montrent déjà les qualifiés
+ *           du tour d'avant) ; les tours finis disparaissent et le reste
+ *           grossit au fil de la compétition
  *   layout  'ltr' ou 'branches' (arbre entier seulement)
  *   focus   nœud du modèle autour duquel resserrer la vue
  */
-export function renderTree(board, model, { full = false, layout = 'ltr', focus = undefined } = {}) {
+export function renderTree(board, model, { full = false, trim = false, layout = 'ltr', focus = undefined } = {}) {
   // Colonne de chaque série (0 = premier tour) : cadence l'entrée en cascade.
   const columnOf = new Map();
 
@@ -38,7 +42,8 @@ export function renderTree(board, model, { full = false, layout = 'ltr', focus =
       return `<div class="${classes.join(' ')}"><span class="tb-who">${who}</span><span class="tb-rank">${result}</span></div>`;
     }).join('');
     const label = [n.isFinal ? null : `Série ${n.name.replace('S', '')}`, n.startTime].filter(Boolean).join(' · ');
-    const live = n.etat === 3 ? '<span class="tb-live">en course</span>' : '';
+    const live = n.etat === 3 ? '<span class="tb-live">en course</span>'
+      : n.provisoire ? '<span class="tb-prov">provisoire</span>' : '';
     return `<div class="tb-heat ${state}${big ? ' big' : ''}" data-key="${esc(n.key)}" style="--ci:${ci};--bi:${bi}">
         ${label || live ? `<div class="tb-heat-label">${esc(label)}${live}</div>` : ''}
         <div class="tb-heat-box">${rows}</div>
@@ -52,7 +57,16 @@ export function renderTree(board, model, { full = false, layout = 'ltr', focus =
 
   const branch = full ? null : focusBranch(model, focus);
   const lay = branch ? 'ltr' : layout;
-  const cols = branch || (lay === 'ltr' ? model.rounds : [...model.left, ...model.right]);
+  // Premier tour dont une série reste à jouer (une série validée ou classée
+  // en provisoire compte comme jouée) : l'arbre part de là. Tout couru avant
+  // la finale : le dernier tour, pour voir d'où viennent les finalistes.
+  let rounds = model.rounds;
+  if (trim && !branch && lay === 'ltr' && rounds.length > 1) {
+    const joue = (c) => c.nodes.length > 0 && c.nodes.every((n) => n.etat === 5);
+    const first = rounds.findIndex((c) => !joue(c));
+    rounds = rounds.slice(first < 0 ? rounds.length - 1 : first);
+  }
+  const cols = branch || (lay === 'ltr' ? rounds : [...model.left, ...model.right]);
   const maxPerColumn = Math.max(1, ...cols.map((c) => c.nodes.length));
   board.classList.toggle('focus', !!branch);
   board.classList.toggle('ltr', lay === 'ltr');
@@ -94,7 +108,7 @@ export function renderTree(board, model, { full = false, layout = 'ltr', focus =
       reachesFinal ? finalColumn(branch.length - 1) : '',
     ].join('');
   } else if (lay === 'ltr') {
-    html = [...model.rounds.map((c, i) => column(c, 'left', i)), finalColumn(model.rounds.length)].join('');
+    html = [...rounds.map((c, i) => column(c, 'left', i)), finalColumn(rounds.length)].join('');
   } else {
     html = [
       ...model.left.map((c, i) => column(c, 'left', i)),

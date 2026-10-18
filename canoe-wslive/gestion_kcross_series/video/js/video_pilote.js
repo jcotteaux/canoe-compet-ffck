@@ -4,8 +4,8 @@
 // séries seulement, sans rien retenir : recharger la page la remet au même
 // point. Toutes les 1,5 s :
 //   - une série en course : LIVE_RUN (la dernière partie : elle passe avant
-//     une série précédente restée à valider), arrivés dans l'ordre d'arrivée
-//     puis les autres dans l'ordre des couloirs ;
+//     une série précédente restée à valider), les bateaux triés comme le
+//     classement au fil des pénalités (ordreKx), sans rang affiché ;
 //   - une série à valider (ou en modification) dont tous les bateaux ont une
 //     place ou un statut : RESULTS « PROVISOIRE », le classement déduit des
 //     places et des fautes (voir classementProvisoire), pendant ?maintien= s
@@ -15,6 +15,10 @@
 //   - sinon la dernière série validée, pendant ?maintien= s : RESULTS ;
 //   - sinon la prochaine série : d'abord ?tableau= s de tableau des phases
 //     finales (BRACKET, si le format en a un), puis sa rampe (START_RAMP) ;
+//     avant la toute première série (?depart=), le tableau jusqu'à
+//     ?rampe_avant= s du départ, puis la rampe ;
+//   - les catégories de ?ignorer= (XK1INV,…) n'existent pas pour le pilote :
+//     leurs séries courent sans passer à l'incrustation ;
 //   - plus rien à courir : l'incrustation est vidée.
 // L'état n'est réécrit que s'il change. Charges utiles identiques à celles de
 // pushToOBS (ui_video_control.js) et de la régie du simulateur (mock/kcross/regie.mjs).
@@ -32,6 +36,10 @@ const BRACKET_MS = (params.has('tableau') ? Number(params.get('tableau')) : 12) 
 // elle couvre l'écran de son titre pendant ?titre= s ; le tableau attend la fin.
 const TITLE_MS = (Number(params.get('titre')) || 0) * 1000;
 const POLL_MS = 1500;
+const IGNORER = (params.get('ignorer') || '').split(',').map((s) => s.trim()).filter(Boolean);
+// Heure du premier départ, en ms (heure serveur) : l'arbre jusqu'à rampe_avant s avant.
+const DEPART_MS = Number(params.get('depart')) || 0;
+const RAMPE_AVANT_MS = (params.has('rampe_avant') ? Number(params.get('rampe_avant')) : 60) * 1000;
 
 // js/texts/fr_text_ui_roundnames.js, regie_video.roundNames
 const ROUND_NAMES = {
@@ -62,7 +70,7 @@ async function loadHeats() {
   if (!r.ok) throw new Error(`api_get_next_heats ${r.status}`);
   const j = await r.json();
   return (j.heats || [])
-    .filter((h) => h.name !== '_TEST_RESEAU_' && h.globalHeatNumber)
+    .filter((h) => h.name !== '_TEST_RESEAU_' && h.globalHeatNumber && !IGNORER.includes(h.categoryKey))
     .sort((a, b) => a.globalHeatNumber - b.globalHeatNumber);
 }
 
@@ -94,14 +102,21 @@ function classementProvisoire(heat) {
   const aResultat = (p) => (p.ordre_arrivee !== null && p.ordre_arrivee !== '' && p.ordre_arrivee !== undefined) || !!p.specialStatus;
   if (!slots.every((s) => aResultat(s.participant))) return null;
 
-  const tries = [...slots].sort((a, b) => {
-    const pa = a.participant, pb = b.participant;
-    return (STATUS_ORDER[pa.specialStatus] || 0) - (STATUS_ORDER[pb.specialStatus] || 0)
-      || penaltyScore(pa.penalite) - penaltyScore(pb.penalite)
-      || (parseInt(pa.ordre_arrivee, 10) || Infinity) - (parseInt(pb.ordre_arrivee, 10) || Infinity)
-      || a.prioDepart - b.prioDepart;
-  });
-  return tries.map((s, i) => ({ slot: s, rank: String(i + 1) }));
+  return [...slots].sort(ordreKx).map((s, i) => ({ slot: s, rank: String(i + 1) }));
+}
+
+/**
+ * L'ordre du classement kayak-cross entre deux couloirs : le statut, les
+ * pénalités (RAL, puis FLT, puis leur position), la place d'arrivée, le
+ * couloir. Un bateau pas encore arrivé passe après les arrivés à pénalités
+ * égales : pendant la série, c'est le classement « au mieux » de l'instant.
+ */
+function ordreKx(a, b) {
+  const pa = a.participant, pb = b.participant;
+  return (STATUS_ORDER[pa.specialStatus] || 0) - (STATUS_ORDER[pb.specialStatus] || 0)
+    || penaltyScore(pa.penalite) - penaltyScore(pb.penalite)
+    || (parseInt(pa.ordre_arrivee, 10) || Infinity) - (parseInt(pb.ordre_arrivee, 10) || Infinity)
+    || a.prioDepart - b.prioDepart;
 }
 
 /** La charge utile d'un mode pour une série, comme pushToOBS. */
@@ -142,8 +157,9 @@ function payloadFor(mode, heat, provisoire = null) {
   const list = provisoire ? provisoire.map((e) => e.slot)
     : mode === 'RESULTS'
     ? [...slots].sort((a, b) => (parseInt(a.participant.finalRank) || 999) - (parseInt(b.participant.finalRank) || 999))
-    : [...slots].sort((a, b) => (parseInt(a.participant.ordre_arrivee) || 99) - (parseInt(b.participant.ordre_arrivee) || 99)
-                                || a.prioDepart - b.prioDepart);
+    // En course : l'ordre du classement à l'instant, d'après les pénalités
+    // déjà jugées. Pas de rang : il n'est pas encore acquis.
+    : [...slots].sort(ordreKx);
 
   for (const s of list) {
     const p = s.participant;
@@ -201,20 +217,25 @@ function decide(heats) {
   // Plus rien à courir : la dernière série reste en provisoire jusqu'à la validation.
   if (!next) return provisoire ? payloadFor('RESULTS', aValider, provisoire) : null;
 
+  const bracket = {
+    mode: 'BRACKET',
+    title: `${next.categoryKey} | Tableau`,
+    categoryKey: next.categoryKey,
+    heatId: next.id,
+    slots: [],
+    styleSheet: STYLE,
+  };
+
+  // Rien de couru encore : l'arbre jusqu'à rampe_avant s du premier départ.
+  if (!lastDone && !aValider && DEPART_MS && now < DEPART_MS - RAMPE_AVANT_MS && hasBracket(next, heats))
+    return bracket;
+
   // Le tableau d'abord, juste après les résultats de la série précédente (et
   // après le titre de la régie si l'on change de bloc).
   const newBlock = lastDone && (lastDone.categoryKey !== next.categoryKey || lastDone.roundKey !== next.roundKey);
   const since = lastDone ? now - (lastDone.lastModified + HOLD_MS + (newBlock ? TITLE_MS : 0)) : Infinity;
-  if (BRACKET_MS > 0 && since < BRACKET_MS && (since >= 0 || !newBlock) && hasBracket(next, heats)) {
-    return {
-      mode: 'BRACKET',
-      title: `${next.categoryKey} | Tableau`,
-      categoryKey: next.categoryKey,
-      heatId: next.id,
-      slots: [],
-      styleSheet: STYLE,
-    };
-  }
+  if (BRACKET_MS > 0 && since < BRACKET_MS && (since >= 0 || !newBlock) && hasBracket(next, heats))
+    return bracket;
   return payloadFor('START_RAMP', next);
 }
 

@@ -120,6 +120,13 @@ html, body
 	padding-bottom: 1px;
 	background: var(--bande);
 	background-clip: content-box;
+
+	/* Reclassement : la ligne de chaque couloir glisse vers sa place (posée
+	   par dalle.js en translateY, multiple entier de --u25 : pile sur les
+	   pixels de la dalle une fois arrivée). */
+	position: relative;
+	transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+	will-change: transform;
 }
 
 /* Chacun dans sa colonne, même quand une case est vide. */
@@ -167,9 +174,9 @@ html, body
 }
 
 /*
- * Les zones du parcours, une case chacune : sombre tant qu'elle n'est pas
- * jugée, verte sans pénalité, jaune FLT, rouge RAL avec la zone écrite dedans
- * (S départ, numéro de porte, R esquimautage).
+ * Les zones du parcours, une case chacune, comme les portes de tv_duo_kx :
+ * sombre tant qu'elle n'est pas jugée, verte sans pénalité, « F » sur jaune
+ * pour une FLT, « R » sur rouge pour un RAL.
  */
 .kx-pena
 {

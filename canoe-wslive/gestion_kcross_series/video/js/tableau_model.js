@@ -92,6 +92,53 @@ export function isBracket(variante, formatDef) {
 
 const ordinal = (n) => (n === 1 ? '1er' : `${n}e`);
 
+// js/constants.js, statusOrder : sans statut d'abord, puis DNF, DSQ, DNS, DQB.
+const STATUS_ORDER = { DNF: 1, DSQ: 2, DNS: 3, DQB: 4 };
+
+/** js/engine.js, PenaltyEncoder.encode : le nombre de RAL, puis de FLT, puis leur position. */
+function penaltyScore(penaltyString) {
+  if (!penaltyString || [...penaltyString].every((c) => c === '0')) return 0;
+  const n = penaltyString.length;
+  let ralCount = 0, fltCount = 0, ralMask = 0, fltMask = 0;
+  for (let i = 0; i < n; i++) {
+    const pos = n - 1 - i;
+    if (penaltyString[i] === '5') { ralCount++; ralMask |= (1 << pos); }
+    else if (penaltyString[i] === '2') { fltCount++; fltMask |= (1 << pos); }
+  }
+  return (ralCount << 28) | (fltCount << 24) | (ralMask << 12) | fltMask;
+}
+
+/**
+ * Les rangs d'une série, par couloir (prioDepart -> rang), et s'ils sont
+ * provisoires. Validée : les rangs officiels. À valider ou en modification,
+ * dès que chaque bateau a une place d'arrivée ou un statut : le classement
+ * provisoire, mêmes règles que le moteur (statut, pénalités — RAL, puis FLT,
+ * puis leur position —, place d'arrivée, couloir), comme le pilote de
+ * l'incrustation. Sinon null : pas encore de résultat.
+ */
+function rangsDe(heat) {
+  if (!heat) return null;
+  const slots = heat.slots.filter((s) => s.participant && s.participant.id);
+  if (heat.etat === 5) {
+    return {
+      provisoire: false,
+      rang: new Map(slots.map((s) => [s.prioDepart, parseInt(s.participant.finalRank, 10)])
+        .filter(([, r]) => Number.isFinite(r))),
+    };
+  }
+  if (heat.etat !== 4 && heat.etat !== 6) return null;
+  const aResultat = (p) => (p.ordre_arrivee !== null && p.ordre_arrivee !== '' && p.ordre_arrivee !== undefined) || !!p.specialStatus;
+  if (slots.length === 0 || !slots.every((s) => aResultat(s.participant))) return null;
+  const tries = [...slots].sort((a, b) => {
+    const pa = a.participant, pb = b.participant;
+    return (STATUS_ORDER[pa.specialStatus] || 0) - (STATUS_ORDER[pb.specialStatus] || 0)
+      || penaltyScore(pa.penalite) - penaltyScore(pb.penalite)
+      || (parseInt(pa.ordre_arrivee, 10) || Infinity) - (parseInt(pb.ordre_arrivee, 10) || Infinity)
+      || a.prioDepart - b.prioDepart;
+  });
+  return { provisoire: true, rang: new Map(tries.map((s, i) => [s.prioDepart, i + 1])) };
+}
+
 /**
  * Construit le tableau d'une catégorie.
  *   heats      séries de la catégorie (format api_get_next_heats, club=true)
@@ -150,24 +197,29 @@ export function buildBracket({ heats, formats, highlight = null }) {
       const heat = heats.find((h) => h.roundKey === phase.cle && h.name === name) || null;
       const isFinal = pi === phases.length - 1;
       const qualifies = isFinal ? 0 : phase.nbQualifiesParSerie || 0;
-      const official = heat && heat.etat === 5;
-      // Place encore vide dont la série source est déjà validée : on connaît le
+      // Classée : validée, ou à valider avec tous les bateaux arrivés (rangs
+      // provisoires). Elle se lit alors comme une série jouée.
+      const rangs = rangsDe(heat);
+      const official = !!rangs;
+      // Place encore vide dont la série source est classée : on connaît le
       // bateau qualifié, même si le moteur ne l'affecte qu'une fois l'autre
       // série source courue (son couloir dépend alors du time trial).
       const provisionalFor = (res) => {
         const src = res?.source;
         const srcHeat = src && heats.find((h) => h.roundKey === src.phase && h.name === src.name);
-        if (!srcHeat || srcHeat.etat !== 5) return null;
-        const q = srcHeat.slots.find((x) => parseInt(x.participant?.finalRank, 10) === src.rank);
+        const r = rangsDe(srcHeat);
+        if (!r) return null;
+        const q = srcHeat.slots.find((x) => x.participant?.id && r.rang.get(x.prioDepart) === src.rank);
         if (!q || OUT_OF_PROGRESSION.has(q.participant.specialStatus)) return null;
-        return { name: q.participant.name, club: q.participant.club || null, from: `${ordinal(src.rank)} ${src.name}` };
+        return { name: q.participant.name, club: q.participant.club || null,
+          from: `${ordinal(src.rank)} ${src.name}${r.provisoire ? ' (prov.)' : ''}` };
       };
       const slots = [];
       for (let prio = 1; prio <= 4; prio++) {
         const s = heat?.slots.find((x) => x.prioDepart === prio);
         const res = reserved.get(`${phase.cle}:${index}:${prio}`) || null;
         const p = s?.participant;
-        const rankNum = p && Number.isFinite(parseInt(p.finalRank, 10)) ? parseInt(p.finalRank, 10) : null;
+        const rankNum = p && rangs?.rang.has(prio) ? rangs.rang.get(prio) : null;
         const status = p?.specialStatus || null;
         slots.push({
           prio,
@@ -198,7 +250,10 @@ export function buildBracket({ heats, formats, highlight = null }) {
         id: heat?.id ?? null,
         startTime: heat?.startTime ? heat.startTime.slice(0, 5).replace(':', 'h') : null,
         globalHeatNumber: heat?.globalHeatNumber ?? null,
-        etat: heat?.etat ?? 1,
+        // Une série classée provisoirement compte comme jouée (5) pour le
+        // dessin : résultats, liens allumés, recentrage sur la suite.
+        etat: official ? 5 : heat?.etat ?? 1,
+        provisoire: !!rangs?.provisoire,
         next: heat ? heat.id === highlight : false,
         isFinal,
         qualifies,

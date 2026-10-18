@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>KCross - Dalle</title>
 <link rel="icon" type="image/png" sizes="64x64" href="../favicons/favicon-64x64.png">
-<link rel="stylesheet" href="css/dalle.css?v=6">
+<link rel="stylesheet" href="css/dalle.css?v=9">
 </head>
 <body>
 <!--
@@ -15,8 +15,11 @@
   ecran_tv.html.
 
     - à gauche : le tour, Dames / Hommes, la série ;
-    - une ligne par couloir : sa couleur, le nom, les zones du parcours en
-      cases (vert sans pénalité, jaune FLT, rouge RAL), ordre d'arrivée ;
+    - une ligne par couloir : sa couleur, le nom, une case par zone
+      du parcours (verte sans pénalité, F sur jaune, R sur rouge), ordre
+      d'arrivée ;
+      pendant la série, les lignes glissent dans l'ordre du classement de
+      l'instant (pénalités, puis arrivée) ;
     - à la fin : le classement de la série, qualifiés en vert, podium en
       finale ; il reste ?maintien=20 secondes, puis la série suivante.
 
@@ -24,6 +27,6 @@
   prélevée par le contrôleur NovaStar), copies=2 (rangées de dalles qui
   montrent la même chose, empilées), maintien=20.
 -->
-<script type="module" src="js/dalle.js?v=7"></script>
+<script type="module" src="js/dalle.js?v=11"></script>
 </body>
 </html>

@@ -16,8 +16,11 @@ const fixedCategory = params.get('categorie');
 // la finale au centre.
 const layoutParam = params.get('disposition');
 // À l'antenne, seulement la branche de la course qui part (gros caractères,
-// lisibles sur YouTube). ?vue=complet pour l'arbre entier.
-const fullView = params.get('vue') === 'complet';
+// lisibles sur YouTube). ?vue=complet pour l'arbre à partir du premier tour
+// pas encore entièrement couru (les tours finis disparaissent, le reste grossit) ;
+// ?vue=entier pour l'arbre entier, du premier tour à la finale.
+const fullView = params.get('vue') === 'complet' || params.get('vue') === 'entier';
+const trimView = params.get('vue') === 'complet';
 const chooseLayout = () => (layoutParam === 'branches' ? 'branches' : 'ltr');
 const POLL_MS = 1500;
 
@@ -81,7 +84,7 @@ function target() {
 
 function render(model) {
   const board = $('board');
-  renderTree(board, model, { full: fullView, layout: chooseLayout() });
+  renderTree(board, model, { full: fullView, trim: trimView, layout: chooseLayout() });
 
   const genre = genreOf(model.categoryKey);
   if (genre) board.dataset.genre = genre;

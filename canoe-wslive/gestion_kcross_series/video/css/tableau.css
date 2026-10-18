@@ -369,6 +369,15 @@ body:has(#board.visible) { background: #000; }
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Série classée mais pas encore validée : rangs et qualifiés provisoires. */
+.tb-prov {
+    margin-left: 8px;
+    font-weight: bold;
+    color: var(--tv-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
 /* Prochaine course : seul élément appuyé du tableau. */
 .tb-heat.next .tb-heat-box {
     border: 2px solid var(--tv-gold);
