@@ -173,18 +173,36 @@ public enum RegiePlan {
             ),
         ]
 
-        // Les deux séries de caméras se suivent : d'abord toute la fenêtre 1,
-        // puis toute la fenêtre 2, dans l'ordre des caméras. C'est l'ordre des
-        // macros dans le mélangeur, donc celui des boutons dans l'app.
+        recipes += cameraRecipes(cameras: cameras, firstIndex: firstIndex + 2)
+        return recipes
+    }
+
+    /// Les macros de caméra seules, pour les deux fenêtres.
+    ///
+    /// Les deux séries se suivent : d'abord toute la fenêtre 1, puis toute la
+    /// fenêtre 2, dans l'ordre des caméras. C'est l'ordre des macros dans le
+    /// mélangeur, donc celui des boutons dans l'app.
+    ///
+    /// `firstNumber` sert à compléter un jeu déjà gravé : les caméras 6 et 7
+    /// ajoutées après coup s'appellent « Cam6 » et « Cam7 », pas « Cam1 » et
+    /// « Cam2 », et se gravent à la suite plutôt que de renuméroter les macros
+    /// existantes — ce qui décalerait les secteurs réglés dans l'app.
+    public static func cameraRecipes(
+        cameras: [UInt16],
+        firstNumber: Int = 1,
+        firstIndex: UInt16
+    ) -> [MacroRecipe] {
+        var recipes: [MacroRecipe] = []
         for window in UInt8(0)...UInt8(1) {
             for (rank, camera) in cameras.enumerated() {
-                let offset = UInt16(2 + Int(window) * cameras.count + rank)
+                let offset = UInt16(Int(window) * cameras.count + rank)
+                let number = firstNumber + rank
                 recipes.append(MacroRecipe(
                     index: firstIndex + offset,
-                    name: "F\(window + 1)-Cam\(rank + 1)",
+                    name: "F\(window + 1)-Cam\(number)",
                     details: window == 0
-                        ? "Fenetre 1 (plein ecran et haut gauche) : camera \(rank + 1)"
-                        : "Fenetre 2 (bas droite) : camera \(rank + 1)",
+                        ? "Fenetre 1 (plein ecran et haut gauche) : camera \(number)"
+                        : "Fenetre 2 (bas droite) : camera \(number)",
                     steps: [.windowSource(window: window, source: camera)]
                 ))
             }

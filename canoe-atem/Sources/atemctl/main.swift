@@ -13,6 +13,8 @@ import CanoeLiveKit
 ///   swift run atemctl atem sectors 0 1 2 3   (joue le plan, un secteur par seconde)
 ///   swift run atemctl atem cadrage duo       (pose le cadrage sans rien graver)
 ///   swift run atemctl atem grave --essai     (les 12 macros de regie, sans graver)
+///   swift run atemctl atem cameras --cameras 6,7 --numero 6 --depart 14
+///                                            (ajoute des cameras sans renumeroter)
 ///   swift run atemctl atem incrust --sonde   (ce que le melangeur retient comme couleur)
 ///   swift run atemctl canoe watch --host 127.0.0.1 --port 20000
 
@@ -112,12 +114,21 @@ func regie(action: String, on connection: AtemConnection, state: AtemState) asyn
         .split(separator: ",").compactMap { UInt16($0.trimmingCharacters(in: .whitespaces)) }
     let superSource = state.superSourceInput ?? RegiePlan.superSourceId
     let background = UInt16(argument("fond", default: "0")) ?? 0
-    let recipes = RegiePlan.recipes(
-        cameras: cameras,
-        superSource: superSource,
-        background: background,
-        firstIndex: UInt16(argument("depart", default: "0")) ?? 0
-    )
+    let firstIndex = UInt16(argument("depart", default: "0")) ?? 0
+    // « cameras » complète un jeu déjà gravé : les seules macros de caméra, à
+    // la suite des autres, sans renuméroter celles que l'app a déjà en secteurs.
+    let recipes = action == "cameras"
+        ? RegiePlan.cameraRecipes(
+            cameras: cameras,
+            firstNumber: Int(argument("numero", default: "1")) ?? 1,
+            firstIndex: firstIndex
+        )
+        : RegiePlan.recipes(
+            cameras: cameras,
+            superSource: superSource,
+            background: background,
+            firstIndex: firstIndex
+        )
 
     if state.capabilities.superSources == 0 {
         print("""
@@ -339,7 +350,7 @@ case "atem":
                         try? await Task.sleep(for: .milliseconds(800))
                     }
                 }
-                if action == "cadrage" || action == "grave" {
+                if action == "cadrage" || action == "grave" || action == "cameras" {
                     await regie(action: action, on: connection, state: state)
                 }
                 if action == "incrust" {
@@ -355,7 +366,7 @@ case "atem":
     await connection.start()
     // Graver dure plus que les 10 s par défaut : ces actions sortent d'elles-mêmes
     // une fois finies, le délai n'est là que si le mélangeur ne répond jamais.
-    let selfExiting = ["grave", "cadrage", "incrust"].contains(action)
+    let selfExiting = ["grave", "cadrage", "cameras", "incrust"].contains(action)
     try? await Task.sleep(for: .seconds(action == "list" ? 3 : selfExiting ? max(seconds, 120) : seconds))
 
 case "canoe":
@@ -395,10 +406,11 @@ default:
       atem sectors <i...>           déroule un plan de secteurs
       atem cadrage <duo|plein>      pose le cadrage, sans rien graver
       atem grave                    grave les 12 macros de régie
+      atem cameras                  grave des macros de caméra à la suite (--numero 6)
       atem incrust                  grave l'incrustation chroma d'une source
 
     options : --host h  --port p  --seconds n
-              --cameras 1,2,3,4,5  --depart 0  --fond 0  --cam1 n  --cam2 n
+              --cameras 1,2,3,4,5  --depart 0  --fond 0  --cam1 n  --cam2 n  --numero n
               --source 8  --couleur CC00CC|melangeur  --keyer 1  --emplacement n
               --echelle 10000  --sonde (lit la couleur du mélangeur, ne grave pas)
               --essai (n'envoie rien)  --force (écrase les macros occupées)

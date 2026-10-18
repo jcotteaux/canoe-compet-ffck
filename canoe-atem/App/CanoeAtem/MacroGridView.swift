@@ -7,7 +7,9 @@ struct MacroGridView: View {
     @Environment(AppModel.self) private var model
     /// Largeur minimale d'une tuile : elle doit rester frappable d'un pouce,
     /// sans viser, ce qui fixe le nombre de colonnes plutôt que l'inverse.
-    private let columns = [GridItem(.adaptive(minimum: 160), spacing: 12)]
+    /// Compacte depuis qu'il y a dix-huit macros : on veut les voir toutes
+    /// sans faire défiler.
+    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 8)]
 
     var body: some View {
         Group {
@@ -15,17 +17,33 @@ struct MacroGridView: View {
                 emptyState
             } else {
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(model.atem.usedMacros) { macro in
-                            MacroButton(macro: macro, isRunning: model.isRunning(macro)) {
-                                model.run(macro: macro)
+                    VStack(spacing: 8) {
+                        // La macro mise en avant ouvre la grille sur toute sa
+                        // largeur, et n'est pas répétée parmi les autres.
+                        if let featured {
+                            MacroButton(macro: featured, isRunning: model.isRunning(featured), isFeatured: true) {
+                                model.run(macro: featured)
+                            }
+                        }
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            ForEach(model.atem.usedMacros.filter { $0.index != featured?.index }) { macro in
+                                MacroButton(macro: macro, isRunning: model.isRunning(macro)) {
+                                    model.run(macro: macro)
+                                }
                             }
                         }
                     }
-                    .padding(16)
+                    .padding(12)
                 }
             }
         }
+    }
+
+    /// Introuvable sur le mélangeur, elle est ignorée : le réglage reste, et
+    /// elle reviendra dès que la macro existera de nouveau.
+    private var featured: AtemMacro? {
+        guard let index = model.featuredMacro else { return nil }
+        return model.atem.usedMacros.first { $0.index == index }
     }
 
     private var emptyState: some View {
@@ -51,27 +69,33 @@ struct MacroGridView: View {
 struct MacroButton: View {
     let macro: AtemMacro
     let isRunning: Bool
+    var isFeatured = false
     let action: () -> Void
 
     @State private var isPressed = false
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 3) {
                 HStack {
                     Text("\(macro.index + 1)")
-                        .font(.caption.monospacedDigit().weight(.bold))
+                        .font(.caption2.monospacedDigit().weight(.bold))
                         .foregroundStyle(Theme.textMuted)
+                    if isFeatured {
+                        Image(systemName: "star.fill")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.running)
+                    }
                     Spacer()
                     if isRunning {
                         Image(systemName: "play.fill")
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundStyle(Theme.running)
                     }
                 }
 
                 Text(macro.displayName)
-                    .font(.title3.weight(.semibold))
+                    .font(isFeatured ? .title3.weight(.bold) : .subheadline.weight(.semibold))
                     .foregroundStyle(Theme.text)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
@@ -79,18 +103,18 @@ struct MacroButton: View {
 
                 if !macro.description.isEmpty {
                     Text(macro.description)
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundStyle(Theme.textMuted)
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .multilineTextAlignment(.leading)
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
-            .padding(14)
-            .cardBackground(isRunning ? Theme.accent.opacity(0.35) : Theme.surface)
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .topLeading)
+            .padding(10)
+            .cardBackground(background)
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.corner, style: .continuous)
-                    .stroke(isRunning ? Theme.running : Theme.separator, lineWidth: isRunning ? 2 : 1)
+                    .stroke(border, lineWidth: isRunning || isFeatured ? 2 : 1)
             )
             .scaleEffect(isPressed ? 0.97 : 1)
         }
@@ -102,5 +126,15 @@ struct MacroButton: View {
                 .onChanged { _ in isPressed = true }
                 .onEnded { _ in isPressed = false }
         )
+    }
+
+    private var background: Color {
+        if isRunning { return Theme.accent.opacity(0.35) }
+        return isFeatured ? Theme.accent.opacity(0.18) : Theme.surface
+    }
+
+    private var border: Color {
+        if isRunning { return Theme.running }
+        return isFeatured ? Theme.accent : Theme.separator
     }
 }

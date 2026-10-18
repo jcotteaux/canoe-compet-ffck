@@ -41,6 +41,13 @@ final class AppModel {
     /// avant une descente, pas au milieu.
     private(set) var sectors = SectorPlan()
 
+    /// La macro qu'on veut sous la main avant toutes les autres : elle passe
+    /// en tête de grille, sur toute la largeur. Rangée en entier, -1 valant
+    /// « aucune », comme les macros des secteurs.
+    var featuredMacro: UInt16? {
+        didSet { defaults.set(featuredMacro.map(Int.init) ?? -1, forKey: Keys.featuredMacro) }
+    }
+
     // MARK: État observé
 
     private(set) var atem = AtemState()
@@ -64,6 +71,7 @@ final class AppModel {
         static let canoePort = "canoe.port"
         static let sectorCount = "sectors.count"
         static let sectorMacros = "sectors.macros"
+        static let featuredMacro = "macros.featured"
     }
 
     /// Les adresses de la régie des France Elite : l'app s'y connecte dès le
@@ -79,6 +87,9 @@ final class AppModel {
         canoeHost = canoe.isEmpty ? Self.defaultCanoeHost : canoe
         let port = defaults.integer(forKey: Keys.canoePort)
         canoePort = port > 0 ? port : Self.defaultCanoePort
+
+        let featured = defaults.object(forKey: Keys.featuredMacro) as? Int ?? -1
+        featuredMacro = featured >= 0 ? UInt16(featured) : nil
 
         // Les macros sont rangées en entiers, -1 valant « aucune » : le format
         // de liste des réglages ne connaît pas les valeurs absentes.

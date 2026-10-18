@@ -44,6 +44,19 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Picker("Macro", selection: $model.featuredMacro) {
+                        Text("Aucune").tag(UInt16?.none)
+                        ForEach(model.atem.usedMacros) { macro in
+                            Text(macro.displayName).tag(UInt16?.some(macro.index))
+                        }
+                    }
+                } header: {
+                    Text("Mise en avant")
+                } footer: {
+                    Text("La macro qu'on doit trouver sans chercher : elle passe en tête de la grille, sur toute la largeur.")
+                }
+
+                Section {
                     Picker("Secteurs utilisés", selection: sectorCount) {
                         ForEach(1...SectorPlan.maxSectors, id: \.self) { count in
                             Text("\(count)").tag(count)

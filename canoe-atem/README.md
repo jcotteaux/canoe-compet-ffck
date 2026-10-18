@@ -294,6 +294,17 @@ de `CSBP` laisse position et taille intactes, et la même macro sert en plein
 Graver écrase. `atem grave` refuse les emplacements déjà occupés et les liste ;
 `--force` passe outre, `--depart n` grave ailleurs.
 
+Des caméras ajoutées après coup se gravent **à la suite**, sans renuméroter
+les macros existantes — les secteurs réglés dans l'app pointent sur des
+emplacements, pas sur des noms :
+
+```bash
+swift run atemctl atem cameras --cameras 6,7 --numero 6 --depart 14
+```
+
+C'est ce qui a donné `F1-Cam6`, `F1-Cam7`, `F2-Cam6`, `F2-Cam7` en 14 à 17,
+derrière l'incrustation (12 et 13).
+
 ## Incruster une source
 
 Une incrustation chroma — une source posée sur le programme, une couleur rendue

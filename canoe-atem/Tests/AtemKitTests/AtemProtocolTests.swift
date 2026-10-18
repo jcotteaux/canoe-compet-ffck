@@ -195,6 +195,16 @@ func regiePlanCoversBothWindows() throws {
     #expect(recipes[11].steps == [.windowSource(window: 1, source: 5)])
 }
 
+@Test("Des caméras ajoutées après coup se gravent à la suite, sous leur numéro")
+func cameraRecipesExtendAnExistingSet() {
+    let recipes = RegiePlan.cameraRecipes(cameras: [6, 7], firstNumber: 6, firstIndex: 14)
+
+    #expect(recipes.map(\.index) == [14, 15, 16, 17])
+    #expect(recipes.map(\.name) == ["F1-Cam6", "F1-Cam7", "F2-Cam6", "F2-Cam7"])
+    #expect(recipes[0].steps == [.windowSource(window: 0, source: 6)])
+    #expect(recipes[3].steps == [.windowSource(window: 1, source: 7)])
+}
+
 @Test("Le départ décale les douze emplacements sans rien changer d'autre")
 func regiePlanShiftsWithFirstIndex() {
     let recipes = RegiePlan.recipes(cameras: [1, 2, 3], firstIndex: 10)
