@@ -7,7 +7,7 @@
 	<link rel="shortcut icon" href="./16x16_ffck.png" />
 	<link rel="icon" href="./16x16_ffck.png" />
 
-	<link href="./css/tv_palmares.css?v10" rel="stylesheet">
+	<link href="./css/tv_palmares.css?v11" rel="stylesheet">
 </head>
 
 <!--
@@ -70,6 +70,10 @@
 			<div class="texte">Résultats à venir<span class="pt">.</span><span class="pt">.</span><span class="pt">.</span></div>
 		</div>
 
+		<!-- Écran des bénévoles (catégorie "type": "merci") : confettis et
+		     ballons derrière, la rivière et sa parade de bateaux, le MERCI devant. -->
+		<div id="merci_ciel" aria-hidden="true"><div class="confettis"></div><div class="ballons"></div></div>
+
 		<div id="riviere" aria-hidden="true">
 			<div class="porte p1"><span class="fil"></span><span class="perche"></span><span class="perche"></span></div>
 			<div class="porte p2 remontee"><span class="fil"></span><span class="perche"></span><span class="perche"></span></div>
@@ -77,6 +81,12 @@
 			<div class="vague v2"></div>
 			<div class="vague v1"></div>
 		</div>
+		<div id="merci_texte">
+			<div class="mot"></div>
+			<div class="sous">à toutes celles et ceux qui ont fait ces championnats</div>
+		</div>
+		<div id="merci_gerbe" aria-hidden="true"></div>
+
 		<div id="points"></div>
 	</div>
 
@@ -88,7 +98,7 @@
 
 	<script src="./js/categories.js?v2"></script>
 	<script src="./js/regie_scenarios.js?v19"></script>
-	<script src="./js/tv_palmares.js?v15"></script>
+	<script src="./js/tv_palmares.js?v16"></script>
 
 	<script>document.addEventListener('DOMContentLoaded', function() {Init();})</script>
 </body>

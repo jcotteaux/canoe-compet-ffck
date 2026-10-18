@@ -33,6 +33,9 @@
  *                              le 3e, le 2e puis le 1er n'apparaissent qu'à l'ordre
  *                              du pilote (voir plus bas), qui choisit aussi la catégorie
  *   anim=0                     sans animation (ni entrée, ni reflets, ni paillettes)
+ *   (fichier) "type": "merci"  sur une catégorie : pas de podium mais l'écran des
+ *                              bénévoles, MERCI, ballons (une mission ou un nom par
+ *                              ligne du classement), confettis, parade de bateaux
  *   fichier                    le palmarès vient de podium/podium.json, pas de
  *                              competFFCK ; fichier=autre.json pour un autre
  *                              fichier (chemin relatif à la page)
@@ -52,6 +55,13 @@ function AppliquerEtape()
 	if (!wsMain.pilote)
 		return;
 	const e = wsMain.etape;
+	if (document.body.classList.contains('merci'))
+	{
+		if (wsMain.etapeVue !== undefined && e !== wsMain.etapeVue && e > 0)
+			MerciGerbe();
+		wsMain.etapeVue = e;
+		return;
+	}
 	document.getElementById('m3').classList.toggle('montre', e >= 1);
 	document.getElementById('m2').classList.toggle('montre', e >= 2);
 	document.getElementById('m1').classList.toggle('montre', e >= 3);
@@ -99,7 +109,7 @@ function Celebrer()
 	if (document.body.classList.contains('no-anim'))
 		return;
 	const m1 = document.getElementById('m1');
-	if (!m1 || m1.classList.contains('libre'))
+	if (!m1 || m1.classList.contains('libre') || document.body.classList.contains('merci'))
 		return;
 
 	const fete = document.createElement('div');
@@ -626,6 +636,8 @@ function Render()
 
 		const cl = code ? GetClassement(code) : [];
 		document.body.classList.toggle('vide', cl.length === 0);
+		const fc = CategorieFichier(code);
+		Merci(fc && fc.type === 'merci' ? code : '', cl);
 
 		// L'entrée se joue quand une catégorie arrive à l'écran avec ses
 		// résultats : pas pendant l'attente des données, où tout est caché.
@@ -706,6 +718,147 @@ function Render()
 		// Une erreur garde l'écran en cours plutôt que de casser.
 		console.error(e);
 	}
+}
+
+/******************** merci aux bénévoles ********************/
+
+const MERCI_COULEURS = ['#097AFF', '#E8C33A', '#E0262B', '#1FA84A', '#629BF1', '#ffffff', '#F07C1E', '#B04FD8'];
+
+function Couleur(i) { return MERCI_COULEURS[((i % MERCI_COULEURS.length) + MERCI_COULEURS.length) % MERCI_COULEURS.length]; }
+
+/**
+ * L'écran des bénévoles pour la catégorie `code` ('' : on le quitte). Monté une
+ * fois à l'arrivée ; les ballons et les bateaux partent ensuite au fil du temps.
+ */
+function Merci(code, cl)
+{
+	wsMain.merciNoms = cl.map(function(r) { return r.name; }).filter(function(n) { return n && n.indexOf('À COMPLÉTER') < 0; });
+	if (code === (wsMain.merci || ''))
+		return;
+	wsMain.merci = code;
+	document.body.classList.toggle('merci', code !== '');
+	clearInterval(wsMain.merciBallons);
+	clearInterval(wsMain.merciBateaux);
+	document.querySelectorAll('#merci_ciel .confettis, #merci_ciel .ballons, #merci_gerbe').forEach(function(z) { z.innerHTML = ''; });
+	const vieille = document.querySelector('#riviere .flotte');
+	if (vieille)
+		vieille.remove();
+	if (code === '')
+		return;
+
+	const mot = document.querySelector('#merci_texte .mot');
+	mot.innerHTML = 'MERCI!'.split('').map(function(l) { return '<span class="lettre">' + l + '</span>'; }).join('');
+	const sous = document.querySelector('#merci_texte .sous');
+	sous.style.animation = 'none';
+	void sous.offsetWidth;
+	sous.style.animation = '';
+
+	if (document.body.classList.contains('no-anim'))
+		return;
+
+	// La pluie de confettis.
+	let html = '';
+	for (let i = 0; i < 110; i++)
+	{
+		html += '<i class="confetti' + (i % 4 === 0 ? ' rond' : '') + '" style="left:' + Hasard(0, 100).toFixed(1) + '%;'
+			+ '--c:' + Couleur(i) + ';--d:' + Hasard(5, 10).toFixed(1) + 's;--del:-' + Hasard(0, 10).toFixed(1) + 's;'
+			+ '--derive:' + Math.round(Hasard(-160, 160)) + 'px;--rot:' + Math.round(Hasard(-900, 900)) + 'deg"></i>';
+	}
+	document.querySelector('#merci_ciel .confettis').innerHTML = html;
+
+	// La parade, entre les vagues.
+	const flotte = document.createElement('div');
+	flotte.className = 'flotte';
+	const riviere = document.getElementById('riviere');
+	riviere.insertBefore(flotte, riviere.querySelector('.vague.v2'));
+
+	wsMain.merciN = 0;
+	wsMain.merciB = 0;
+	for (let i = 0; i < 4; i++)
+		setTimeout(Ballon, i * 350);
+	wsMain.merciBallons = setInterval(Ballon, 1100);
+	Bateau();
+	wsMain.merciBateaux = setInterval(Bateau, 3800);
+	setTimeout(MerciGerbe, 700);
+}
+
+/** Un ballon qui monte, avec la mission (ou le nom) suivante. */
+function Ballon()
+{
+	const zone = document.querySelector('#merci_ciel .ballons');
+	const noms = wsMain.merciNoms || [];
+	if (!zone || noms.length === 0 || zone.children.length > 24)
+		return;
+	const i = wsMain.merciN++;
+	const b = document.createElement('div');
+	b.className = 'ballon';
+	const c = Couleur(i * 3 + 1);
+	b.style.left = Math.round(Hasard(40, 1600)) + 'px';
+	b.style.setProperty('--d', Hasard(10, 15).toFixed(1) + 's');
+	b.style.setProperty('--b', Hasard(1.6, 2.8).toFixed(1) + 's');
+	b.style.setProperty('--c', c);
+	if (c === '#ffffff' || c === '#E8C33A')
+		b.style.setProperty('--t', '#09006D');
+	b.innerHTML = '<div class="corps"></div>';
+	b.firstChild.textContent = noms[i % noms.length];
+	b.addEventListener('animationend', function(ev) { if (ev.target === b) b.remove(); });
+	zone.appendChild(b);
+}
+
+/** Un bateau de la parade : kayak ou canoë, à la couleur suivante, un sur trois avec sa banderole. */
+function Bateau()
+{
+	const flotte = document.querySelector('#riviere .flotte');
+	if (!flotte || flotte.children.length > 6)
+		return;
+	const i = wsMain.merciB++;
+	const canoe = i % 2 === 1;
+	const coque = Couleur(i * 5);
+	const casque = Couleur(i * 5 + 3);
+	const b = document.createElement('div');
+	b.className = 'bateau' + (canoe ? ' canoe' : '');
+	b.style.setProperty('--d', Hasard(13, 17).toFixed(1) + 's');
+	b.style.bottom = Math.round(Hasard(40, 70)) + 'px';
+	// Le pagayeur : buste, tête casquée, gilet ; la pagaie à une pale (canoë) ou deux (kayak).
+	const pagaie = canoe
+		? '<g class="pagaie"><line x1="150" y1="22" x2="196" y2="128" stroke="#5b3a1a" stroke-width="7" stroke-linecap="round"/>'
+		  + '<rect x="186" y="112" width="20" height="40" rx="8" fill="#F2C200" transform="rotate(-24 196 128)"/>'
+		  + '<rect x="140" y="14" width="22" height="8" rx="4" fill="#5b3a1a"/></g>'
+		: '<g class="pagaie"><line x1="70" y1="90" x2="230" y2="34" stroke="#333" stroke-width="7" stroke-linecap="round"/>'
+		  + '<ellipse cx="66" cy="92" rx="11" ry="24" fill="#F2C200" transform="rotate(-20 66 92)"/>'
+		  + '<ellipse cx="234" cy="32" rx="11" ry="24" fill="#F2C200" transform="rotate(-20 234 32)"/></g>';
+	b.innerHTML = '<svg viewBox="0 0 300 150">'
+		+ '<path d="M8 108 Q150 142 292 104 Q150 92 8 108 Z" fill="' + coque + '" stroke="rgba(0,0,0,0.25)" stroke-width="3"/>'
+		+ '<ellipse cx="150" cy="104" rx="30" ry="6" fill="rgba(0,0,0,0.35)"/>'
+		+ '<path d="M128 104 Q130 66 150 60 Q170 66 172 104 Z" fill="#E0262B"/>'
+		+ '<circle cx="150" cy="44" r="17" fill="#f2c9a0"/>'
+		+ '<path d="M131 42 Q150 14 169 42 Z" fill="' + casque + '"/>'
+		+ '<circle cx="156" cy="46" r="2.6" fill="#222"/>'
+		+ '<path d="M150 53 Q156 57 161 52" stroke="#222" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
+		+ pagaie + '</svg>'
+		+ (i % 3 === 0 ? '<div class="banniere">MERCI !</div>' : '');
+	b.addEventListener('animationend', function(ev) { if (ev.target === b) b.remove(); });
+	flotte.appendChild(b);
+}
+
+/** Une gerbe de confettis, des deux coins du bas. */
+function MerciGerbe()
+{
+	const zone = document.getElementById('merci_gerbe');
+	if (!zone || document.body.classList.contains('no-anim'))
+		return;
+	let html = '';
+	[[120, 1], [1800, -1]].forEach(function(coin) {
+		for (let i = 0; i < 60; i++)
+		{
+			html += '<i class="gerbe-c" style="left:' + coin[0] + 'px;top:1060px;--c:' + Couleur(i) + ';'
+				+ '--dx:' + Math.round(coin[1] * Hasard(150, 1100)) + 'px;--dy:' + Math.round(-Hasard(600, 1050)) + 'px;'
+				+ '--rot:' + Math.round(Hasard(-1080, 1080)) + 'deg;--del:' + Hasard(0, 0.35).toFixed(2) + 's"></i>';
+		}
+	});
+	zone.innerHTML = html;
+	clearTimeout(wsMain.gerbeTimer);
+	wsMain.gerbeTimer = setTimeout(function() { zone.innerHTML = ''; }, 3600);
 }
 
 /** Passe à la catégorie suivante, s'il y en a plusieurs. */

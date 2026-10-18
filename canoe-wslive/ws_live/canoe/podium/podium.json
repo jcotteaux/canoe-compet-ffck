@@ -9,7 +9,7 @@
 		"4. Podium du Championnat de France des clubs (classement combiné slalom et kayak-cross 2026 au 31/07) : trophée remis par Sébastien Chaplais, élu à la CNA Slalom",
 		"5. Podium des bénévoles"
 	],
-	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; classement de secours relevé sur competFFCK le 18/10 à 16h05, s'il ne répond pas. Coupe de France N1 : K1H, K1D, C1H saisis le 18/10 ; C1D et bénévoles : à saisir.",
+	"a_completer": "Slalom Elite et champions slalom : en direct de competFFCK (« competffck », la phase chargée — la finale le soir) ; classement de secours relevé sur competFFCK le 18/10 à 16h05, s'il ne répond pas. Coupe de France N1 : K1H, K1D, C1H saisis le 18/10 ; C1D : à saisir. Bénévoles : écran « merci » (missions en ballons, des noms peuvent s'y ajouter).",
 	"categories": [
 		{
 			"epreuve": "SLA_K1H",
@@ -353,24 +353,105 @@
 		},
 		{
 			"epreuve": "BENEVOLES",
-			"libelle": "Podium des bénévoles",
+			"libelle": "Merci aux bénévoles",
 			"titre": "Merci aux bénévoles",
 			"phase": "Championnats de France Elite — Cesson-Sévigné",
 			"classement": [
 				{
-					"nom": "À COMPLÉTER bénévole 1",
+					"nom": "Juges de porte",
 					"club": ""
 				},
 				{
-					"nom": "À COMPLÉTER bénévole 2",
+					"nom": "Chronométreurs",
 					"club": ""
 				},
 				{
-					"nom": "À COMPLÉTER bénévole 3",
+					"nom": "Juges au départ",
+					"club": ""
+				},
+				{
+					"nom": "Juges à l'arrivée",
+					"club": ""
+				},
+				{
+					"nom": "Ouvreurs",
+					"club": ""
+				},
+				{
+					"nom": "Sécurité en rivière",
+					"club": ""
+				},
+				{
+					"nom": "Secouristes",
+					"club": ""
+				},
+				{
+					"nom": "Pose des portes",
+					"club": ""
+				},
+				{
+					"nom": "Montage et démontage",
+					"club": ""
+				},
+				{
+					"nom": "Accueil",
+					"club": ""
+				},
+				{
+					"nom": "Buvette",
+					"club": ""
+				},
+				{
+					"nom": "Restauration",
+					"club": ""
+				},
+				{
+					"nom": "Parking",
+					"club": ""
+				},
+				{
+					"nom": "Secrétariat de course",
+					"club": ""
+				},
+				{
+					"nom": "Informatique",
+					"club": ""
+				},
+				{
+					"nom": "Vidéo et régie TV",
+					"club": ""
+				},
+				{
+					"nom": "Speaker",
+					"club": ""
+				},
+				{
+					"nom": "Photographes",
+					"club": ""
+				},
+				{
+					"nom": "Signaleurs",
+					"club": ""
+				},
+				{
+					"nom": "Remise des dossards",
+					"club": ""
+				},
+				{
+					"nom": "Logistique",
+					"club": ""
+				},
+				{
+					"nom": "Navettes",
+					"club": ""
+				},
+				{
+					"nom": "Et tous les autres !",
 					"club": ""
 				}
 			],
-			"section": "5. Podium des bénévoles"
+			"section": "5. Merci aux bénévoles",
+			"type": "merci"
 		}
 	]
 }

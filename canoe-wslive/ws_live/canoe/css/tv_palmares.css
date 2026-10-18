@@ -938,6 +938,255 @@ body.pilote.entre .m1 .reflet { animation-delay: 2s; }
 body.pilote.entre .m2 .reflet { animation-delay: 2.5s; }
 body.pilote.entre .m3 .reflet { animation-delay: 2.9s; }
 
+/******************** merci aux bénévoles ("type": "merci") ********************/
+
+/*
+ * Pas de podium : tout le monde. Un grand MERCI dont les lettres dansent, des
+ * ballons qui montent avec chaque mission (ou chaque nom) du fichier, une
+ * pluie de confettis, et sur la rivière une parade de bateaux qui pagaient.
+ * Chaque ordre du pilote lance une gerbe de confettis.
+ */
+#merci_ciel,
+#merci_texte,
+#merci_gerbe { display: none; }
+
+#merci_gerbe { z-index: 6; }
+
+body.merci #merci_ciel,
+body.merci #merci_texte,
+body.merci #merci_gerbe,
+body.merci #riviere { display: block; }
+body.merci #marches,
+body.merci #suite,
+body.merci #cat_masque,
+body.merci #attente,
+body.merci .porte { display: none; }
+
+#merci_ciel,
+#merci_gerbe
+{
+	position: absolute;
+	z-index: 0;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+/* ---- le MERCI ---- */
+
+#merci_texte
+{
+	position: absolute;
+	z-index: 5;
+	left: 0;
+	right: 0;
+	top: 170px;
+	text-align: center;
+}
+
+#merci_texte .mot
+{
+	font-size: 300px;
+	line-height: 1;
+	font-weight: bold;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
+}
+
+#merci_texte .lettre
+{
+	display: inline-block;
+	color: var(--c, var(--or));
+	text-shadow: 0 10px 0 rgba(0, 0, 0, 0.25), 0 0 60px rgba(255, 255, 255, 0.25);
+	transform-origin: 50% 90%;
+	animation: lettre-entre 0.9s cubic-bezier(0.2, 1.6, 0.4, 1) both, lettre-danse 1.8s ease-in-out infinite;
+}
+
+#merci_texte .lettre:nth-child(1) { --c: #097AFF; animation-delay: 0.00s, 0.9s; }
+#merci_texte .lettre:nth-child(2) { --c: #E8C33A; animation-delay: 0.12s, 1.05s; }
+#merci_texte .lettre:nth-child(3) { --c: #ffffff; animation-delay: 0.24s, 1.2s; }
+#merci_texte .lettre:nth-child(4) { --c: #E0262B; animation-delay: 0.36s, 1.35s; }
+#merci_texte .lettre:nth-child(5) { --c: #629BF1; animation-delay: 0.48s, 1.5s; }
+#merci_texte .lettre:nth-child(6) { --c: #1FA84A; animation-delay: 0.60s, 1.65s; }
+
+@keyframes lettre-entre
+{
+	from { transform: translateY(-700px) rotate(-30deg); opacity: 0; }
+	to   { transform: none; opacity: 1; }
+}
+
+@keyframes lettre-danse
+{
+	0%, 100% { transform: translateY(0) rotate(0); }
+	25%      { transform: translateY(-46px) rotate(-6deg) scale(1.06); }
+	50%      { transform: translateY(0) rotate(0); }
+	75%      { transform: translateY(-12px) rotate(4deg); }
+}
+
+#merci_texte .sous
+{
+	margin-top: 26px;
+	font-size: 58px;
+	font-weight: bold;
+	letter-spacing: 0.03em;
+	color: white;
+	text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+	animation: monte 0.8s 0.9s ease-out both;
+}
+
+/* ---- confettis ---- */
+
+.confetti
+{
+	position: absolute;
+	top: -40px;
+	width: 16px;
+	height: 26px;
+	border-radius: 3px;
+	background: var(--c);
+	animation: confetti-chute var(--d) linear infinite;
+	animation-delay: var(--del);
+}
+
+.confetti.rond { width: 18px; height: 18px; border-radius: 50%; }
+
+@keyframes confetti-chute
+{
+	from { transform: translate(0, 0) rotate(0) rotateY(0); }
+	to   { transform: translate(var(--derive), 1180px) rotate(var(--rot)) rotateY(1080deg); }
+}
+
+/* ---- ballons ---- */
+
+.ballon
+{
+	position: absolute;
+	top: 1100px;
+	animation: ballon-monte var(--d) linear forwards;
+}
+
+.ballon .corps
+{
+	position: relative;
+	padding: 26px 40px 30px;
+	border-radius: 50% 50% 46% 46% / 55% 55% 45% 45%;
+	background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.55) 0 8%, rgba(255, 255, 255, 0) 30%), var(--c);
+	color: var(--t, white);
+	font-size: 36px;
+	font-weight: bold;
+	white-space: nowrap;
+	text-align: center;
+	box-shadow: inset -10px -14px 24px rgba(0, 0, 0, 0.22), 0 10px 30px rgba(0, 0, 0, 0.3);
+	animation: ballon-balance var(--b) ease-in-out infinite alternate;
+	transform-origin: 50% 140%;
+}
+
+/* Le nœud et la ficelle. */
+.ballon .corps::before
+{
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: -10px;
+	margin-left: -9px;
+	border: 9px solid transparent;
+	border-bottom: 12px solid var(--c);
+	transform: rotate(180deg);
+}
+
+.ballon .corps::after
+{
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	width: 2px;
+	height: 150px;
+	margin-top: 10px;
+	background: rgba(255, 255, 255, 0.55);
+}
+
+@keyframes ballon-monte { to { transform: translateY(-1500px); } }
+@keyframes ballon-balance { from { transform: rotate(-7deg) translateX(-20px); } to { transform: rotate(7deg) translateX(20px); } }
+
+/* ---- la parade sur la rivière ---- */
+
+.flotte
+{
+	position: absolute;
+	inset: 0;
+}
+
+.bateau
+{
+	position: absolute;
+	bottom: 52px;
+	left: -360px;
+	width: 300px;
+	height: 150px;
+	animation: bateau-traverse var(--d) linear forwards;
+}
+
+.bateau svg
+{
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	animation: bateau-tangue 1.6s ease-in-out infinite alternate;
+}
+
+.bateau .pagaie
+{
+	transform-box: view-box;
+	transform-origin: 150px 62px;
+	animation: pagaie 0.9s ease-in-out infinite alternate;
+}
+
+.bateau.canoe .pagaie { animation-name: pagaie-c1; }
+
+.bateau .banniere
+{
+	position: absolute;
+	right: 92%;
+	top: 40px;
+	padding: 6px 16px;
+	background: #E0262B;
+	color: white;
+	font-size: 30px;
+	font-weight: bold;
+	white-space: nowrap;
+	border-radius: 4px;
+	animation: banniere 0.8s ease-in-out infinite alternate;
+	transform-origin: right center;
+}
+
+@keyframes bateau-traverse { to { transform: translateX(2300px); } }
+@keyframes bateau-tangue { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(8px) rotate(2deg); } }
+@keyframes pagaie { from { transform: rotate(-32deg); } to { transform: rotate(32deg); } }
+@keyframes pagaie-c1 { from { transform: rotate(-12deg) translateX(-10px); } to { transform: rotate(18deg) translateX(14px); } }
+@keyframes banniere { from { transform: skewY(-3deg); } to { transform: skewY(3deg); } }
+
+/* ---- la gerbe (entrée et ordres du pilote) ---- */
+
+.gerbe-c
+{
+	position: absolute;
+	width: 18px;
+	height: 28px;
+	border-radius: 3px;
+	background: var(--c);
+	animation: gerbe-c 2.8s cubic-bezier(0.15, 0.7, 0.4, 1) forwards;
+	animation-delay: var(--del);
+	opacity: 0;
+}
+
+@keyframes gerbe-c
+{
+	0%   { transform: translate(0, 0) rotate(0); opacity: 1; }
+	45%  { transform: translate(calc(var(--dx) * 0.8), var(--dy)) rotate(calc(var(--rot) * 0.5)); opacity: 1; }
+	100% { transform: translate(var(--dx), calc(var(--dy) + 900px)) rotate(var(--rot)); opacity: 0; }
+}
+
 /******************** sans animation ********************/
 
 body.no-anim *,
